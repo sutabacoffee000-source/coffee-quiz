@@ -37,7 +37,7 @@
     color:var(--ink);
     font-family:var(--font-body);
     min-height:100vh;
-    padding:32px 16px 64px;
+    padding:calc(32px + env(safe-area-inset-top)) 16px calc(64px + env(safe-area-inset-bottom));
   }
   .wrap{max-width:560px;margin:0 auto;}
   .eyebrow{
