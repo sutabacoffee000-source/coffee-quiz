@@ -85,6 +85,7 @@
     padding:26px 22px;
     box-shadow:0 14px 34px rgba(43,27,18,0.10);
   }
+  .q-topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
   .tag{
     display:inline-block;background:var(--gold-soft);color:#4A3212;
     font-size:11px;font-weight:700;letter-spacing:.05em;
@@ -249,6 +250,19 @@
   .browse-link-btn:hover{background:#e0bd82;}
   .browse-link-btn:active{transform:scale(0.99);}
   .browse-link-btn:focus-visible{outline:2px solid var(--forest);outline-offset:2px;}
+  .exam-link-btn{
+    display:flex;flex-direction:column;align-items:center;gap:3px;
+    width:100%;max-width:340px;
+    background:var(--forest);border:1.5px solid var(--forest-deep);border-radius:14px;
+    padding:13px 16px;margin-top:10px;cursor:pointer;
+    font-family:var(--font-body);color:#F6EFDD;
+    transition:background .15s ease, transform .1s ease;
+  }
+  .exam-link-btn b{font-size:14.5px;}
+  .exam-link-btn span{font-size:11px;font-weight:400;color:#CFE0DA;}
+  .exam-link-btn:hover{background:var(--forest-deep);}
+  .exam-link-btn:active{transform:scale(0.99);}
+  .exam-link-btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   .browse-note{
     margin-top:8px;font-size:12px;color:#4A3212;
     background:rgba(185,138,62,0.12);border-radius:8px;padding:8px 10px;line-height:1.6;
@@ -451,7 +465,8 @@
     {id:116,c:'misc',q:'様々な生豆をブレンドしてからローストする方法を何と呼ぶでしょう？',o:['ポストローストブレンド','ダブルローストブレンド','プレローストブレンド','ミックスロースト'],a:2},
     {id:117,c:'misc',q:'それぞれの生豆を個別にローストしてからブレンドする方法を何と呼ぶでしょう？',o:['ミックスロースト','プレローストブレンド','ポストローストブレンド','シングルロースト'],a:2},
     {id:118,c:'misc',q:'ディカフェのカフェイン除去法「ダイレクトコンタクト法」で使用される薬剤は？',o:['液体二酸化炭素','クエン酸','塩化メチレン','エタノール'],a:2},
-    {id:119,c:'misc',q:'DHO（ディカフェ ハウスブレンド）のカフェイン除去法は？',o:['酵素分解法','二酸化炭素抽出法（ナチュラル除去法）','スイスウォータープロセス','ダイレクトコンタクト法'],a:1},
+    {id:119,c:'misc',q:'DHO（ディカフェ ハウスブレンド）の現在のカフェイン除去法は？',o:['酵素分解法','二酸化炭素抽出法（ナチュラル除去法）','スイスウォータープロセス','ダイレクトコンタクト法'],a:2,hot:true,n:'2026年7月頃から、従来の二酸化炭素抽出法からスイスウォータープロセスに変更されています。'},
+    {id:502,c:'misc',q:'カフェイン除去法「スイスウォータープロセス」の特徴として正しいのは？',o:['化学薬剤を使わず、水と活性炭フィルターだけでカフェインを除去する','塩化メチレンという薬剤に生豆を浸してカフェインを除去する','水と液体二酸化炭素を高圧で使いカフェインを溶かし出す','生豆を高温で焙煎することでカフェインを飛ばす'],a:0,n:'化学薬剤不使用が特徴の除去法で、DHO（ディカフェ ハウスブレンド）にも採用されています。'},
 
     {id:120,c:'mission',q:'OUR MISSIONの一文「『最高』のコーヒー体験を届けるかけがえのない存在となり、人々の心を（　　）にするためにー」の空欄に入る言葉は？',o:['特別で贅沢なもの','便利で快適なもの','豊かで活力あるもの','穏やかで安らげるもの'],a:2,hot:true},
     {id:121,c:'mission',q:'OUR MISSIONの一文「ひとりのお客様、この一杯、そして（　　）から」の空欄に入る言葉は？',o:['ひとつの街','ひとつの物語','ひとつのチーム','ひとつのコミュニティ'],a:3,hot:true},
@@ -600,13 +615,35 @@
     {id:258,c:'core',q:'フレンチ ロースト（FRE）の風味キーワードとして正しいのは？',o:['豊かな風味とキャラメルのような甘み','大地を思わせる風味としっかりとしたコク','スモーキーさと個性的で力強い風味','ロースト感のある甘みとカラメルのような風味'],a:2},
     {id:259,c:'core',q:'FRE（フレンチ ロースト）の相性の良い風味の組み合わせとして正しいのは？',o:['ダークチョコレート、カラメル、スパイス','キャラメル、チョコレート、スパイス、ナッツ','シナモン、メープル、バター、チーズ、ハーブ','煎ったナッツ、ローストした野菜、カラメル'],a:3},
 
-    {id:260,c:'core',q:'次の地図はハワイ島を表しています。コペラニ ブレンド（KLB）に使われるコナ地区の位置として正しいのはどこでしょう？',o:['③','④','①','②'],a:2,map:'<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg"><path d="M150,40 Q220,50 240,110 Q260,160 230,210 Q200,260 140,255 Q80,250 60,190 Q40,130 70,80 Q100,45 150,40 Z" fill="#E3C089" stroke="#2B1B12" stroke-width="2"/><circle cx="75" cy="150" r="17" fill="#1C3B32"/><text x="75" y="157" text-anchor="middle" font-size="18" font-weight="700" fill="#FBF7EC">①</text><circle cx="215" cy="150" r="17" fill="#1C3B32"/><text x="215" y="157" text-anchor="middle" font-size="18" font-weight="700" fill="#FBF7EC">②</text><circle cx="150" cy="58" r="17" fill="#1C3B32"/><text x="150" y="65" text-anchor="middle" font-size="18" font-weight="700" fill="#FBF7EC">③</text><circle cx="140" cy="232" r="17" fill="#1C3B32"/><text x="140" y="239" text-anchor="middle" font-size="18" font-weight="700" fill="#FBF7EC">④</text></svg>',n:'コナ地区はハワイ島の西側（火山の風下にあたる西海岸）に位置し、コナコーヒーの産地として知られています。'}
+    {id:260,c:'core',q:'次の地図はハワイ島を表しています。コペラニ ブレンド（KLB）に使われるコナ地区の位置として正しいのはどこでしょう？',o:['③','④','①','②'],a:2,map:'<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg"><path d="M150,40 Q220,50 240,110 Q260,160 230,210 Q200,260 140,255 Q80,250 60,190 Q40,130 70,80 Q100,45 150,40 Z" fill="#E3C089" stroke="#2B1B12" stroke-width="2"/><circle cx="75" cy="150" r="17" fill="#1C3B32"/><text x="75" y="157" text-anchor="middle" font-size="18" font-weight="700" fill="#FBF7EC">①</text><circle cx="215" cy="150" r="17" fill="#1C3B32"/><text x="215" y="157" text-anchor="middle" font-size="18" font-weight="700" fill="#FBF7EC">②</text><circle cx="150" cy="58" r="17" fill="#1C3B32"/><text x="150" y="65" text-anchor="middle" font-size="18" font-weight="700" fill="#FBF7EC">③</text><circle cx="140" cy="232" r="17" fill="#1C3B32"/><text x="140" y="239" text-anchor="middle" font-size="18" font-weight="700" fill="#FBF7EC">④</text></svg>',n:'コナ地区はハワイ島の西側（火山の風下にあたる西海岸）に位置し、コナコーヒーの産地として知られています。'},
+
+    {id:503,c:'roast',q:'スターバックス1号店（1971年、シアトル）は、実際にはどのようなお店だった？',o:['カフェとして飲食を提供する店','焙煎したコーヒー豆を量り売りする専門店','コーヒー器具の販売店','紅茶専門店'],a:1,hot:true},
+    {id:504,c:'roast',q:'アメリカにおける「スペシャルティコーヒーの父」と呼ばれ、創業者たちに焙煎を教えた人物は？',o:['ハワード・シュルツ','デイブ・オルセン','アルフレッド・ピート','ゴードン・バウカー'],a:2},
+    {id:505,c:'roast',q:'世界5ヵ所にあるSTARBUCKS RESERVE ROASTERYの立ち上げメンバーが、シアトルで受けた研修期間は？',o:['3ヵ月','6ヵ月','9ヵ月','12ヵ月'],a:2},
+    {id:506,c:'roast',q:'スターバックスの生豆購買量は年間およそどれくらい？',o:['約10万トン','約35万トン','約100万トン','約5万トン'],a:1},
+    {id:507,c:'roast',q:'スターバックスが購買する生豆の量は、世界全体のコーヒー取引量のおよそ何%に及ぶ？',o:['0.5〜1%','3〜5%','10〜15%','20%以上'],a:1},
+    {id:508,c:'roast',q:'世界中でマスターロースターの称号を持つ人は何人しかいない？',o:['5人','13人','30人','50人'],a:1},
+    {id:509,c:'roast',q:'東京・中目黒のSTARBUCKS RESERVE ROASTERY TOKYOで焙煎を担当するマスターロースターは？',o:['木戸田直子さん','デイブ・オルセンさん','アンソニー・キャロルさん','ビクター・トレホスさん'],a:0},
+    {id:510,c:'roast',q:'木戸田直子さんがマスターロースターに任命されたのは何年？',o:['2019年','2021年','2024年','2026年'],a:2},
+    {id:511,c:'roast',q:'STARBUCKS RESERVE ROASTERY TOKYOで随時焙煎されている豆はおよそ何種類？',o:['約5種類','約15種類','約30種類','約50種類'],a:1},
+    {id:512,c:'roast',q:'STARBUCKS RESERVE ROASTERY TOKYOで焙煎された豆の一部は、アジア何ヵ国のSTARBUCKS RESERVEでも販売されている？',o:['3ヵ国','5ヵ国','8ヵ国','12ヵ国'],a:2},
+    {id:513,c:'roast',q:'日本のロースター育成プログラムは全何段階のプロセスで構成されている？',o:['3段階','5段階','7段階','10段階'],a:2},
+    {id:514,c:'roast',q:'ロースターとして新作の焙煎に挑戦できるレベルになるまでに必要な期間は？',o:['半年程度','1年半程度','3年程度','5年程度'],a:1},
+    {id:515,c:'roast',q:'焙煎で発生する煙を、外に排出する前に850℃の熱で焼き切るために設置されている装置の名称は？',o:['アフターバーナー','エアロプレス','デパルパー','サイフォン'],a:0},
+    {id:516,c:'roast',q:'STARBUCKS RESERVE ROASTERY TOKYOにある主力焙煎機「プロバット Neptune 500」の1回あたりの最大焙煎量は？',o:['最大60kg','最大80kg','最大120kg','最大200kg'],a:2},
+    {id:517,c:'roast',q:'Neptune 500で1回に焙煎される豆の量（60〜80kg）は、トールサイズのドリップコーヒーに換算するとおよそ何杯分に相当する？',o:['約1,000杯分','約2,000杯分','約3,300杯分','約5,000杯分'],a:2},
+    {id:518,c:'roast',q:'STARBUCKS RESERVE ROASTERY TOKYOで焙煎を担当する8人のロースターに共通する経歴として正しいのは？',o:['全員が海外での焙煎経験者','全員がもともと店舗のバリスタ経験者','全員が農学の専門家','全員がコーヒー鑑定士の資格を持つ'],a:1},
+    {id:519,c:'roast',q:'日本国内のスターバックス店舗で販売されるコーヒー豆の焙煎について、正しいのは？',o:['現在もすべてアメリカ本国で焙煎し輸入している','1996年の日本上陸以来、常に国内焙煎だった','以前はアメリカ本国で焙煎していたが、現在はほぼすべて国内で焙煎している','焙煎は行わず生豆のまま販売している'],a:2},
+    {id:520,c:'roast',q:'STARBUCKS RESERVE ROASTERY TOKYOの焙煎機で、コーヒー豆1回あたりの焙煎にかかる時間はおよそ何分？',o:['約3分','約10分','約30分','約60分'],a:1},
+    {id:521,c:'roast',q:'木戸田直子さんがロースターを志願するきっかけとなったのは、何年頃のことだった？',o:['2011年頃','2014年頃','2017年頃','2020年頃'],a:2},
+    {id:522,c:'roast',q:'木戸田直子さんは、アジアで何人しかいないマスターロースターの一人か？',o:['1人','2人','3人','5人'],a:1}
   ];
 
   var CATS = {
     hist:'歴史', basic:'コーヒーの基礎', proc:'構造・加工法', cafe:'C.A.F.E.プラクティス',
     supply:'サプライチェーン', brew:'抽出の基本', equip:'抽出器具', core:'コアコーヒー',
-    mission:'企業理念（Mission/Promise/Values）', news2026:'2026年の時事（30周年・新商品）', misc:'その他'
+    mission:'企業理念（Mission/Promise/Values）', news2026:'2026年の時事（30周年・新商品）',
+    roast:'焙煎・ロースタリー東京', misc:'その他'
   };
   var DAILY_COUNT = 15;
 
@@ -681,6 +718,7 @@
   var examStartTs = 0;
   var examTimerInterval = null;
   var EXAM_DURATION_SEC = 30*60;
+  var examQuitConfirm = false;
 
   function currentList(){ return mode==='daily' ? daily.ids : practiceIds; }
   function currentAnswers(){ return mode==='daily' ? daily.answers : practiceAnswers; }
@@ -846,14 +884,15 @@
 
   function browseLinkHtml(){
     return '<button class="browse-link-btn" id="btnBrowseAll" type="button">'+
-           '<b>📖 収録されている全問題を見る</b><span>（'+QUESTIONS.length+'問・答えつき一覧）</span></button>';
+           '<b>📖 収録されている全問題の単語帳</b><span>タップして確認（'+QUESTIONS.length+'問）</span></button>';
   }
   function bindBrowseLink(){
     var ba = document.getElementById('btnBrowseAll');
     if(ba) ba.onclick = function(){ screen='browse'; render(); };
   }
   function examLinkHtml(){
-    return '<button class="text-link-btn" id="btnExamEntry" type="button">📝 模擬試験を受ける（本番形式・50問・30分）</button>';
+    return '<button class="exam-link-btn" id="btnExamEntry" type="button">'+
+           '<b>📝 模擬試験を受ける</b><span>本番形式・50問・制限時間30分</span></button>';
   }
   function bindExamLink(){
     var eb = document.getElementById('btnExamEntry');
@@ -943,8 +982,10 @@
     var qi = qIndex;
     var q = getQ(list[qi]);
     var html = '';
+    html += '<div class="q-topbar"><div>';
     html += '<span class="tag">'+esc(CATS[q.c])+'</span>';
     if(q.hot){ html += '<span class="tag hot">🔥 出題頻度高め！</span>'; }
+    html += '</div><button class="text-link-btn" id="btnQuitToHome" type="button">ホーム画面に戻る</button></div>';
     html += '<div class="qnum">'+(qi+1)+' / '+list.length+' 問目'+(mode==='practice' ? '（復習ラウンド）' : '')+'</div>';
     html += '<p class="qtext">'+esc(q.q)+'</p>';
     if(q.map){ html += '<div class="question-map">'+q.map+'</div>'; }
@@ -977,6 +1018,8 @@
     return html;
   }
   function bindQuestion(){
+    var qb = document.getElementById('btnQuitToHome');
+    if(qb) qb.onclick = goHome;
     var btns = document.querySelectorAll('.choice-btn');
     btns.forEach(function(b){
       b.onclick = function(){ selectAnswer(parseInt(b.getAttribute('data-idx'),10)); };
@@ -1035,7 +1078,7 @@
   function renderBrowse(){
     var html = '<div>';
     html += '<button class="text-link-btn" id="btnBrowseBack" type="button">← ホーム画面に戻る</button>';
-    html += '<div class="big-title" style="margin-top:10px;text-align:left;">収録されている全問題（'+QUESTIONS.length+'問）</div>';
+    html += '<div class="big-title" style="margin-top:10px;text-align:left;">収録されている全問題の単語帳（'+QUESTIONS.length+'問）</div>';
     html += '<p class="desc" style="text-align:left;max-width:none;">分野をタップすると開きます。各問題は単語帳のように、タップすると答えが表示されます。🔥は出題頻度高めの問題です。</p>';
     Object.keys(CATS).forEach(function(catKey){
       var qs = QUESTIONS.filter(function(q){ return q.c===catKey; });
@@ -1077,9 +1120,19 @@
     newCorrect.sort(function(a,b){ return a-b; });
     return {q:q.q, o:newOpts, a:newCorrect, multi:true};
   }
+  var EXAM_QUOTAS = {hist:3, basic:3, proc:3, cafe:3, supply:3, brew:4, equip:4, core:4, mission:3, news2026:2, vocab:3, misc:2, roast:3};
+  function buildExamForty(){
+    var picked = [];
+    Object.keys(EXAM_QUOTAS).forEach(function(catKey){
+      var quota = EXAM_QUOTAS[catKey];
+      var poolForCat = shuffleArrayInPlace(QUESTIONS.filter(function(q){ return q.c===catKey; }));
+      picked = picked.concat(poolForCat.slice(0, quota));
+    });
+    return shuffleArrayInPlace(picked);
+  }
   function beginExam(){
-    var pool = shuffleArrayInPlace(QUESTIONS.slice());
-    var forty = pool.slice(0,40).map(function(q){
+    examQuitConfirm = false;
+    var forty = buildExamForty().map(function(q){
       return {q:q.q, o:q.o.slice(), a:q.a, multi:false};
     });
     var ten = shuffleArrayInPlace(EXAM_MULTI.slice()).map(shuffleMultiQuestion);
@@ -1133,11 +1186,21 @@
     document.getElementById('btnExamCancel').onclick = function(){ mode='daily'; screen='home'; render(); };
   }
   function renderExamQuestion(){
+    if(examQuitConfirm){
+      var hq = '<div class="center-col">';
+      hq += '<div class="big-title">試験を中断しますか？</div>';
+      hq += '<p class="desc">ここまでの回答内容は保存されず、スコアも記録されません。</p>';
+      hq += '<button class="btn" id="btnQuitYes" type="button">中断してホーム画面に戻る</button>';
+      hq += '<button class="text-link-btn" id="btnQuitNo" type="button">試験を続ける</button>';
+      hq += '</div>';
+      return hq;
+    }
     var q = examQuestions[examIndex];
     var ans = examAnswers[examIndex];
     var html = '';
     html += '<div class="exam-topbar"><span class="exam-qnum">問 '+(examIndex+1)+' / '+examQuestions.length+'</span>'+
             '<span class="exam-timer" id="examTimerDisplay">30:00</span></div>';
+    html += '<button class="text-link-btn" id="btnExamQuit" type="button" style="margin:-6px 0 14px;">試験を中断してホームに戻る</button>';
     html += '<p class="qtext">'+esc(q.q)+'</p>';
     if(q.multi){ html += '<p class="exam-hint">※正しいものをすべて選んでください（複数選択・部分点なし）</p>'; }
     html += '<div class="choices">';
@@ -1150,11 +1213,22 @@
     html += '</div>';
     html += '<div class="actions" style="justify-content:space-between;">';
     html += examIndex>0 ? '<button class="btn secondary" id="btnExamPrev" type="button">戻る</button>' : '<span></span>';
-    html += '<button class="btn" id="btnExamNext" type="button">'+(examIndex===examQuestions.length-1?'提出する':'次へ')+'</button>';
+    html += '<button class="btn" id="btnExamNext" type="button">'+(examIndex===examQuestions.length-1?'採点する':'次へ')+'</button>';
     html += '</div>';
     return html;
   }
   function bindExamQuestion(){
+    if(examQuitConfirm){
+      document.getElementById('btnQuitYes').onclick = function(){
+        examQuitConfirm = false;
+        if(examTimerInterval){ clearInterval(examTimerInterval); examTimerInterval = null; }
+        mode = 'daily'; screen = 'home'; render();
+      };
+      document.getElementById('btnQuitNo').onclick = function(){ examQuitConfirm = false; render(); };
+      return;
+    }
+    var quitBtn = document.getElementById('btnExamQuit');
+    if(quitBtn) quitBtn.onclick = function(){ examQuitConfirm = true; render(); };
     var q = examQuestions[examIndex];
     var btns = document.querySelectorAll('.choice-btn');
     btns.forEach(function(b){
