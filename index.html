@@ -85,7 +85,16 @@
     padding:26px 22px;
     box-shadow:0 14px 34px rgba(43,27,18,0.10);
   }
-  .q-topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+  .q-actions{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;}
+  .q-tags{margin-bottom:2px;}
+  .bookmark-btn{
+    background:var(--paper);border:1px solid var(--line);border-radius:999px;cursor:pointer;
+    font-size:11.5px;padding:5px 12px;color:var(--ink-soft);font-family:var(--font-body);
+    white-space:nowrap;
+  }
+  .bookmark-btn:hover{border-color:var(--gold);}
+  .bookmark-btn.active{background:rgba(28,59,50,0.10);border-color:var(--forest);color:var(--forest-deep);font-weight:700;}
+  .bookmark-btn:focus-visible{outline:2px solid var(--forest);outline-offset:2px;}
   .tag{
     display:inline-block;background:var(--gold-soft);color:#4A3212;
     font-size:11px;font-weight:700;letter-spacing:.05em;
@@ -106,6 +115,8 @@
     padding:14px;margin:0 0 20px;display:flex;justify-content:center;
   }
   .question-map svg{width:100%;max-width:280px;height:auto;display:block;}
+  .browse-map{margin:10px 0 2px;padding:10px;cursor:default;}
+  .browse-map svg{max-width:200px;}
   .choices{display:flex;flex-direction:column;gap:10px;}
   .exam-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
   .exam-qnum{font-size:13px;font-weight:700;color:var(--ink-soft);}
@@ -283,6 +294,7 @@
   .confirm-row{display:flex;gap:8px;justify-content:flex-end;align-items:center;margin-top:8px;font-size:12.5px;}
 
   .footer-note{text-align:center;color:var(--ink-soft);font-size:11.5px;margin-top:26px;line-height:1.7;}
+  .feedback-link{color:var(--forest-deep);font-weight:600;text-decoration:underline;}
 
   @media (prefers-reduced-motion: reduce){
     *{transition:none !important;}
@@ -322,7 +334,9 @@
   </div>
   <div class="stats-panel" id="statsPanel"></div>
 
-  <p class="footer-note">記録はこの端末のこのページにのみ保存されます</p>
+  <p class="footer-note">記録はこの端末のこのページにのみ保存されます<br>
+    <a href="https://forms.gle/R3p2jfv8kXh7TYnB7" target="_blank" rel="noopener" class="feedback-link">💬 ご意見・追加してほしい問題はこちらへ</a>
+  </p>
 </div>
 
 <script>
@@ -628,7 +642,52 @@
     {id:519,c:'roast',q:'日本国内のスターバックス店舗で販売されるコーヒー豆の焙煎について、正しいのは？',o:['現在もすべてアメリカ本国で焙煎し輸入している','1996年の日本上陸以来、常に国内焙煎だった','以前はアメリカ本国で焙煎していたが、現在はほぼすべて国内で焙煎している','焙煎は行わず生豆のまま販売している'],a:2},
     {id:520,c:'roast',q:'STARBUCKS RESERVE ROASTERY TOKYOの焙煎機で、コーヒー豆1回あたりの焙煎にかかる時間はおよそ何分？',o:['約3分','約10分','約30分','約60分'],a:1},
     {id:521,c:'roast',q:'木戸田直子さんがロースターを志願するきっかけとなったのは、何年頃のことだった？',o:['2011年頃','2014年頃','2017年頃','2020年頃'],a:2},
-    {id:522,c:'roast',q:'木戸田直子さんは、アジアで何人しかいないマスターロースターの一人か？',o:['1人','2人','3人','5人'],a:1}
+    {id:522,c:'roast',q:'木戸田直子さんは、アジアで何人しかいないマスターロースターの一人か？',o:['1人','2人','3人','5人'],a:1},
+
+    {id:523,c:'core',q:'次の地図はコスタリカを表しています。スターバックス初の自社農園「ハシエンダ アルサシア」があるポアス火山周辺の位置として正しいのはどこでしょう？',o:['②','①','④','③'],a:1,map:'<svg viewBox="0 0 300 220" xmlns="http://www.w3.org/2000/svg"><path d="M40,140 Q55,95 115,85 Q180,75 245,105 Q275,125 262,155 Q235,185 170,190 Q100,195 58,175 Q38,162 40,140 Z" fill="#E3C089" stroke="#2B1B12" stroke-width="2"/><circle cx="120" cy="108" r="16" fill="#1C3B32"/><text x="120" y="114" text-anchor="middle" font-size="16" font-weight="700" fill="#FBF7EC">①</text><circle cx="230" cy="130" r="16" fill="#1C3B32"/><text x="230" y="136" text-anchor="middle" font-size="16" font-weight="700" fill="#FBF7EC">②</text><circle cx="80" cy="168" r="16" fill="#1C3B32"/><text x="80" y="174" text-anchor="middle" font-size="16" font-weight="700" fill="#FBF7EC">③</text><circle cx="210" cy="168" r="16" fill="#1C3B32"/><text x="210" y="174" text-anchor="middle" font-size="16" font-weight="700" fill="#FBF7EC">④</text></svg>',n:'ハシエンダ アルサシア農園はコスタリカ・アラフエラ州のポアス火山の斜面にあり、2013年にスターバックスが購入した初の自社農園です。'},
+    {id:524,c:'core',q:'次の地図はインドネシアの主な島々を表しています。スマトラ島の位置として正しいのはどこでしょう？',o:['④','①','②','③'],a:1,map:'<svg viewBox="0 0 300 260" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="300" height="260" fill="#C9DDE0"/><path d="M40,50 Q58,80 48,130 Q42,170 58,205 Q70,182 63,140 Q68,95 80,62 Q60,48 40,50 Z" fill="#E3C089" stroke="#2B1B12" stroke-width="2"/><circle cx="56" cy="120" r="16" fill="#1C3B32"/><text x="56" y="126" text-anchor="middle" font-size="16" font-weight="700" fill="#FBF7EC">①</text><path d="M95,205 Q135,198 175,210 Q138,220 98,217 Z" fill="#E3C089" stroke="#2B1B12" stroke-width="2"/><circle cx="132" cy="210" r="16" fill="#1C3B32"/><text x="132" y="216" text-anchor="middle" font-size="16" font-weight="700" fill="#FBF7EC">②</text><path d="M140,70 Q190,58 212,100 Q218,140 182,158 Q142,152 130,112 Q128,88 140,70 Z" fill="#E3C089" stroke="#2B1B12" stroke-width="2"/><circle cx="172" cy="110" r="16" fill="#1C3B32"/><text x="172" y="116" text-anchor="middle" font-size="16" font-weight="700" fill="#FBF7EC">③</text><path d="M228,80 Q248,75 254,102 Q264,124 248,140 Q254,162 238,172 Q226,150 232,130 Q214,108 228,80 Z" fill="#E3C089" stroke="#2B1B12" stroke-width="2"/><circle cx="240" cy="122" r="16" fill="#1C3B32"/><text x="240" y="128" text-anchor="middle" font-size="16" font-weight="700" fill="#FBF7EC">④</text></svg>',n:'スマトラ島はインドネシア西部にある大きな島で、半水洗式加工の代表的な産地として知られています。'},
+    {id:525,c:'core',q:'次の地図はアフリカ大陸を表しています。ケニアの位置として正しいのはどこでしょう？',o:['①','③','②','④'],a:2,map:'<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg"><path d="M80,30 Q170,18 215,55 Q255,85 248,135 Q244,185 205,235 Q175,278 140,288 Q112,278 102,238 Q68,190 58,135 Q48,88 80,30 Z" fill="#E3C089" stroke="#2B1B12" stroke-width="2"/><circle cx="198" cy="88" r="16" fill="#1C3B32"/><text x="198" y="94" text-anchor="middle" font-size="16" font-weight="700" fill="#FBF7EC">①</text><circle cx="188" cy="135" r="16" fill="#1C3B32"/><text x="188" y="141" text-anchor="middle" font-size="16" font-weight="700" fill="#FBF7EC">②</text><circle cx="148" cy="158" r="16" fill="#1C3B32"/><text x="148" y="164" text-anchor="middle" font-size="16" font-weight="700" fill="#FBF7EC">③</text><circle cx="178" cy="182" r="16" fill="#1C3B32"/><text x="178" y="188" text-anchor="middle" font-size="16" font-weight="700" fill="#FBF7EC">④</text></svg>',n:'ケニアはエチオピアの南に位置する東アフリカの国で、グレープフルーツやベリー、カラントを思わせる風味の水洗式コーヒーで知られています。'},
+    {id:526,c:'core',q:'次の地図はアフリカ大陸を表しています。エチオピアの位置として正しいのはどこでしょう？',o:['③','④','①','②'],a:2,map:'<svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg"><path d="M80,30 Q170,18 215,55 Q255,85 248,135 Q244,185 205,235 Q175,278 140,288 Q112,278 102,238 Q68,190 58,135 Q48,88 80,30 Z" fill="#E3C089" stroke="#2B1B12" stroke-width="2"/><circle cx="198" cy="88" r="16" fill="#1C3B32"/><text x="198" y="94" text-anchor="middle" font-size="16" font-weight="700" fill="#FBF7EC">①</text><circle cx="188" cy="135" r="16" fill="#1C3B32"/><text x="188" y="141" text-anchor="middle" font-size="16" font-weight="700" fill="#FBF7EC">②</text><circle cx="148" cy="158" r="16" fill="#1C3B32"/><text x="148" y="164" text-anchor="middle" font-size="16" font-weight="700" fill="#FBF7EC">③</text><circle cx="178" cy="182" r="16" fill="#1C3B32"/><text x="178" y="188" text-anchor="middle" font-size="16" font-weight="700" fill="#FBF7EC">④</text></svg>',n:'エチオピアは「アフリカの角」と呼ばれる地域にある、アラビカ種発祥の地とされる国です。'},
+
+    {id:527,c:'equip',q:'グラスドリップコーヒーメーカーの推奨挽き具合（マルコニックグラインダー）は？',o:['3～4番','8～10番（推奨8番）','13番','ディッティング5番'],a:1,hot:true},
+    {id:528,c:'equip',q:'グラスドリップコーヒーメーカーの特徴として正しいのは？',o:['専用のオリジナルステンレスコーンフィルターを使用でき、ふたはドリッパー置きとしても使える','紙フィルターの使用はできない設計になっている','1杯分しか抽出できない小型サイズである','冷蔵庫での抽出にのみ対応している'],a:0},
+    {id:529,c:'equip',q:'グラスドリップコーヒーメーカーは、日本オリジナルと世界共通のどちらの商品でしょう？',o:['世界共通の商品である','日本オリジナルの商品である','中国限定の商品である','アメリカ限定の商品である'],a:1},
+
+    {id:530,c:'equip',q:'スターバックス ソロフィルターの推奨挽き具合（マルコニックグラインダー）は？',o:['5番','8番','10番','13番'],a:0,hot:true},
+    {id:531,c:'equip',q:'スターバックス ソロフィルターで使用するコーヒー粉とお湯の量（ホットの場合）は？',o:['10g・180ml','20g・250ml','15g・150ml','10g・90ml'],a:0,n:'アイスの場合は、コーヒー粉10gに対してお湯90mlを使用します。'},
+    {id:532,c:'equip',q:'スターバックス ソロフィルターの特徴として正しいのは？',o:['底面の細かい穴からお湯がシャワー状に流れ、コツ不要で抽出できる','ペーパーフィルターを別途購入する必要がある','2杯分を同時に抽出できる','ステンレス製で紙を使わない'],a:0},
+
+    {id:533,c:'equip',q:'オリジナル ステンレスコーンフィルターの推奨挽き具合（マルコニックグラインダー）は？',o:['5番','8～10番（推奨10番）','13番','1～2番'],a:1},
+    {id:534,c:'equip',q:'オリジナル ステンレスコーンフィルターの特徴として正しいのは？',o:['ステンレス製で紙を使わずコーヒーの風味をダイレクトに抽出できる','使い捨てのペーパーフィルターである','電動でお湯を注ぐ機能がついている','エスプレッソ専用の器具である'],a:0},
+    {id:535,c:'equip',q:'オリジナル ステンレスコーンフィルターは、どの抽出器具専用の付属品でしょう？',o:['コーヒープレス','グラスドリップコーヒーメーカー','コールドブリューストレーナー','サイフォン'],a:1},
+
+    {id:536,c:'equip',q:'コールドブリューストレーナーの推奨挽き具合（マルコニックグラインダー）は？',o:['5番','8番','10番','13番'],a:2,hot:true},
+    {id:537,c:'equip',q:'コールドブリューストレーナーで使用する分量（中挽きの粉と水）は？',o:['80g・720ml','50g・500ml','100g・1000ml','30g・300ml'],a:0},
+    {id:538,c:'equip',q:'コールドブリューストレーナーの使い方として正しいのは？',o:['家庭にあるピッチャーと組み合わせて使い、冷蔵庫で長時間抽出する','電子レンジで温めながら抽出する','エスプレッソマシンに装着して使う','熱湯を注いですぐに抽出が完了する'],a:0,n:'目安の抽出時間は冷蔵庫で約12時間です。'},
+
+    {id:539,c:'equip',q:'BALMUDA The Brew STARBUCKS RESERVE LIMITED EDITIONの説明として正しいのは？',o:['家電メーカーのバルミューダ社とスターバックスが共同開発した','スターバックス単独で開発した家庭用エスプレッソマシンである','コーヒープレス専用のアクセサリーである','電気を使わない手動式のドリッパーである'],a:0},
+    {id:540,c:'equip',q:'BALMUDA The Brewの抽出方法として正しいのは？',o:['オープンドリップ式で5回に分けて注湯される','浸漬式でコーヒー粉を一度に浸す','エスプレッソ式で高圧抽出する','水出し式で常温抽出する'],a:0},
+    {id:541,c:'equip',q:'BALMUDA The Brewのサイズ・モードの組み合わせとして正しいのは？',o:['Short/Tallのみ、Hot/Iced/Cleaningの3モード','Short/Tall/Grandeの3サイズ、Hotのみ','全サイズ対応、Icedのみ','Tallのみ、Hotのみ'],a:0},
+
+    {id:542,c:'equip',q:'次のうち、日本オリジナルの抽出器具に含まれないものはどれでしょう？',o:['グラスドリップコーヒーメーカー','スターバックス ソロフィルター','コーヒープレス','コールドブリューストレーナー'],a:2,n:'コーヒープレスは世界共通で使われている抽出器具です。'},
+
+    {id:543,c:'misc',q:'スイスウォータープロセスの工程順序として正しいのは？',o:['生豆を水に浸ける→カーボンフィルターでカフェインのみ除去→残った成分を含む水で生豆を「味付け」する','生豆を焙煎する→冷水で急冷する→乾燥させる','生豆に液体二酸化炭素を注入する→高圧で抽出する→乾燥させる','生豆を塩化メチレンに浸す→乾燥させる→焙煎する'],a:0,hot:true},
+    {id:544,c:'misc',q:'スイスウォータープロセスにおける「味付け」とは何を指すか？',o:['カフェイン以外の風味成分を含んだ水を、生豆に戻すこと','人工香料を生豆に添加すること','焙煎後にシロップをかけること','塩を加えて風味を調整すること'],a:0},
+    {id:545,c:'misc',q:'スイスウォータープロセスで、水に溶け出したカフェインだけを捕らえるために使われるフィルターは？',o:['カーボンフィルター（活性炭フィルター）','ペーパーフィルター','ステンレスフィルター','逆浸透膜フィルター'],a:0},
+
+    {id:546,c:'misc',q:'平均気温が1℃上昇すると、コーヒーの収量はおよそどれくらい低下すると言われているか？',o:['約5%','約14%','約30%','約50%'],a:1,hot:true},
+    {id:547,c:'misc',q:'コーヒーの「2050年問題」とは何を指すか？',o:['気候変動の影響により、2050年までにアラビカ種の栽培適地が半減すると危惧されている問題','2050年にコーヒーの価格が現在の半額になる問題','2050年までに世界のコーヒー消費量が半減する問題','2050年に主要生産国の人口が半減する問題'],a:0,hot:true},
+
+    {id:548,c:'misc',q:'コーヒー品種「スターマヤ」の特徴として正しいのは？',o:['種子から栽培できる、世界初のF1ハイブリッド品種である','エチオピア原産の伝統的な在来品種（エアルーム種）である','遺伝子組み換え技術で作られた品種である','ロブスタ種とアラビカ種を交配した品種である'],a:0},
+    {id:549,c:'misc',q:'スターマヤの開発に関わった機関の組み合わせとして正しいのは？',o:['フランスのCIRADとコーヒー商社のECOM','スターバックスとワールドコーヒーリサーチ','コンサベーション・インターナショナルとFSC','SCAとCQI'],a:0},
+    {id:550,c:'misc',q:'スターマヤの片方の親である「マルセレサ種」の特徴として正しいのは？',o:['さび病への耐性があり、樹高が低い（矮性）品種である','非常に樹高が高く、収穫に手間がかかる品種である','カフェインを含まない品種である','水洗式でしか加工できない品種である'],a:0},
+
+    {id:551,c:'misc',q:'「凍結蒸留ミルク（フリーズディスティレーション）」の説明として正しいのは？',o:['牛乳を凍らせ、解凍時に最初に溶け出す濃厚な部分を取り出すことで、加熱せずに濃縮する技術','牛乳を高温で煮詰めて水分を飛ばす技術','牛乳にアルコールを加えて蒸留する技術','牛乳を粉末状に加工する技術'],a:0,n:'英語ではFreeze Distilled Milk、学術的にはFreeze Concentrated Milk（凍結濃縮乳）とも呼ばれます。'},
+    {id:552,c:'misc',q:'凍結蒸留ミルクの最大の特徴として正しいのは？',o:['加熱せずに濃縮でき、コンデンスミルクのような甘みと濃厚さが得られる','冷凍することでミルクの賞味期限が半永久的になる','通常のミルクよりカロリーが大幅に高くなる','製造に大規模な工場設備が必須である'],a:0},
+
+    {id:553,c:'misc',q:'「ファインロブスタ」の説明として正しいのは？',o:['CQI認定のRグレーダーによる評価で「Fine」と判定された高品質なロブスタ種','ロブスタ種とアラビカ種を交配した新品種','スターバックスが独自に開発したロブスタ種','焙煎度がブロンドのロブスタ種のみを指す言葉'],a:0},
+    {id:554,c:'misc',q:'ファインロブスタと評価されるためのCQI評価基準のスコアの目安は？',o:['80点以上','50点以上','95点以上','60点以上'],a:0},
+    {id:555,c:'misc',q:'ファインロブスタの主な生産国として知られていないのはどこか？',o:['ベトナム','インド','インドネシア','スイス'],a:3}
   ];
 
   var CATS = {
@@ -701,7 +760,8 @@
   var screen = 'loading';  // 'loading'|'home'|'question'|'summary'
   var answeredThisQ = null; // {choice, correct}
   var pendingResetConfirm = false;
-  var pendingMode = 'all'; /* ホーム画面で選ぶ出題モード（daily未作成時のみ表示）: 'all' | 'core' */
+  var pendingMode = 'all'; /* ホーム画面で選ぶ出題モード（daily未作成時のみ表示）: 'all' | 'core' | 'bookmark' */
+  var bookmarkedIds = []; /* 苦手フラグを立てた問題IDの配列（localStorageに保存） */
 
   /* ---------------- 模擬試験モード用の状態 ---------------- */
   var examQuestions = [];   /* {q,o,a,multi} の配列 50件 */
@@ -728,7 +788,14 @@
     return q.hot ? base * 1.7 : base;
   }
   function pickSet(filterCat){
-    var pool = filterCat ? QUESTIONS.filter(function(q){ return q.c===filterCat; }) : QUESTIONS;
+    var pool;
+    if(filterCat === 'bookmark'){
+      pool = QUESTIONS.filter(function(q){ return bookmarkedIds.indexOf(q.id) !== -1; });
+    } else if(filterCat){
+      pool = QUESTIONS.filter(function(q){ return q.c===filterCat; });
+    } else {
+      pool = QUESTIONS;
+    }
     var keyed = pool.map(function(q){
       var w = weightFor(q);
       return {id:q.id, key: Math.pow(Math.random(), 1/w)};
@@ -737,11 +804,18 @@
     var n = Math.min(DAILY_COUNT, pool.length);
     return keyed.slice(0, n).map(function(x){ return x.id; });
   }
+  function isBookmarked(id){ return bookmarkedIds.indexOf(id) !== -1; }
+  function toggleBookmark(id){
+    var idx = bookmarkedIds.indexOf(id);
+    if(idx===-1){ bookmarkedIds.push(id); } else { bookmarkedIds.splice(idx,1); }
+    saveJSON('bac-bookmarks', bookmarkedIds);
+  }
 
   /* ---------------- 初期化 ---------------- */
   async function init(){
     stats = await loadJSON('bac-stats', {});
     streak = await loadJSON('bac-streak', {lastDate:null,count:0});
+    bookmarkedIds = await loadJSON('bac-bookmarks', []);
     var t = todayStr();
     daily = await loadJSON('bac-daily-'+t, null);
     /* daily が無ければモード選択画面を出すため、ここでは自動作成しない */
@@ -850,7 +924,9 @@
     var badges = document.getElementById('badges');
     var streakTxt = streak.count>0 ? ('🔥 連続 <b>'+streak.count+'</b> 日') : '🔥 今日から始めよう';
     var doneToday = daily ? daily.answers.length : 0;
-    var modeBadge = (daily && daily.categoryFilter==='core') ? '<div class="badge">☕ コーヒー豆モード</div>' : '';
+    var modeBadge = '';
+    if(daily && daily.categoryFilter==='core'){ modeBadge = '<div class="badge">☕ コーヒー豆モード</div>'; }
+    else if(daily && daily.categoryFilter==='bookmark'){ modeBadge = '<div class="badge">🔖 苦手克服モード</div>'; }
     badges.innerHTML =
       '<div class="badge">'+streakTxt+'</div>'+
       '<div class="badge">☕ 本日 <b>'+doneToday+'/'+DAILY_COUNT+'</b></div>' + modeBadge;
@@ -909,8 +985,14 @@
               '<b>🎯 通常モード</b><span>全分野からランダムに出題</span></button>';
       html += '<button class="mode-btn'+(pendingMode==='core'?' active':'')+'" data-mode="core" type="button">'+
               '<b>☕ コーヒー豆を覚える</b><span>コア豆・プロモ豆の情報だけを出題</span></button>';
+      html += '<button class="mode-btn'+(pendingMode==='bookmark'?' active':'')+'" data-mode="bookmark" type="button">'+
+              '<b>🔖 苦手な問題だけ</b><span>ブックマークした問題だけを出題（現在'+bookmarkedIds.length+'問）</span></button>';
       html += '</div>';
-      html += '<button class="btn" id="btnPrimary" type="button" style="margin-top:10px;">'+
+      if(pendingMode==='bookmark' && bookmarkedIds.length===0){
+        html += '<p class="desc" style="color:var(--clay);font-size:12px;margin-top:-4px;">まだ苦手フラグが登録されていません。問題画面右上の📑アイコンで登録できます。</p>';
+      }
+      html += '<button class="btn" id="btnPrimary" type="button" style="margin-top:10px;"'+
+              (pendingMode==='bookmark' && bookmarkedIds.length===0 ? ' disabled' : '') + '>'+
               (isFirstRound ? '今日の'+DAILY_COUNT+'問を始める' : 'このモードでもう1周する（'+DAILY_COUNT+'問）') +
               '</button>';
       if(!isFirstRound){
@@ -942,7 +1024,8 @@
         b.onclick = function(){ pendingMode = b.getAttribute('data-mode'); render(); };
       });
       document.getElementById('btnPrimary').onclick = function(){
-        var filter = pendingMode==='core' ? 'core' : null;
+        if(pendingMode==='bookmark' && bookmarkedIds.length===0){ return; }
+        var filter = (pendingMode==='core' || pendingMode==='bookmark') ? pendingMode : null;
         if(isFirstRound){
           var t = todayStr();
           daily = {date:t, ids:pickSet(filter), answers:[], completed:false, categoryFilter:filter};
@@ -974,10 +1057,15 @@
     var qi = qIndex;
     var q = getQ(list[qi]);
     var html = '';
-    html += '<div class="q-topbar"><div>';
+    var bm = isBookmarked(q.id);
+    html += '<div class="q-actions">';
+    html += '<button class="bookmark-btn'+(bm?' active':'')+'" id="btnBookmark" type="button">'+(bm?'✅ 苦手登録済み':'🔖 苦手登録')+'</button>';
+    html += '<button class="text-link-btn" id="btnQuitToHome" type="button">ホーム画面に戻る</button>';
+    html += '</div>';
+    html += '<div class="q-tags">';
     html += '<span class="tag">'+esc(CATS[q.c])+'</span>';
     if(q.hot){ html += '<span class="tag hot">🔥 出題頻度高め！</span>'; }
-    html += '</div><button class="text-link-btn" id="btnQuitToHome" type="button">ホーム画面に戻る</button></div>';
+    html += '</div>';
     html += '<div class="qnum">'+(qi+1)+' / '+list.length+' 問目'+(mode==='practice' ? '（復習ラウンド）' : '')+'</div>';
     html += '<p class="qtext">'+esc(q.q)+'</p>';
     if(q.map){ html += '<div class="question-map">'+q.map+'</div>'; }
@@ -1012,6 +1100,15 @@
   function bindQuestion(){
     var qb = document.getElementById('btnQuitToHome');
     if(qb) qb.onclick = goHome;
+    var bm = document.getElementById('btnBookmark');
+    if(bm){
+      bm.onclick = function(){
+        var list = currentList();
+        var q = getQ(list[qIndex]);
+        toggleBookmark(q.id);
+        render();
+      };
+    }
     var btns = document.querySelectorAll('.choice-btn');
     btns.forEach(function(b){
       b.onclick = function(){ selectAnswer(parseInt(b.getAttribute('data-idx'),10)); };
@@ -1080,7 +1177,9 @@
       html += '<div class="cat-qlist">';
       qs.forEach(function(q, idx){
         html += '<details class="flashcard">';
-        html += '<summary>'+(idx+1)+'. '+(q.hot?'🔥 ':'')+esc(q.q)+'</summary>';
+        html += '<summary>'+(idx+1)+'. '+(q.hot?'🔥 ':'')+esc(q.q);
+        if(q.map){ html += '<div class="question-map browse-map">'+q.map+'</div>'; }
+        html += '</summary>';
         html += '<div class="flashcard-answer">';
         html += '<div class="browse-answer">'+esc(q.o[q.a])+'</div>';
         if(q.n){ html += '<div class="browse-note">💡 '+esc(q.n)+'</div>'; }
