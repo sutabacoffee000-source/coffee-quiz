@@ -24,6 +24,7 @@
     --gold-soft:#E3C089;
     --clay:#A8492E;
     --line: rgba(43,27,18,0.14);
+    --tint-rgb:28,59,50;
     --radius:20px;
     --font-display:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic Medium","Yu Gothic",YuGothic,Meiryo,sans-serif;
     --font-body:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic Medium","Yu Gothic",YuGothic,Meiryo,sans-serif;
@@ -57,7 +58,7 @@
   }
   .update-note{
     text-align:center;font-size:11px;color:var(--ink-soft);
-    background:rgba(28,59,50,0.06);border:1px solid rgba(28,59,50,0.14);
+    background:rgba(var(--tint-rgb),0.06);border:1px solid rgba(var(--tint-rgb),0.14);
     border-radius:14px;padding:2px 14px;
     max-width:340px;margin:0 auto 22px;
   }
@@ -93,7 +94,7 @@
     white-space:nowrap;
   }
   .bookmark-btn:hover{border-color:var(--gold);}
-  .bookmark-btn.active{background:rgba(28,59,50,0.10);border-color:var(--forest);color:var(--forest-deep);font-weight:700;}
+  .bookmark-btn.active{background:rgba(var(--tint-rgb),0.10);border-color:var(--forest);color:var(--forest-deep);font-weight:700;}
   .bookmark-btn:focus-visible{outline:2px solid var(--forest);outline-offset:2px;}
   .tag{
     display:inline-block;background:var(--gold-soft);color:#4A3212;
@@ -126,12 +127,23 @@
   }
   .exam-timer.warn{color:#fff;background:var(--clay);}
   .exam-hint{font-size:12px;color:var(--ink-soft);margin:-10px 0 16px;}
-  .choice-btn.selected{background:rgba(28,59,50,0.10);border-color:var(--forest);}
+  .exam-history-box{
+    width:100%;background:var(--paper);border:1px solid var(--line);border-radius:14px;
+    padding:12px 16px;margin:14px 0 4px;text-align:left;
+  }
+  .exam-history-summary{font-size:12.5px;color:var(--ink);line-height:1.6;}
+  .exam-history-summary b{color:var(--forest-deep);}
+  .exam-history-detail{margin-top:6px;}
+  .exam-history-detail summary{cursor:pointer;font-size:11.5px;color:var(--gold);list-style:none;}
+  .exam-history-detail summary::-webkit-details-marker{display:none;}
+  .exam-history-detail ul{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:5px;}
+  .exam-history-detail li{font-size:12px;color:var(--ink-soft);}
+  .choice-btn.selected{background:rgba(var(--tint-rgb),0.10);border-color:var(--forest);}
   .choice-btn.selected .mark{border-color:var(--forest);background:var(--forest);color:#fff;}
   .mark.checkbox{border-radius:5px;}
   .choice-btn{
     text-align:left;
-    background:#fff;
+    background:var(--card);
     border:1px solid var(--line);
     border-radius:13px;
     padding:13px 16px;
@@ -150,7 +162,7 @@
     display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;
     margin-top:1px;
   }
-  .choice-btn.correct{background:rgba(28,59,50,0.10);border-color:var(--forest);}
+  .choice-btn.correct{background:rgba(var(--tint-rgb),0.10);border-color:var(--forest);}
   .choice-btn.correct .mark{border-color:var(--forest);background:var(--forest);color:#fff;}
   .choice-btn.wrong{background:rgba(168,73,46,0.10);border-color:var(--clay);}
   .choice-btn.wrong .mark{border-color:var(--clay);background:var(--clay);color:#fff;}
@@ -191,14 +203,14 @@
   .mode-btn{
     display:flex;flex-direction:column;align-items:flex-start;gap:3px;
     text-align:left;width:100%;
-    background:#fff;border:1.5px solid var(--line);border-radius:14px;
+    background:var(--card);border:1.5px solid var(--line);border-radius:14px;
     padding:13px 16px;cursor:pointer;font-family:var(--font-body);
     transition:border-color .15s ease, background .15s ease;
   }
   .mode-btn b{font-size:14.5px;color:var(--ink);}
   .mode-btn span{font-size:11.5px;color:var(--ink-soft);font-weight:400;}
   .mode-btn:hover{background:var(--paper);}
-  .mode-btn.active{border-color:var(--forest);background:rgba(28,59,50,0.07);}
+  .mode-btn.active{border-color:var(--forest);background:rgba(var(--tint-rgb),0.07);}
   .mode-btn.active b{color:var(--forest-deep);}
   .mode-btn:focus-visible{outline:2px solid var(--forest);outline-offset:2px;}
   .big-title{font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--forest-deep);}
@@ -219,9 +231,15 @@
     border-radius:16px;padding:18px 20px;display:none;
   }
   .stats-panel.open{display:block;}
+  .browse-search{
+    width:100%;box-sizing:border-box;font-family:var(--font-body);font-size:14px;
+    padding:11px 14px;border:1.5px solid var(--line);border-radius:12px;
+    background:var(--card);color:var(--ink);margin:12px 0 6px;
+  }
+  .browse-search:focus{outline:none;border-color:var(--forest);}
   .cat-accordion{
     margin-top:12px;border:1px solid var(--line);border-radius:14px;
-    background:#fff;overflow:hidden;
+    background:var(--card);overflow:hidden;
   }
   .cat-accordion summary{
     cursor:pointer;padding:13px 16px;font-weight:700;font-size:14px;
@@ -246,7 +264,7 @@
   .flashcard-answer{padding:0 0 14px;}
   .browse-answer{
     display:inline-block;font-size:13px;font-weight:700;color:var(--forest-deep);
-    background:rgba(28,59,50,0.10);border-radius:8px;padding:6px 12px;
+    background:rgba(var(--tint-rgb),0.10);border-radius:8px;padding:6px 12px;
   }
   .browse-link-btn{
     display:flex;flex-direction:column;align-items:center;gap:3px;
@@ -295,6 +313,29 @@
 
   .footer-note{text-align:center;color:var(--ink-soft);font-size:11.5px;margin-top:26px;line-height:1.7;}
   .feedback-link{color:var(--forest-deep);font-weight:600;text-decoration:underline;}
+  .onboard-overlay{
+    position:fixed;inset:0;background:rgba(28,21,15,0.72);z-index:1000;
+    display:flex;align-items:center;justify-content:center;padding:20px;
+    -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
+  }
+  .onboard-card{
+    background:var(--card);border-radius:20px;padding:26px 22px;max-width:400px;width:100%;
+    max-height:86vh;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,0.35);
+  }
+  .onboard-title{
+    font-family:var(--font-display);font-size:19px;font-weight:700;color:var(--forest-deep);
+    text-align:center;margin:0 0 8px;line-height:1.4;
+  }
+  .onboard-lead{text-align:center;color:var(--ink-soft);font-size:12.5px;margin:0 0 16px;}
+  .onboard-list{list-style:none;margin:0 0 20px;padding:0;display:flex;flex-direction:column;gap:12px;}
+  .onboard-list li{font-size:13px;line-height:1.6;color:var(--ink);}
+  .onboard-list b{color:var(--forest-deep);}
+  .reopen-guide-link{
+    display:block;text-align:center;font-size:11.5px;color:var(--ink-soft);
+    text-decoration:underline;margin:-4px 0 18px;cursor:pointer;background:none;border:none;
+    font-family:var(--font-body);width:100%;
+  }
+  #btnOnboardClose{display:block;margin:0 auto;}
 
   @media (prefers-reduced-motion: reduce){
     *{transition:none !important;}
@@ -328,6 +369,7 @@
   </div>
 
   <p class="sub">1周15問、コーヒーの必須知識をランダム出題。何周でもOK、苦手な問題ほどよく出ます。</p>
+  <button class="reopen-guide-link" id="btnShowGuide" type="button">？ このアプリの使い方を見る</button>
 
   <div class="stats-toggle">
     <button id="statsToggleBtn" type="button">📊 これまでの記録・分野別の正答率を見る</button>
@@ -337,6 +379,22 @@
   <p class="footer-note">記録はこの端末のこのページにのみ保存されます<br>
     <a href="https://forms.gle/R3p2jfv8kXh7TYnB7" target="_blank" rel="noopener" class="feedback-link">💬 ご意見・追加してほしい問題はこちらへ</a>
   </p>
+</div>
+
+<div class="onboard-overlay" id="onboardOverlay" style="display:none;">
+  <div class="onboard-card">
+    <div class="onboard-title">☕ ブラックエプロン デイリードリルへようこそ！</div>
+    <p class="onboard-lead">機能がいろいろ増えてきたので、ざっくり紹介します👇</p>
+    <ul class="onboard-list">
+      <li>🎯 <b>1周15問、何周でもOK！</b> 苦手な問題ほどよく出るようになってます</li>
+      <li>☕ <b>「コーヒー豆を覚える」モード</b>でコア豆・プロモ豆だけ集中特訓</li>
+      <li>🔖 <b>不安な問題は「苦手登録」</b>！あとで「苦手な問題だけ」モードでまとめて復習できます</li>
+      <li>📖 <b>「収録されている全問題の単語帳」</b>でいつでも一覧チェック（タップで答え表示）</li>
+      <li>📝 <b>「模擬試験を受ける」</b>で本番そっくりの50問・制限時間30分にチャレンジ</li>
+      <li>📊 <b>「これまでの記録」</b>で分野別の得意・不得意もひと目で分かります</li>
+    </ul>
+    <button class="btn" id="btnOnboardClose" type="button">はじめる！</button>
+  </div>
 </div>
 
 <script>
@@ -687,7 +745,14 @@
 
     {id:553,c:'misc',q:'「ファインロブスタ」の説明として正しいのは？',o:['CQI認定のRグレーダーによる評価で「Fine」と判定された高品質なロブスタ種','ロブスタ種とアラビカ種を交配した新品種','スターバックスが独自に開発したロブスタ種','焙煎度がブロンドのロブスタ種のみを指す言葉'],a:0},
     {id:554,c:'misc',q:'ファインロブスタと評価されるためのCQI評価基準のスコアの目安は？',o:['80点以上','50点以上','95点以上','60点以上'],a:0},
-    {id:555,c:'misc',q:'ファインロブスタの主な生産国として知られていないのはどこか？',o:['ベトナム','インド','インドネシア','スイス'],a:3}
+    {id:555,c:'misc',q:'ファインロブスタの主な生産国として知られていないのはどこか？',o:['ベトナム','インド','インドネシア','スイス'],a:3},
+
+    {id:556,c:'basic',q:'世界の人々は1年におよそ何杯のコーヒーを飲んでいると言われているか？',o:['5億杯','500億杯','5000億杯','5兆杯'],a:2,hot:true},
+    {id:557,c:'basic',q:'コーヒー栽培における「シェードツリー」とは何か？',o:['コーヒーの木に直射日光を遮る日陰を作るために植えられる背の高い樹木','コーヒーチェリーを乾燥させるための木製の棚','焙煎後のコーヒー豆を保管する木箱','コーヒーの木を支えるための添え木'],a:0,hot:true},
+    {id:558,c:'basic',q:'シェードツリーを使った栽培（シェードグロウン）の利点として正しいのは？',o:['直射日光と気温の急激な変化を和らげ、チェリーがゆっくり熟すことで風味の発達を助ける','コーヒーチェリーの収穫量を必ず2倍にする','病害虫を完全に防ぎ、農薬が一切不要になる','焙煎時間を大幅に短縮できる'],a:0},
+    {id:559,c:'basic',q:'シェードツリーがもたらす環境面でのメリットとして正しいのは？',o:['野鳥や生き物の生息地となり、土壌の浸食や乾燥を防ぐ','コーヒーの木の寿命を縮める','周辺の水源を枯渇させる','土壌の栄養分をすべて奪ってしまう'],a:0},
+
+    {id:560,c:'cafe',q:'スターバックスのサプライヤーに義務付けられている、生豆の支払いに関する証明書の提出について正しいのは？',o:['コーヒーの対価として生産者に直接支払われたことを示す「領収書」の提出も含まれる','支払い証明の提出は義務ではなく任意である','証明書には生産者の署名は不要である','支払いはすべて現金で行うことが義務付けられている'],a:0,hot:true}
   ];
 
   var CATS = {
@@ -762,6 +827,9 @@
   var pendingResetConfirm = false;
   var pendingMode = 'all'; /* ホーム画面で選ぶ出題モード（daily未作成時のみ表示）: 'all' | 'core' | 'bookmark' */
   var bookmarkedIds = []; /* 苦手フラグを立てた問題IDの配列（localStorageに保存） */
+  var browseSearchQuery = ''; /* 単語帳の検索キーワード */
+  var examHistory = []; /* 模擬試験の受験履歴 {date,score,correct,total} の配列 */
+  var examLastResult = null; /* 直近に採点したexamの結果 {correctCount,score,details} */
 
   /* ---------------- 模擬試験モード用の状態 ---------------- */
   var examQuestions = [];   /* {q,o,a,multi} の配列 50件 */
@@ -816,11 +884,27 @@
     stats = await loadJSON('bac-stats', {});
     streak = await loadJSON('bac-streak', {lastDate:null,count:0});
     bookmarkedIds = await loadJSON('bac-bookmarks', []);
+    examHistory = await loadJSON('bac-exam-history', []);
     var t = todayStr();
     daily = await loadJSON('bac-daily-'+t, null);
     /* daily が無ければモード選択画面を出すため、ここでは自動作成しない */
     screen = 'home';
     render();
+    var onboarded = await loadJSON('bac-onboarded', false);
+    var guideBtn = document.getElementById('btnShowGuide');
+    if(guideBtn) guideBtn.onclick = showOnboarding;
+    if(!onboarded){ showOnboarding(); }
+  }
+  function showOnboarding(){
+    var ov = document.getElementById('onboardOverlay');
+    if(ov) ov.style.display = 'flex';
+    var closeBtn = document.getElementById('btnOnboardClose');
+    if(closeBtn) closeBtn.onclick = closeOnboarding;
+  }
+  function closeOnboarding(){
+    var ov = document.getElementById('onboardOverlay');
+    if(ov) ov.style.display = 'none';
+    saveJSON('bac-onboarded', true);
   }
 
   /* ---------------- 回答処理 ---------------- */
@@ -1168,16 +1252,17 @@
     var html = '<div>';
     html += '<button class="text-link-btn" id="btnBrowseBack" type="button">← ホーム画面に戻る</button>';
     html += '<div class="big-title" style="margin-top:10px;text-align:left;">収録されている全問題の単語帳（'+QUESTIONS.length+'問）</div>';
-    html += '<p class="desc" style="text-align:left;max-width:none;">分野をタップすると開きます。各問題は単語帳のように、タップすると答えが表示されます。🔥は出題頻度高めの問題です。</p>';
-    Object.keys(CATS).forEach(function(catKey){
-      var qs = QUESTIONS.filter(function(q){ return q.c===catKey; });
-      if(!qs.length) return;
-      html += '<details class="cat-accordion">';
-      html += '<summary>'+esc(CATS[catKey])+'（'+qs.length+'問）</summary>';
-      html += '<div class="cat-qlist">';
-      qs.forEach(function(q, idx){
+    html += '<input type="text" id="browseSearchInput" class="browse-search" placeholder="🔍 キーワードで検索（例：カティカティ、C.A.F.E.）" value="'+esc(browseSearchQuery)+'">';
+    var q2 = browseSearchQuery.trim().toLowerCase();
+    if(q2){
+      var matches = QUESTIONS.filter(function(q){
+        return q.q.toLowerCase().indexOf(q2)!==-1 || q.o[q.a].toLowerCase().indexOf(q2)!==-1;
+      });
+      html += '<p class="desc" style="text-align:left;max-width:none;">'+matches.length+'件ヒットしました</p>';
+      html += '<div class="cat-qlist" style="padding:0;">';
+      matches.forEach(function(q, idx){
         html += '<details class="flashcard">';
-        html += '<summary>'+(idx+1)+'. '+(q.hot?'🔥 ':'')+esc(q.q);
+        html += '<summary><span class="tag" style="margin-right:6px;margin-bottom:0;">'+esc(CATS[q.c])+'</span>'+(idx+1)+'. '+(q.hot?'🔥 ':'')+esc(q.q);
         if(q.map){ html += '<div class="question-map browse-map">'+q.map+'</div>'; }
         html += '</summary>';
         html += '<div class="flashcard-answer">';
@@ -1186,13 +1271,44 @@
         html += '</div>';
         html += '</details>';
       });
-      html += '</div></details>';
-    });
+      html += '</div>';
+    } else {
+      html += '<p class="desc" style="text-align:left;max-width:none;">分野をタップすると開きます。各問題は単語帳のように、タップすると答えが表示されます。🔥は出題頻度高めの問題です。</p>';
+      Object.keys(CATS).forEach(function(catKey){
+        var qs = QUESTIONS.filter(function(q){ return q.c===catKey; });
+        if(!qs.length) return;
+        html += '<details class="cat-accordion">';
+        html += '<summary>'+esc(CATS[catKey])+'（'+qs.length+'問）</summary>';
+        html += '<div class="cat-qlist">';
+        qs.forEach(function(q, idx){
+          html += '<details class="flashcard">';
+          html += '<summary>'+(idx+1)+'. '+(q.hot?'🔥 ':'')+esc(q.q);
+          if(q.map){ html += '<div class="question-map browse-map">'+q.map+'</div>'; }
+          html += '</summary>';
+          html += '<div class="flashcard-answer">';
+          html += '<div class="browse-answer">'+esc(q.o[q.a])+'</div>';
+          if(q.n){ html += '<div class="browse-note">💡 '+esc(q.n)+'</div>'; }
+          html += '</div>';
+          html += '</details>';
+        });
+        html += '</div></details>';
+      });
+    }
     html += '</div>';
     return html;
   }
   function bindBrowse(){
     document.getElementById('btnBrowseBack').onclick = function(){ screen='home'; render(); };
+    var searchInput = document.getElementById('browseSearchInput');
+    if(searchInput){
+      searchInput.oninput = function(){
+        browseSearchQuery = searchInput.value;
+        var cursorPos = searchInput.selectionStart;
+        render();
+        var newInput = document.getElementById('browseSearchInput');
+        if(newInput){ newInput.focus(); newInput.setSelectionRange(cursorPos, cursorPos); }
+      };
+    }
   }
 
   /* ---------------- 模擬試験モード ---------------- */
@@ -1252,11 +1368,43 @@
       submitExam();
     }
   }
-  function submitExam(){
+  async function submitExam(){
     if(examTimerInterval){ clearInterval(examTimerInterval); examTimerInterval = null; }
+    var correctCount = 0;
+    var details = [];
+    examQuestions.forEach(function(q, i){
+      var ans = examAnswers[i];
+      var isCorrect;
+      if(q.multi){
+        var a = (ans ? ans.slice() : []).sort(function(x,y){ return x-y; });
+        var c = q.a.slice().sort(function(x,y){ return x-y; });
+        isCorrect = a.length===c.length && a.every(function(v,idx){ return v===c[idx]; });
+      } else {
+        isCorrect = ans===q.a;
+      }
+      if(isCorrect) correctCount++;
+      details.push({q:q, ans:ans, isCorrect:isCorrect});
+    });
+    examLastResult = {correctCount:correctCount, score:correctCount*2, details:details};
+    examHistory.push({date:todayStr(), score:examLastResult.score, correct:correctCount, total:examQuestions.length});
+    if(examHistory.length > 30){ examHistory = examHistory.slice(-30); }
+    await saveJSON('bac-exam-history', examHistory);
     mode = 'daily';
     screen = 'examResult';
     render();
+  }
+  function examHistoryBoxHtml(){
+    if(!examHistory.length) return '';
+    var best = Math.max.apply(null, examHistory.map(function(h){ return h.score; }));
+    var last = examHistory[examHistory.length-1];
+    var html = '<div class="exam-history-box">';
+    html += '<div class="exam-history-summary">これまで <b>'+examHistory.length+'回</b> 受験　自己ベスト <b>'+best+'点</b>　直近 <b>'+last.score+'点</b>（'+esc(last.date)+'）</div>';
+    html += '<details class="exam-history-detail"><summary>過去の結果を見る</summary><ul>';
+    examHistory.slice().reverse().slice(0,10).forEach(function(h){
+      html += '<li>'+esc(h.date)+'：'+h.score+'点（'+h.correct+'/'+h.total+'問正解）</li>';
+    });
+    html += '</ul></details></div>';
+    return html;
   }
   function renderExamIntro(){
     var html = '<div class="center-col">';
@@ -1267,6 +1415,7 @@
             '・制限時間30分（開始と同時にタイマーが始まります）<br>'+
             '・回答はその場で正誤を表示せず、最後にまとめて採点します<br><br>'+
             '合格ラインの目安は74点（100点満点）です。腕試しのつもりでどうぞ。</p>';
+    html += examHistoryBoxHtml();
     html += '<button class="btn" id="btnExamStart" type="button">試験を開始する</button>';
     html += '<button class="text-link-btn" id="btnExamCancel" type="button">やめてホーム画面に戻る</button>';
     html += '</div>';
@@ -1344,28 +1493,24 @@
     };
   }
   function renderExamResult(){
-    var correctCount = 0;
-    var details = [];
-    examQuestions.forEach(function(q, i){
-      var ans = examAnswers[i];
-      var isCorrect;
-      if(q.multi){
-        var a = (ans ? ans.slice() : []).sort(function(x,y){ return x-y; });
-        var c = q.a.slice().sort(function(x,y){ return x-y; });
-        isCorrect = a.length===c.length && a.every(function(v,idx){ return v===c[idx]; });
-      } else {
-        isCorrect = ans===q.a;
-      }
-      if(isCorrect) correctCount++;
-      details.push({q:q, ans:ans, isCorrect:isCorrect});
-    });
-    var score = correctCount*2;
+    var correctCount = examLastResult.correctCount;
+    var details = examLastResult.details;
+    var score = examLastResult.score;
     var pass = score>=74;
+    var prevAttempts = examHistory.slice(0, -1);
+    var bestBadge = '';
+    if(prevAttempts.length){
+      var bestPrev = Math.max.apply(null, prevAttempts.map(function(h){ return h.score; }));
+      bestBadge = score > bestPrev
+        ? '<div class="exam-history-summary">🎉 自己ベスト更新！（これまでの最高：'+bestPrev+'点）</div>'
+        : '<div class="exam-history-summary">自己ベストは '+bestPrev+'点 です。</div>';
+    }
     var html = '<div class="center-col">';
     html += '<div class="big-title">模擬試験 結果</div>';
     html += '<div class="score-big">'+score+'<span style="font-size:20px;"> / 100</span></div>';
     html += '<div class="score-sub">正解 '+correctCount+' / '+examQuestions.length+'問　'+
             (pass ? '🎉 合格ラインを突破しました！' : '合格ラインまであと'+(74-score)+'点') + '</div>';
+    html += bestBadge;
     html += '<p class="desc">合格ラインの目安（74点）と比較した参考結果です。実際の合否ラインとは異なる場合があります。</p>';
     html += '<button class="btn" id="btnExamReview" type="button">回答を見直す</button>';
     html += '<button class="text-link-btn" id="btnExamHome" type="button">ホーム画面に戻る</button>';
