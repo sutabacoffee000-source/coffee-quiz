@@ -66,6 +66,8 @@
     cursor:pointer;padding:6px 2px;list-style:none;font-weight:600;
   }
   .update-note summary::-webkit-details-marker{display:none;}
+  .update-note summary::before { content:"▶︎ "; color:var(--gold); margin-right:4px; display:inline-block; }
+  .update-note[open] summary::before { content:"▼ "; }
   .update-note ul{
     text-align:left;margin:0;padding:0 0 10px 2px;list-style:none;
     display:flex;flex-direction:column;gap:6px;
@@ -183,8 +185,9 @@
     background:var(--forest);color:#F6EFDD;
     transition:background .15s ease, opacity .15s ease;
   }
-  .btn:hover{background:var(--forest-deep);}
+  .btn:hover:not(:disabled){background:var(--forest-deep);}
   .btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .btn:disabled{opacity:0.6;cursor:default;}
   .btn.secondary{
     background:transparent;color:var(--forest-deep);
     border:1px solid var(--line);
@@ -335,7 +338,6 @@
     text-decoration:underline;margin:-4px 0 18px;cursor:pointer;background:none;border:none;
     font-family:var(--font-body);width:100%;
   }
-  #btnOnboardClose{display:block;margin:0 auto;}
 
   @media (prefers-reduced-motion: reduce){
     *{transition:none !important;}
@@ -381,19 +383,25 @@
   </p>
 </div>
 
+<!-- 2段階オンボーディング -->
 <div class="onboard-overlay" id="onboardOverlay" style="display:none;">
-  <div class="onboard-card">
-    <div class="onboard-title">☕ ブラックエプロン デイリードリルへようこそ！</div>
+  <div class="onboard-card" id="onboardStep1">
+    <div class="onboard-title">☕ BAドリルへようこそ！</div>
+    <p class="onboard-lead">毎日15問、コーヒーの必須知識をランダムに出題します。苦手な問題ほどよく出ます。</p>
+    <button class="btn" id="btnOnboardNext" type="button" style="width:100%;margin-top:10px;">次へ</button>
+  </div>
+  <div class="onboard-card" id="onboardStep2" style="display:none;">
+    <div class="onboard-title">☕ ブラックエプロン デイリードリル</div>
     <p class="onboard-lead">機能がいろいろ増えてきたので、ざっくり紹介します👇</p>
     <ul class="onboard-list">
       <li>🎯 <b>1周15問、何周でもOK！</b> 苦手な問題ほどよく出るようになってます</li>
       <li>☕ <b>「コーヒー豆を覚える」モード</b>でコア豆・プロモ豆だけ集中特訓</li>
-      <li>🔖 <b>不安な問題は「苦手登録」</b>！あとで「苦手な問題だけ」モードでまとめて復習できます</li>
-      <li>📖 <b>「収録されている全問題の単語帳」</b>でいつでも一覧チェック（タップで答え表示）</li>
+      <li>🔖 <b>不安な問題は「苦手登録」</b>！あとでまとめて復習できます</li>
+      <li>📖 <b>「収録されている全問題の単語帳」</b>でいつでも一覧チェック</li>
       <li>📝 <b>「模擬試験を受ける」</b>で本番そっくりの50問・制限時間30分にチャレンジ</li>
       <li>📊 <b>「これまでの記録」</b>で分野別の得意・不得意もひと目で分かります</li>
     </ul>
-    <button class="btn" id="btnOnboardClose" type="button">はじめる！</button>
+    <button class="btn" id="btnOnboardClose" type="button" style="width:100%;">はじめる！</button>
   </div>
 </div>
 
@@ -532,10 +540,10 @@
     {id:119,c:'misc',q:'DHO（ディカフェ ハウスブレンド）の現在のカフェイン除去法は？',o:['酵素分解法','二酸化炭素抽出法（ナチュラル除去法）','スイスウォータープロセス','ダイレクトコンタクト法'],a:2,hot:true,n:'2026年7月頃から、従来の二酸化炭素抽出法からスイスウォータープロセスに変更されています。'},
     {id:502,c:'misc',q:'カフェイン除去法「スイスウォータープロセス」の特徴として正しいのは？',o:['化学薬剤を使わず、水と活性炭フィルターだけでカフェインを除去する','塩化メチレンという薬剤に生豆を浸してカフェインを除去する','水と液体二酸化炭素を高圧で使いカフェインを溶かし出す','生豆を高温で焙煎することでカフェインを飛ばす'],a:0,n:'化学薬剤不使用が特徴の除去法で、DHO（ディカフェ ハウスブレンド）にも採用されています。'},
 
-    {id:120,c:'mission',q:'OUR MISSIONの一文「『最高』のコーヒー体験を届けるかけがえのない存在となり、人々の心を（　　）にするためにー」の空欄に入る言葉は？',o:['特別で贅沢なもの','便利で快適なもの','豊かで活力あるもの','穏やかで安らげるもの'],a:2,hot:true},
-    {id:121,c:'mission',q:'OUR MISSIONの一文「ひとりのお客様、この一杯、そして（　　）から」の空欄に入る言葉は？',o:['ひとつの街','ひとつの物語','ひとつのチーム','ひとつのコミュニティ'],a:3,hot:true},
+    {id:120,c:'mission',q:'OUR MISSIONの一文「『最高』のコーヒー体験を届けるかけがえのない存在となり、人々の心を（  ）にするためにー」の空欄に入る言葉は？',o:['特別で贅沢なもの','便利で快適なもの','豊かで活力あるもの','穏やかで安らげるもの'],a:2,hot:true},
+    {id:121,c:'mission',q:'OUR MISSIONの一文「ひとりのお客様、この一杯、そして（  ）から」の空欄に入る言葉は？',o:['ひとつの街','ひとつの物語','ひとつのチーム','ひとつのコミュニティ'],a:3,hot:true},
     {id:122,c:'mission',q:'OUR MISSIONのタイトルの下に添えられている副題は？',o:['私たちがここにいる理由','私たちの約束','私たちの行動指針','私たちがともに目指す姿'],a:0,hot:true},
-    {id:125,c:'mission',q:'OUR VALUESの前文「私たちは（　　）を大切にしながら成長し続けます」の空欄に入る言葉は？',o:['効率性','人間らしさ','独自性','伝統'],a:1,hot:true},
+    {id:125,c:'mission',q:'OUR VALUESの前文「私たちは（  ）を大切にしながら成長し続けます」の空欄に入る言葉は？',o:['効率性','人間らしさ','独自性','伝統'],a:1,hot:true},
     {id:126,c:'mission',q:'OUR PROMISEにおいて「一人ひとりの心豊かな明日を」はどの約束でしょう？',o:['OUR CUSTOMER PROMISE','OUR COMMUNITY PROMISE','OUR PARTNER PROMISE','OUR FARMER PROMISE'],a:2,hot:true},
     {id:128,c:'mission',q:'OUR PROMISEにおいて「コーヒーの未来を確かなものに」はどの約束でしょう？',o:['OUR COMMUNITY PROMISE','OUR FARMER PROMISE','OUR CUSTOMER PROMISE','OUR SHAREHOLDER PROMISE'],a:1,hot:true},
     {id:131,c:'mission',q:'OUR PROMISEにおいて「たゆみなく永きにわたる成長を」はどの約束でしょう？',o:['OUR ENVIRONMENT PROMISE','OUR SHAREHOLDER PROMISE','OUR PARTNER PROMISE','OUR COMMUNITY PROMISE'],a:1,hot:true},
@@ -773,18 +781,19 @@
   };
   var DAILY_COUNT = 15;
 
-  /* ---------------- 模擬試験専用：複数選択問題（10問・全問正解で得点） ---------------- */
+  /* ---------------- 模擬試験専用：複数選択問題（11問から10問選出・全問正解で得点） ---------------- */
   var EXAM_MULTI = [
-    {q:'次のうち、C.A.F.E.プラクティスの「社会的責任」の指標に当てはまるものをすべて選んでください。',o:['賃金と労働','気候変動','教育へのアクセス','水域の保護'],a:[0,2]},
-    {q:'次のうち、水洗式加工の特徴として正しいものをすべて選んでください。',o:['発酵の工程を経る','果肉をつけたまま乾燥させる','際立つ酸味が特徴である','半水洗式より水の使用量が少ない'],a:[0,2]},
-    {q:'次のうち、OUR VALUESの5つの言葉に含まれるものをすべて選んでください。',o:['CRAFT','INNOVATION','COURAGE','QUALITY'],a:[0,2]},
-    {q:'次のうち、ダークローストに分類されるコーヒーをすべて選んでください。',o:['SUM（スマトラ）','BRK（ブレックファーストブレンド）','VER（カフェベロナ）','HOU（ハウスブレンド）'],a:[0,2]},
-    {q:'次のうち、コーヒーチェリーの構造に含まれる層をすべて選んでください。',o:['パーチメント','シルバースキン','カスカラ','ミューシレージ'],a:[0,1,3]},
-    {q:'次のうち、ファーマーサポートセンター（FSC）が設置されている国をすべて選んでください。',o:['コスタリカ','フランス','ルワンダ','ドイツ'],a:[0,2]},
-    {q:'次のうち、おいしいコーヒーをいれるための「4つの基本」に含まれるものをすべて選んでください。',o:['分量','焙煎度','鮮度','挽き具合'],a:[0,2,3]},
-    {q:'次のうち、コーヒーの三大生産地に含まれるものをすべて選んでください。',o:['ラテンアメリカ','ヨーロッパ','アフリカ','アジア・太平洋'],a:[0,2,3]},
-    {q:'次のうち、コーヒー豆とパッケージのモチーフの組み合わせとして正しいものをすべて選んでください。',o:['グアテマラ アンティグア（GUA）―ケツァール','ライトノートブレンド（LNB）―ハチドリ','コロンビア（CLG）―コモドドラゴン','カフェ ベロナ（VER）―ロミオとジュリエット'],a:[0,1,3]},
-    {q:'次のうち、GCQ（グローバルコーヒークオリティチーム）の役割に含まれるものをすべて選んでください。',o:['生豆の全購買量の管理','レシピ管理','品質基準の策定','輸送スケジュールの手配'],a:[1,2]}
+    {q:'インドネシア・スマトラ島のコーヒー生産および風味の特徴として、正しいものをすべて選んでください。',o:['伝統的に半水洗式で加工される','ハーブや大地を思わせる風味（EARTHY）が特徴である','主にアラビカ種ではなくロブスタ種のみが栽培される','パッケージデザインにはスマトラトラの縞模様が隠されている'],a:[0,1,3]},
+    {q:'次のうち、C.A.F.E.プラクティスの「社会的責任」の指標に当てはまるものをすべて選んでください。',o:['賃金と労働','農園の生物多様性の保全','教育へのアクセス','生豆の支払いに関する証明書の提出'],a:[0,2]},
+    {q:'次のうち、水洗式加工の特徴として正しいものをすべて選んでください。',o:['発酵タンクで発酵させる工程を経る','果肉をつけたまま乾燥させる','際立つ酸味が特徴である','ハニープロセスよりも甘みが強くなる'],a:[0,2]},
+    {q:'次のうち、OUR VALUESの5つの言葉に含まれるものをすべて選んでください。',o:['CRAFT','BELONGING','RESPECT','JOY'],a:[0,1,3]},
+    {q:'次のうち、ダークローストに分類されるコーヒーをすべて選んでください。',o:['SUM（スマトラ）','EDB（パイクプレイス ロースト）','VER（カフェ ベロナ）','ITA（イタリアン ロースト）'],a:[0,2,3]},
+    {q:'次のうち、コーヒーチェリーの構造に含まれる層をすべて選んでください。',o:['パーチメント','シルバースキン','カスカラ','ミューシレージ（粘液）'],a:[0,1,3]},
+    {q:'次のうち、ファーマーサポートセンター（FSC）が設置されている国をすべて選んでください。',o:['コスタリカ','ルワンダ','中国','スイス'],a:[0,1,2]},
+    {q:'次のうち、おいしいコーヒーをいれるための「4つの基本」に含まれるものをすべて選んでください。',o:['分量','水','鮮度','抽出器具'],a:[0,1,2]},
+    {q:'次のうち、コーヒーの三大生産地に含まれるものをすべて選んでください。',o:['ラテンアメリカ','中東','アフリカ','アジア・太平洋'],a:[0,2,3]},
+    {q:'次のうち、コーヒー豆とパッケージのモチーフの組み合わせとして正しいものをすべて選んでください。',o:['グアテマラ アンティグア（GUA）―ケツァール','ライトノートブレンド（LNB）―ハチドリ','スマトラ（SUM）―コモドドラゴン','カフェ ベロナ（VER）―ロミオとジュリエット'],a:[0,1,3]},
+    {q:'次のうち、GCQ（グローバルコーヒークオリティチーム）の役割に含まれるものをすべて選んでください。',o:['世界中の生豆の購買','ブレンドレシピの作成','品質基準の策定','到着した生豆のテイスティング'],a:[1,2,3]}
   ];
 
   /* ---------------- ユーティリティ ---------------- */
@@ -842,7 +851,7 @@
   var examLastResult = null; /* 直近に採点したexamの結果 {correctCount,score,details} */
 
   /* ---------------- 模擬試験モード用の状態 ---------------- */
-  var examQuestions = [];   /* {q,o,a,multi} の配列 50件 */
+  var examQuestions = [];   /* {q,map,o,a,multi} の配列 50件 */
   var examAnswers = [];     /* 単一選択:数値 / 複数選択:配列 / 未回答:null */
   var examIndex = 0;
   var examStartTs = 0;
@@ -902,14 +911,55 @@
     render();
     var onboarded = await loadJSON('bac-onboarded', false);
     var guideBtn = document.getElementById('btnShowGuide');
-    if(guideBtn) guideBtn.onclick = showOnboarding;
-    if(!onboarded){ showOnboarding(); }
+    if(guideBtn) guideBtn.onclick = function() { showOnboarding(false); };
+    if(!onboarded){ showOnboarding(true); }
   }
-  function showOnboarding(){
+  function showOnboarding(isFirstTime){
     var ov = document.getElementById('onboardOverlay');
+    var s1 = document.getElementById('onboardStep1');
+    var s2 = document.getElementById('onboardStep2');
     if(ov) ov.style.display = 'flex';
-    var closeBtn = document.getElementById('btnOnboardClose');
-    if(closeBtn) closeBtn.onclick = closeOnboarding;
+    
+    if (isFirstTime) {
+      if(s1) s1.style.display = 'block';
+      if(s2) s2.style.display = 'none';
+      
+      var nextBtn = document.getElementById('btnOnboardNext');
+      if(nextBtn){
+        nextBtn.onclick = function(){
+          s1.style.display = 'none';
+          s2.style.display = 'block';
+          
+          var closeBtn = document.getElementById('btnOnboardClose');
+          if(closeBtn){
+            closeBtn.disabled = true;
+            closeBtn.textContent = 'はじめる！（3秒）';
+            var count = 3;
+            var timer = setInterval(function(){
+              count--;
+              if(count > 0){
+                closeBtn.textContent = 'はじめる！（' + count + '秒）';
+              } else {
+                clearInterval(timer);
+                closeBtn.disabled = false;
+                closeBtn.textContent = 'はじめる！';
+              }
+            }, 1000);
+            closeBtn.onclick = closeOnboarding;
+          }
+        };
+      }
+    } else {
+      // ヘルプボタンから開いた時は待ち時間なし
+      if(s1) s1.style.display = 'none';
+      if(s2) s2.style.display = 'block';
+      var closeBtn = document.getElementById('btnOnboardClose');
+      if(closeBtn){
+        closeBtn.disabled = false;
+        closeBtn.textContent = '閉じる';
+        closeBtn.onclick = closeOnboarding;
+      }
+    }
   }
   function closeOnboarding(){
     var ov = document.getElementById('onboardOverlay');
@@ -1072,7 +1122,7 @@
         var doneToday = daily.answers.length;
         var correctCount = daily.answers.filter(function(a){ return a.correct; }).length;
         html += '<div class="big-title">お疲れさまでした！</div>';
-        html += '<p class="desc">本日1周目：'+correctCount+'/'+doneToday+'問正解　連続記録 🔥'+streak.count+'日<br>もう1周する場合は、モードを選んでください。</p>';
+        html += '<p class="desc">本日1周目：'+correctCount+'/'+doneToday+'問正解 連続記録 🔥'+streak.count+'日<br>もう1周する場合は、モードを選んでください。</p>';
       }
       html += '<div class="mode-picker">';
       html += '<button class="mode-btn'+(pendingMode==='all'?' active':'')+'" data-mode="all" type="button">'+
@@ -1234,9 +1284,14 @@
     html += '<div class="big-title">'+(mode==='practice' ? '復習ラウンド 結果' : '本日の結果')+'</div>';
     html += '<div class="score-big">'+correctCount+' / '+total+'</div>';
     html += '<div class="score-sub">正答率 '+pct+'%</div>';
-    if(weakest && total>=4){
+    
+    if(pct === 100){
+      html += '<div style="font-size:64px;margin:10px 0;line-height:1;">💮</div>';
+      html += '<p class="desc" style="color:var(--forest-deep);font-weight:bold;">全問正解です！素晴らしい！</p>';
+    } else if(weakest && total>=4){
       html += '<p class="desc">今回とくに間違いが多かった分野は「<b>'+esc(CATS[weakest.cat])+'</b>」でした。次回はそこを重点的にチェックしましょう。</p>';
     }
+    
     if(mode==='daily'){
       html += '<p class="desc" style="margin-top:2px;">連続記録：🔥 '+streak.count+' 日</p>';
     }
@@ -1256,7 +1311,6 @@
     if(rs) rs.onclick = startRepeat;
   }
 
-  /* ---------------- 分野別スタッツ ---------------- */
   /* ---------------- 全問題ブラウズ画面 ---------------- */
   function renderBrowse(){
     var html = '<div>';
@@ -1335,7 +1389,7 @@
     var newCorrect = [];
     order.forEach(function(origIdx, newIdx){ if(q.a.indexOf(origIdx)!==-1) newCorrect.push(newIdx); });
     newCorrect.sort(function(a,b){ return a-b; });
-    return {q:q.q, o:newOpts, a:newCorrect, multi:true};
+    return {q:q.q, map:q.map, o:newOpts, a:newCorrect, multi:true};
   }
   var EXAM_QUOTAS = {hist:3, basic:3, proc:3, cafe:3, supply:3, brew:4, equip:4, core:4, mission:3, news2026:2, vocab:3, misc:2, roast:3};
   function buildExamForty(){
@@ -1350,9 +1404,9 @@
   function beginExam(){
     examQuitConfirm = false;
     var forty = buildExamForty().map(function(q){
-      return {q:q.q, o:q.o.slice(), a:q.a, multi:false};
+      return {q:q.q, map:q.map, o:q.o.slice(), a:q.a, multi:false};
     });
-    var ten = shuffleArrayInPlace(EXAM_MULTI.slice()).map(shuffleMultiQuestion);
+    var ten = shuffleArrayInPlace(EXAM_MULTI.slice()).slice(0, 10).map(shuffleMultiQuestion);
     examQuestions = forty.concat(ten);
     examAnswers = examQuestions.map(function(){ return null; });
     examIndex = 0;
@@ -1408,7 +1462,7 @@
     var best = Math.max.apply(null, examHistory.map(function(h){ return h.score; }));
     var last = examHistory[examHistory.length-1];
     var html = '<div class="exam-history-box">';
-    html += '<div class="exam-history-summary">これまで <b>'+examHistory.length+'回</b> 受験　自己ベスト <b>'+best+'点</b>　直近 <b>'+last.score+'点</b>（'+esc(last.date)+'）</div>';
+    html += '<div class="exam-history-summary">これまで <b>'+examHistory.length+'回</b> 受験 自己ベスト <b>'+best+'点</b> 直近 <b>'+last.score+'点</b>（'+esc(last.date)+'）</div>';
     html += '<details class="exam-history-detail"><summary>過去の結果を見る</summary><ul>';
     examHistory.slice().reverse().slice(0,10).forEach(function(h){
       html += '<li>'+esc(h.date)+'：'+h.score+'点（'+h.correct+'/'+h.total+'問正解）</li>';
@@ -1452,6 +1506,7 @@
             '<span class="exam-timer" id="examTimerDisplay">30:00</span></div>';
     html += '<button class="text-link-btn" id="btnExamQuit" type="button" style="margin:-6px 0 14px;">試験を中断してホームに戻る</button>';
     html += '<p class="qtext">'+esc(q.q)+'</p>';
+    if(q.map){ html += '<div class="question-map">'+q.map+'</div>'; }
     if(q.multi){ html += '<p class="exam-hint">※正しいものをすべて選んでください（複数選択・部分点なし）</p>'; }
     html += '<div class="choices">';
     q.o.forEach(function(opt, i){
@@ -1518,7 +1573,7 @@
     var html = '<div class="center-col">';
     html += '<div class="big-title">模擬試験 結果</div>';
     html += '<div class="score-big">'+score+'<span style="font-size:20px;"> / 100</span></div>';
-    html += '<div class="score-sub">正解 '+correctCount+' / '+examQuestions.length+'問　'+
+    html += '<div class="score-sub">正解 '+correctCount+' / '+examQuestions.length+'問 '+
             (pass ? '🎉 合格ラインを突破しました！' : '合格ラインまであと'+(74-score)+'点') + '</div>';
     html += bestBadge;
     html += '<p class="desc">合格ラインの目安（74点）と比較した参考結果です。実際の合否ラインとは異なる場合があります。</p>';
