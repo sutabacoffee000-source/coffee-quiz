@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ブラックエプロン・デイリードリル</title>
+<title>BAドリル</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1C3B32">
 <meta name="description" content="ブラックエプロンチャレンジ対策。毎日15問、コーヒー知識をランダム出題。">
@@ -47,27 +47,27 @@
   }
   h1{
     font-family:var(--font-display);
-    font-weight:600;
-    font-size:clamp(22px,5.5vw,30px);
+    font-weight:800;
+    font-size:clamp(32px, 8vw, 42px);
     text-align:center;margin:0 0 18px;
     color:var(--forest-deep);
     line-height:1.35;
   }
   .sub{
-    text-align:center;color:var(--ink-soft);font-size:13.5px;margin:16px 0 20px;
+    text-align:center;color:var(--ink-soft);font-size:13.5px;margin:16px 0 6px;
   }
   .update-note{
-    text-align:center;font-size:11px;color:var(--ink-soft);
+    text-align:center;font-size:11.5px;color:var(--ink-soft);
     background:rgba(var(--tint-rgb),0.06);border:1px solid rgba(var(--tint-rgb),0.14);
-    border-radius:14px;padding:2px 14px;
+    border-radius:14px;padding:6px 14px;
     max-width:340px;margin:0 auto 22px;
   }
   .update-note summary{
-    cursor:pointer;padding:6px 2px;list-style:none;font-weight:600;
+    cursor:pointer;padding:6px 2px;list-style:none;font-weight:700;color:var(--forest-deep);
   }
   .update-note summary::-webkit-details-marker{display:none;}
   .update-note ul{
-    text-align:left;margin:0;padding:0 0 10px 2px;list-style:none;
+    text-align:left;margin:0;padding:4px 0 10px 2px;list-style:none;
     display:flex;flex-direction:column;gap:6px;
   }
   .update-note li{line-height:1.5;}
@@ -112,10 +112,9 @@
     margin:0 0 20px;color:var(--ink);
   }
   .question-map{
-    background:var(--paper);border:1px solid var(--line);border-radius:14px;
-    padding:14px;margin:0 0 20px;display:flex;justify-content:center;
+    margin:0 auto 20px;display:flex;justify-content:center;
   }
-  .question-map svg{width:100%;max-width:280px;height:auto;display:block;}
+  .question-map svg{width:100%;max-width:320px;height:auto;display:block;}
   .browse-map{margin:10px 0 2px;padding:10px;cursor:default;}
   .browse-map svg{max-width:200px;}
   .choices{display:flex;flex-direction:column;gap:10px;}
@@ -220,10 +219,10 @@
   .score-sub{font-size:13px;color:var(--ink-soft);}
 
   .stats-toggle{
-    text-align:center;margin-top:18px;
+    text-align:center;margin-bottom:24px; 
   }
   .stats-panel{
-    margin-top:14px;background:var(--card);border:1px solid var(--line);
+    margin-bottom:24px;background:var(--card);border:1px solid var(--line);
     border-radius:16px;padding:18px 20px;display:none;
   }
   .stats-panel.open{display:block;}
@@ -328,7 +327,7 @@
   .onboard-list b{color:var(--forest-deep);}
   .reopen-guide-link{
     display:block;text-align:center;font-size:11.5px;color:var(--ink-soft);
-    text-decoration:underline;margin:-4px 0 18px;cursor:pointer;background:none;border:none;
+    text-decoration:underline;margin:0 0 18px;cursor:pointer;background:none;border:none;
     font-family:var(--font-body);width:100%;
   }
   #btnOnboardClose{display:block;margin:0 auto;}
@@ -341,7 +340,7 @@
     .choice-btn{padding:11px 13px;font-size:14px;}
   }
 
-  /* --- 追加：進捗円グラフと新しい記録ボタンのスタイル --- */
+  /* --- 進捗円グラフと新しい記録ボタンのスタイル --- */
   .stats-toggle button {
     display: flex; flex-direction: column; align-items: center; gap: 4px;
     width: 100%; max-width: 340px; margin: 0 auto;
@@ -377,19 +376,34 @@
   .legend-label { display: flex; align-items: center; gap: 6px; color: var(--ink); }
   .legend-dot { width: 12px; height: 12px; border-radius: 4px; }
   .legend-dot.blue { background: #3b82f6; }
+  .legend-dot.green { background: #10b981; }
   .legend-dot.orange { background: #f59e0b; }
   .legend-dot.red { background: #ef4444; }
   .legend-dot.gray { background: #d1d5db; }
   .legend-count { font-weight: 600; font-family: var(--font-display); color: var(--ink); }
+
+  .map-wrapper {
+    position: relative; border-radius: 14px; overflow: hidden;
+    box-shadow: 0 4px 14px rgba(28,59,50,0.15);
+    background: #A0C4C9; 
+    margin: 0 auto;
+  }
 </style>
 </head>
 <body>
+
+<!-- 起動時スプラッシュ画面 -->
+<div id="splashScreen" style="position:fixed; inset:0; background:var(--paper); z-index:10000; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:opacity 0.5s ease;">
+  <div style="font-family:var(--font-display); font-size:42px; font-weight:800; color:var(--forest-deep); margin-bottom:12px;">BAドリル</div>
+  <div style="font-size:13px; color:var(--ink-soft); font-weight:600; letter-spacing:0.1em;">STARBUCKS COFFEE MASTER</div>
+</div>
+
 <div class="wrap">
   <div class="eyebrow">STARBUCKS COFFEE MASTER</div>
-  <h1>ブラックエプロン<br>デイリードリル</h1>
+  <h1>BAドリル</h1>
 
   <details class="update-note">
-    <summary>📅 FY27 ブラックエプロンチャレンジのお知らせ</summary>
+    <summary>▶︎ 📅 FY27 ブラックエプロンチャレンジのお知らせ</summary>
     <ul>
       <li>年に一度、コーヒーマスターの資格を持つパートナーを対象に行われる認定テストです。合格すると名前入りのブラックエプロンがもらえます。</li>
       <li>店舗のiPadで受験。全問選択式・50問（1問2点の100点満点）。40問は選択肢を1つ選ぶ形式、10問はすべて正解して初めて得点になる複数選択形式です。制限時間は30分、合格ラインの目安は74点前後と言われています。</li>
@@ -405,10 +419,7 @@
     <div class="center-col">読み込み中...</div>
   </div>
 
-  <p class="sub">1周15問、コーヒーの必須知識をランダム出題。何周でもOK、苦手な問題ほどよく出ます。</p>
-  <button class="reopen-guide-link" id="btnShowGuide" type="button">？ このアプリの使い方を見る</button>
-
-  <div class="stats-toggle">
+  <div class="stats-toggle" style="margin-top:24px;">
     <button id="statsToggleBtn" type="button">
       <b>📊 これまでの学習記録・進捗を見る</b>
       <span>全体のマスター状況や、分野別の得意・不得意をチェック</span>
@@ -416,8 +427,12 @@
   </div>
   <div class="stats-panel" id="statsPanel"></div>
 
+  <p class="sub">1周15問、コーヒーの必須知識をランダム出題。<br>何周でもOK、苦手な問題ほどよく出ます。</p>
+  <button class="reopen-guide-link" id="btnShowGuide" type="button">？ このアプリの使い方を見る</button>
+
   <p class="footer-note">記録はこの端末のこのページにのみ保存されます<br>
-    <a href="https://forms.gle/R3p2jfv8kXh7TYnB7" target="_blank" rel="noopener" class="feedback-link">💬 ご意見・追加してほしい問題はこちらへ</a>
+    <a href="https://forms.gle/R3p2jfv8kXh7TYnB7" target="_blank" rel="noopener" class="feedback-link">💬 ご意見・追加してほしい問題はこちらへ</a><br><br>
+    <span style="opacity:0.6;font-size:10.5px;font-weight:600;letter-spacing:0.05em;">MADE IN MASA</span>
   </p>
 </div>
 
@@ -435,6 +450,16 @@
     </ul>
     <button class="btn" id="btnOnboardClose" type="button">はじめる！</button>
   </div>
+</div>
+
+<!-- アプリ化案内バナー -->
+<div id="toastBanner" style="position:fixed; bottom:-120px; left:50%; transform:translateX(-50%); width:90%; max-width:400px; background:var(--forest-deep); color:#FFF; padding:16px; border-radius:16px; box-shadow:0 10px 25px rgba(0,0,0,0.3); transition:bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index:9999; display:flex; gap:14px; align-items:center;">
+  <span style="font-size:28px;">📱</span>
+  <div style="flex:1;">
+    <div style="font-weight:700; font-size:14px; margin-bottom:4px;">ホーム画面に追加してアプリ化！</div>
+    <div style="font-size:12px; color:rgba(255,255,255,0.85); line-height:1.4;">Safariの「共有」から「ホーム画面に追加」すると、いつでもサクサク使えます☕️</div>
+  </div>
+  <button id="toastClose" style="background:rgba(255,255,255,0.2); border:none; border-radius:50%; width:28px; height:28px; color:#FFF; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center;">×</button>
 </div>
 
 <script>
@@ -706,7 +731,7 @@
     {id:258,c:'core',q:'フレンチ ロースト（FRE）の風味キーワードとして正しいのは？',o:['豊かな風味とキャラメルのような甘み','大地を思わせる風味としっかりとしたコク','スモーキーさと個性的で力強い風味','ロースト感のある甘みとカラメルのような風味'],a:2},
     {id:259,c:'core',q:'FRE（フレンチ ロースト）の相性の良い風味の組み合わせとして正しいのは？',o:['ダークチョコレート、カラメル、スパイス','キャラメル、チョコレート、スパイス、ナッツ','シナモン、メープル、バター、チーズ、ハーブ','煎ったナッツ、ローストした野菜、カラメル'],a:3},
 
-    {id:260,c:'core',q:'次の地図はハワイ島を表しています。コペラニ ブレンド（KLB）に使われるコナ地区の位置として正しいのはどこでしょう？',o:['③','④','①','②'],a:2,map:'<svg viewBox="0 0 300 260" xmlns="http://www.w3.org/2000/svg"><path d="M105,42 Q165,30 205,58 Q248,65 255,110 Q275,130 253,155 Q265,185 225,198 Q205,228 165,215 Q135,240 100,218 Q65,220 52,188 Q28,168 50,138 Q35,100 72,85 Q72,55 105,42 Z" fill="#E3C089" stroke="#2B1B12" stroke-width="2.5" stroke-linejoin="round"/><circle cx="65" cy="150" r="15" fill="#1C3B32"/><text x="65" y="156" text-anchor="middle" font-size="15" font-weight="700" fill="#FBF7EC">①</text><circle cx="225" cy="135" r="15" fill="#1C3B32"/><text x="225" y="141" text-anchor="middle" font-size="15" font-weight="700" fill="#FBF7EC">②</text><circle cx="155" cy="52" r="15" fill="#1C3B32"/><text x="155" y="58" text-anchor="middle" font-size="15" font-weight="700" fill="#FBF7EC">③</text><circle cx="125" cy="212" r="15" fill="#1C3B32"/><text x="125" y="218" text-anchor="middle" font-size="15" font-weight="700" fill="#FBF7EC">④</text></svg>',n:'コナ地区はハワイ島の西側（火山の風下にあたる西海岸）に位置し、コナコーヒーの産地として知られています。'},
+    {id:260,c:'core',q:'次の地図はハワイ島を表しています。コペラニ ブレンド（KLB）に使われるコナ地区の位置として正しいのはどこでしょう？',o:['③','④','①','②'],a:2,map:'<div class="map-wrapper"><svg viewBox="0 0 300 260" xmlns="http://www.w3.org/2000/svg" style="display:block;"><defs><filter id="sh1" x="-10%" y="-10%" width="130%" height="130%"><feDropShadow dx="2" dy="5" stdDeviation="4" flood-color="#1C3B32" flood-opacity="0.3"/></filter><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#EADDCA"/><stop offset="100%" stop-color="#D4B883"/></linearGradient></defs><path d="M0,65 L300,65 M0,130 L300,130 M0,195 L300,195 M100,0 L100,260 M200,0 L200,260" stroke="#FFF" stroke-width="0.8" stroke-dasharray="4,4" opacity="0.4"/><path d="M105,42 Q165,30 205,58 Q248,65 255,110 Q275,130 253,155 Q265,185 225,198 Q205,228 165,215 Q135,240 100,218 Q65,220 52,188 Q28,168 50,138 Q35,100 72,85 Q72,55 105,42 Z" fill="url(#g1)" stroke="#8A6B4E" stroke-width="1.5" filter="url(#sh1)"/><circle cx="65" cy="150" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="65" y="154" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">①</text><circle cx="225" cy="135" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="225" y="139" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">②</text><circle cx="155" cy="52" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="155" y="56" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">③</text><circle cx="125" cy="212" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="125" y="216" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">④</text></svg></div>',n:'コナ地区はハワイ島の西側（火山の風下にあたる西海岸）に位置し、コナコーヒーの産地として知られています。'},
 
     {id:503,c:'roast',q:'スターバックス1号店（1971年、シアトル）は、実際にはどのようなお店だった？',o:['カフェとして飲食を提供する店','焙煎したコーヒー豆を量り売りする専門店','コーヒー器具の販売店','紅茶専門店'],a:1,hot:true},
     {id:504,c:'roast',q:'アメリカにおける「スペシャルティコーヒーの父」と呼ばれ、創業者たちに焙煎を教えた人物は？',o:['ハワード・シュルツ','デイブ・オルセン','アルフレッド・ピート','ゴードン・バウカー'],a:2},
@@ -728,10 +753,10 @@
     {id:520,c:'roast',q:'STARBUCKS RESERVE ROASTERY TOKYOの焙煎機で、コーヒー豆1回あたりの焙煎にかかる時間はおよそ何分？',o:['約3分','約10分','約30分','約60分'],a:1},
     {id:522,c:'roast',q:'木戸田直子さんは、アジアで何人しかいないマスターロースターの一人か？',o:['1人','2人','3人','5人'],a:1},
 
-    {id:523,c:'core',q:'次の地図はコスタリカを表しています。スターバックス初の自社農園「ハシエンダ アルサシア」があるポアス火山周辺の位置として正しいのはどこでしょう？',o:['②','①','④','③'],a:1,map:'<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg"><path d="M55,95 Q30,90 25,72 Q45,62 60,72 Q50,50 75,45 Q95,55 90,78 Q120,35 160,42 Q200,30 240,45 Q275,42 305,65 Q325,85 310,105 Q320,128 295,138 Q280,158 250,150 Q225,168 195,155 Q165,165 135,150 Q105,158 80,140 Q55,145 55,120 Q40,115 55,95 Z" fill="#E3C089" stroke="#2B1B12" stroke-width="2.5" stroke-linejoin="round"/><circle cx="160" cy="75" r="15" fill="#1C3B32"/><text x="160" y="81" text-anchor="middle" font-size="15" font-weight="700" fill="#FBF7EC">①</text><circle cx="285" cy="85" r="15" fill="#1C3B32"/><text x="285" y="91" text-anchor="middle" font-size="15" font-weight="700" fill="#FBF7EC">②</text><circle cx="40" cy="75" r="15" fill="#1C3B32"/><text x="40" y="81" text-anchor="middle" font-size="15" font-weight="700" fill="#FBF7EC">③</text><circle cx="255" cy="130" r="15" fill="#1C3B32"/><text x="255" y="136" text-anchor="middle" font-size="15" font-weight="700" fill="#FBF7EC">④</text></svg>',n:'ハシエンダ アルサシア農園はコスタリカ・アラフエラ州のポアス火山の斜面にあり、2013年にスターバックスが購入した初の自社農園です。'},
-    {id:524,c:'core',q:'次の地図はインドネシアの主な島々を表しています。スマトラ島の位置として正しいのはどこでしょう？',o:['④','①','②','③'],a:1,map:'<svg viewBox="0 0 340 260" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="340" height="260" fill="#C9DDE0"/><path d="M35,45 Q52,55 48,90 Q60,100 52,130 Q64,145 54,175 Q62,192 50,212 Q40,190 44,165 Q30,150 38,125 Q24,110 34,88 Q20,72 35,45 Z" fill="#E3C089" stroke="#2B1B12" stroke-width="2.5"/><circle cx="45" cy="120" r="14" fill="#1C3B32"/><text x="45" y="126" text-anchor="middle" font-size="14" font-weight="700" fill="#FBF7EC">①</text><path d="M90,205 Q130,198 175,208 Q195,213 210,208 Q170,222 125,220 Q100,218 90,205 Z" fill="#E3C089" stroke="#2B1B12" stroke-width="2.5"/><circle cx="150" cy="212" r="14" fill="#1C3B32"/><text x="150" y="218" text-anchor="middle" font-size="14" font-weight="700" fill="#FBF7EC">②</text><path d="M115,55 Q160,42 200,55 Q225,68 222,100 Q228,130 200,150 Q165,158 140,145 Q115,135 108,105 Q102,78 115,55 Z" fill="#E3C089" stroke="#2B1B12" stroke-width="2.5"/><circle cx="165" cy="105" r="14" fill="#1C3B32"/><text x="165" y="111" text-anchor="middle" font-size="14" font-weight="700" fill="#FBF7EC">③</text><path d="M255,80 Q270,65 260,45 Q275,40 280,55 Q290,45 288,65 Q300,70 290,85 Q310,90 300,110 Q285,115 275,105 Q278,130 260,135 Q255,155 240,145 Q245,125 255,115 Q230,120 225,100 Q240,95 255,100 Q245,85 255,80 Z" fill="#E3C089" stroke="#2B1B12" stroke-width="2.5"/><circle cx="265" cy="92" r="14" fill="#1C3B32"/><text x="265" y="98" text-anchor="middle" font-size="14" font-weight="700" fill="#FBF7EC">④</text></svg>',n:'スマトラ島はインドネシア西部にある大きな島で、半水洗式加工の代表的な産地として知られています。'},
-    {id:525,c:'core',q:'次の地図はアフリカ大陸を表しています。ケニアの位置として正しいのはどこでしょう？',o:['①','③','②','④'],a:2,map:'<svg viewBox="0 0 300 360" xmlns="http://www.w3.org/2000/svg"><path d="M95,15 Q120,8 140,10 Q165,8 190,18 Q205,22 215,30 Q228,36 240,45 Q258,55 270,70 Q292,82 285,90 Q278,100 265,105 Q258,118 250,130 Q248,145 245,160 Q238,178 225,195 Q218,212 210,230 Q198,250 185,270 Q175,288 165,305 Q160,320 150,330 Q142,318 135,310 Q128,292 120,275 Q112,258 105,240 Q100,222 95,205 Q92,192 100,180 Q112,177 130,175 Q120,168 110,160 Q98,155 85,150 Q70,143 60,135 Q52,122 55,110 Q60,100 75,95 Q68,82 70,70 Q75,58 85,45 Q88,30 95,15 Z" fill="#E3C089" stroke="#2B1B12" stroke-width="2.5" stroke-linejoin="round"/><circle cx="272" cy="78" r="15" fill="#1C3B32"/><text x="272" y="84" text-anchor="middle" font-size="15" font-weight="700" fill="#FBF7EC">①</text><circle cx="243" cy="140" r="15" fill="#1C3B32"/><text x="243" y="146" text-anchor="middle" font-size="15" font-weight="700" fill="#FBF7EC">②</text><circle cx="175" cy="165" r="15" fill="#1C3B32"/><text x="175" y="171" text-anchor="middle" font-size="15" font-weight="700" fill="#FBF7EC">③</text><circle cx="215" cy="185" r="15" fill="#1C3B32"/><text x="215" y="191" text-anchor="middle" font-size="15" font-weight="700" fill="#FBF7EC">④</text></svg>',n:'ケニアはエチオピアの南に位置する東アフリカの国で、グレープフルーツやベリー、カラントを思わせる風味の水洗式コーヒーで知られています。'},
-    {id:526,c:'core',q:'次の地図はアフリカ大陸を表しています。エチオピアの位置として正しいのはどこでしょう？',o:['③','④','①','②'],a:2,map:'<svg viewBox="0 0 300 360" xmlns="http://www.w3.org/2000/svg"><path d="M95,15 Q120,8 140,10 Q165,8 190,18 Q205,22 215,30 Q228,36 240,45 Q258,55 270,70 Q292,82 285,90 Q278,100 265,105 Q258,118 250,130 Q248,145 245,160 Q238,178 225,195 Q218,212 210,230 Q198,250 185,270 Q175,288 165,305 Q160,320 150,330 Q142,318 135,310 Q128,292 120,275 Q112,258 105,240 Q100,222 95,205 Q92,192 100,180 Q112,177 130,175 Q120,168 110,160 Q98,155 85,150 Q70,143 60,135 Q52,122 55,110 Q60,100 75,95 Q68,82 70,70 Q75,58 85,45 Q88,30 95,15 Z" fill="#E3C089" stroke="#2B1B12" stroke-width="2.5" stroke-linejoin="round"/><circle cx="272" cy="78" r="15" fill="#1C3B32"/><text x="272" y="84" text-anchor="middle" font-size="15" font-weight="700" fill="#FBF7EC">①</text><circle cx="243" cy="140" r="15" fill="#1C3B32"/><text x="243" y="146" text-anchor="middle" font-size="15" font-weight="700" fill="#FBF7EC">②</text><circle cx="175" cy="165" r="15" fill="#1C3B32"/><text x="175" y="171" text-anchor="middle" font-size="15" font-weight="700" fill="#FBF7EC">③</text><circle cx="215" cy="185" r="15" fill="#1C3B32"/><text x="215" y="191" text-anchor="middle" font-size="15" font-weight="700" fill="#FBF7EC">④</text></svg>',n:'エチオピアは「アフリカの角」と呼ばれる地域にある、アラビカ種発祥の地とされる国です。'},
+    {id:523,c:'core',q:'次の地図はコスタリカを表しています。スターバックス初の自社農園「ハシエンダ アルサシア」があるポアス火山周辺の位置として正しいのはどこでしょう？',o:['②','①','④','③'],a:1,map:'<div class="map-wrapper"><svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" style="display:block;"><defs><filter id="sh2" x="-10%" y="-10%" width="130%" height="130%"><feDropShadow dx="2" dy="5" stdDeviation="4" flood-color="#1C3B32" flood-opacity="0.3"/></filter><linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#EADDCA"/><stop offset="100%" stop-color="#D4B883"/></linearGradient></defs><path d="M0,50 L340,50 M0,100 L340,100 M0,150 L340,150 M113,0 L113,200 M226,0 L226,200" stroke="#FFF" stroke-width="0.8" stroke-dasharray="4,4" opacity="0.4"/><path d="M55,95 Q30,90 25,72 Q45,62 60,72 Q50,50 75,45 Q95,55 90,78 Q120,35 160,42 Q200,30 240,45 Q275,42 305,65 Q325,85 310,105 Q320,128 295,138 Q280,158 250,150 Q225,168 195,155 Q165,165 135,150 Q105,158 80,140 Q55,145 55,120 Q40,115 55,95 Z" fill="url(#g2)" stroke="#8A6B4E" stroke-width="1.5" filter="url(#sh2)"/><circle cx="160" cy="75" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="160" y="79" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">①</text><circle cx="285" cy="85" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="285" y="89" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">②</text><circle cx="40" cy="75" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="40" y="79" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">③</text><circle cx="255" cy="130" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="255" y="134" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">④</text></svg></div>',n:'ハシエンダ アルサシア農園はコスタリカ・アラフエラ州のポアス火山の斜面にあり、2013年にスターバックスが購入した初の自社農園です。'},
+    {id:524,c:'core',q:'次の地図はインドネシアの主な島々を表しています。スマトラ島の位置として正しいのはどこでしょう？',o:['④','①','②','③'],a:1,map:'<div class="map-wrapper"><svg viewBox="0 0 340 260" xmlns="http://www.w3.org/2000/svg" style="display:block;"><defs><filter id="sh3" x="-10%" y="-10%" width="130%" height="130%"><feDropShadow dx="2" dy="5" stdDeviation="4" flood-color="#1C3B32" flood-opacity="0.3"/></filter><linearGradient id="g3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#EADDCA"/><stop offset="100%" stop-color="#D4B883"/></linearGradient></defs><path d="M0,65 L340,65 M0,130 L340,130 M0,195 L340,195 M113,0 L113,260 M226,0 L226,260" stroke="#FFF" stroke-width="0.8" stroke-dasharray="4,4" opacity="0.4"/><g filter="url(#sh3)"><path d="M35,45 Q52,55 48,90 Q60,100 52,130 Q64,145 54,175 Q62,192 50,212 Q40,190 44,165 Q30,150 38,125 Q24,110 34,88 Q20,72 35,45 Z" fill="url(#g3)" stroke="#8A6B4E" stroke-width="1.5"/><path d="M90,205 Q130,198 175,208 Q195,213 210,208 Q170,222 125,220 Q100,218 90,205 Z" fill="url(#g3)" stroke="#8A6B4E" stroke-width="1.5"/><path d="M115,55 Q160,42 200,55 Q225,68 222,100 Q228,130 200,150 Q165,158 140,145 Q115,135 108,105 Q102,78 115,55 Z" fill="url(#g3)" stroke="#8A6B4E" stroke-width="1.5"/><path d="M255,80 Q270,65 260,45 Q275,40 280,55 Q290,45 288,65 Q300,70 290,85 Q310,90 300,110 Q285,115 275,105 Q278,130 260,135 Q255,155 240,145 Q245,125 255,115 Q230,120 225,100 Q240,95 255,100 Q245,85 255,80 Z" fill="url(#g3)" stroke="#8A6B4E" stroke-width="1.5"/></g><circle cx="45" cy="120" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="45" y="124" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">①</text><circle cx="150" cy="212" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="150" y="216" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">②</text><circle cx="165" cy="105" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="165" y="109" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">③</text><circle cx="265" cy="92" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="265" y="96" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">④</text></svg></div>',n:'スマトラ島はインドネシア西部にある大きな島で、半水洗式加工の代表的な産地として知られています。'},
+    {id:525,c:'core',q:'次の地図はアフリカ大陸を表しています。ケニアの位置として正しいのはどこでしょう？',o:['①','③','②','④'],a:2,map:'<div class="map-wrapper"><svg viewBox="0 0 300 360" xmlns="http://www.w3.org/2000/svg" style="display:block;"><defs><filter id="sh4" x="-10%" y="-10%" width="130%" height="130%"><feDropShadow dx="2" dy="5" stdDeviation="4" flood-color="#1C3B32" flood-opacity="0.3"/></filter><linearGradient id="g4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#EADDCA"/><stop offset="100%" stop-color="#D4B883"/></linearGradient></defs><path d="M0,90 L300,90 M0,180 L300,180 M0,270 L300,270 M100,0 L100,360 M200,0 L200,360" stroke="#FFF" stroke-width="0.8" stroke-dasharray="4,4" opacity="0.4"/><path d="M95,15 Q120,8 140,10 Q165,8 190,18 Q205,22 215,30 Q228,36 240,45 Q258,55 270,70 Q292,82 285,90 Q278,100 265,105 Q258,118 250,130 Q248,145 245,160 Q238,178 225,195 Q218,212 210,230 Q198,250 185,270 Q175,288 165,305 Q160,320 150,330 Q142,318 135,310 Q128,292 120,275 Q112,258 105,240 Q100,222 95,205 Q92,192 100,180 Q112,177 130,175 Q120,168 110,160 Q98,155 85,150 Q70,143 60,135 Q52,122 55,110 Q60,100 75,95 Q68,82 70,70 Q75,58 85,45 Q88,30 95,15 Z" fill="url(#g4)" stroke="#8A6B4E" stroke-width="1.5" filter="url(#sh4)"/><circle cx="272" cy="78" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="272" y="82" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">①</text><circle cx="243" cy="140" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="243" y="144" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">②</text><circle cx="175" cy="165" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="175" y="169" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">③</text><circle cx="215" cy="185" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="215" y="189" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">④</text></svg></div>',n:'ケニアはエチオピアの南に位置する東アフリカの国で、グレープフルーツやベリー、カラントを思わせる風味の水洗式コーヒーで知られています。'},
+    {id:526,c:'core',q:'次の地図はアフリカ大陸を表しています。エチオピアの位置として正しいのはどこでしょう？',o:['③','④','①','②'],a:2,map:'<div class="map-wrapper"><svg viewBox="0 0 300 360" xmlns="http://www.w3.org/2000/svg" style="display:block;"><defs><filter id="sh5" x="-10%" y="-10%" width="130%" height="130%"><feDropShadow dx="2" dy="5" stdDeviation="4" flood-color="#1C3B32" flood-opacity="0.3"/></filter><linearGradient id="g5" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#EADDCA"/><stop offset="100%" stop-color="#D4B883"/></linearGradient></defs><path d="M0,90 L300,90 M0,180 L300,180 M0,270 L300,270 M100,0 L100,360 M200,0 L200,360" stroke="#FFF" stroke-width="0.8" stroke-dasharray="4,4" opacity="0.4"/><path d="M95,15 Q120,8 140,10 Q165,8 190,18 Q205,22 215,30 Q228,36 240,45 Q258,55 270,70 Q292,82 285,90 Q278,100 265,105 Q258,118 250,130 Q248,145 245,160 Q238,178 225,195 Q218,212 210,230 Q198,250 185,270 Q175,288 165,305 Q160,320 150,330 Q142,318 135,310 Q128,292 120,275 Q112,258 105,240 Q100,222 95,205 Q92,192 100,180 Q112,177 130,175 Q120,168 110,160 Q98,155 85,150 Q70,143 60,135 Q52,122 55,110 Q60,100 75,95 Q68,82 70,70 Q75,58 85,45 Q88,30 95,15 Z" fill="url(#g5)" stroke="#8A6B4E" stroke-width="1.5" filter="url(#sh5)"/><circle cx="272" cy="78" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="272" y="82" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">①</text><circle cx="243" cy="140" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="243" y="144" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">②</text><circle cx="175" cy="165" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="175" y="169" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">③</text><circle cx="215" cy="185" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="215" y="189" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">④</text></svg></div>',n:'エチオピアは「アフリカの角」と呼ばれる地域にある、アラビカ種発祥の地とされる国です。'},
 
     {id:527,c:'equip',q:'グラスドリップコーヒーメーカーの推奨挽き具合（マルコニックグラインダー）は？',o:['3～4番','8～10番（推奨8番）','13番','ディッティング5番'],a:1,hot:true},
     {id:528,c:'equip',q:'グラスドリップコーヒーメーカーの特徴として正しいのは？',o:['専用フィルターを使え、ふたはドリッパー置きにもなる','紙フィルターの使用はできない設計になっている','1杯分しか抽出できない小型サイズである','冷蔵庫での抽出にのみ対応している'],a:0},
@@ -804,7 +829,8 @@
     {id:584,c:'roast',q:'コーヒー豆を焙煎する過程で、豆に含まれるアミノ酸と還元糖が熱によって結びつくことで、茶色く色づき香ばしい風味が生まれます。これは何という化学反応でしょう？',o:['カラメル化','メイラード反応','加水分解','発酵'],a:1},
     {id:585,c:'brew',q:'スターバックス オリガミ®の1袋あたりの標準的なお湯の量（出来高）として正しいのはどれでしょう？',o:['140ml','180ml','240ml','100ml'],a:0,n:'お湯は最初に少量を注いで20〜30秒蒸らしてから、2〜3回に分けて注ぐのがおいしくいれるポイントです。'},
     {id:586,c:'brew',q:'スターバックス ヴィア®（レギュラーコーヒー）の1本あたりの標準的なお湯の量（出来高）として正しいのはどれでしょう？',o:['180ml','140ml','240ml','100ml'],a:0},
-    {id:587,c:'core',q:'「スターバックス クリスマス ブレンド」と同じローストレベル（ダークロースト）のコーヒーをお探しのお客様へおすすめするコアコーヒーとして、適切なものはどれでしょう？',o:['カフェ ベロナ','パイクプレイス ロースト','ライトノート ブレンド','ハウス ブレンド'],a:0,n:'クリスマスブレンドは深煎りのダークローストです。選択肢の中でダークローストなのはカフェ ベロナのみです。'}
+    {id:587,c:'core',q:'「スターバックス クリスマス ブレンド」と同じローストレベルのコーヒーをお探しのお客様へおすすめするコアコーヒーとして、適切なものはどれでしょう？',o:['カフェ ベロナ','パイクプレイス ロースト','ライトノート ブレンド','ハウス ブレンド'],a:0,n:'クリスマスブレンドは深煎りのダークローストです。選択肢の中でダークローストなのはカフェ ベロナのみです。'},
+    {id:588,c:'equip',q:'「HARIO V60 ドリッパー NEO」の最も象徴的な特徴である、内側に等間隔で配置された極細スパイラルリブの数は何本でしょう？',o:['12本','36本','72本','120本'],a:2,n:'72本の極細リブによってお湯がムラなく均一に広がり、底部で9本に集約されることで素早く抜け、クリーンな味わいを引き出します。'}
   ];
 
   var CATS = {
@@ -944,7 +970,25 @@
     var guideBtn = document.getElementById('btnShowGuide');
     if(guideBtn) guideBtn.onclick = showOnboarding;
     if(!onboarded){ showOnboarding(); }
+
+    // スプラッシュ & アプリ案内
+    setTimeout(function(){
+      var sp = document.getElementById('splashScreen');
+      if(sp) {
+        sp.style.opacity = '0';
+        setTimeout(function(){ sp.style.display = 'none'; }, 500);
+      }
+    }, 2500); 
+
+    setTimeout(function(){
+      var tb = document.getElementById('toastBanner');
+      if(tb && window.navigator.standalone === false || !window.matchMedia('(display-mode: standalone)').matches) {
+        tb.style.bottom = '24px';
+        setTimeout(function(){ tb.style.bottom = '-120px'; }, 8000);
+      }
+    }, 3500); 
   }
+
   function showOnboarding(){
     var ov = document.getElementById('onboardOverlay');
     if(ov) ov.style.display = 'flex';
@@ -955,6 +999,14 @@
     var ov = document.getElementById('onboardOverlay');
     if(ov) ov.style.display = 'none';
     saveJSON('bac-onboarded', true);
+  }
+
+  // Toast close
+  var toastCloseBtn = document.getElementById('toastClose');
+  if(toastCloseBtn){
+    toastCloseBtn.onclick = function(){
+      document.getElementById('toastBanner').style.bottom = '-120px';
+    };
   }
 
   /* ---------------- 回答処理 ---------------- */
@@ -969,7 +1021,6 @@
     currentAnswers().push({id:q.id, choice:idx, correct:correct});
 
     if(!stats[q.id]) stats[q.id] = {seen:0, correct:0, streak:0};
-    // 古いデータのマイグレーション（記録を引き継ぐ）
     if(stats[q.id].streak === undefined) {
       stats[q.id].streak = stats[q.id].correct >= 2 ? 2 : (stats[q.id].correct === 1 ? 1 : 0);
     }
@@ -1352,24 +1403,26 @@
     html += '</div>';
     html += '<div class="pie-legend">';
     html += '<div class="legend-item"><div class="legend-label"><div class="legend-dot blue"></div>完璧 (3回以上正解)</div><div class="legend-count">' + cBlue + '問</div></div>';
-    html += '<div class="legend-item"><div class="legend-label"><div class="legend-dot" style="background:#10b981;"></div>覚えた (2回連続正解)</div><div class="legend-count">' + cGreen + '問</div></div>';
+    html += '<div class="legend-item"><div class="legend-label"><div class="legend-dot green"></div>覚えた (2回連続正解)</div><div class="legend-count">' + cGreen + '問</div></div>';
     html += '<div class="legend-item"><div class="legend-label"><div class="legend-dot orange"></div>学習中 (1回以上正解)</div><div class="legend-count">' + cOrange + '問</div></div>';
     html += '<div class="legend-item"><div class="legend-label"><div class="legend-dot red"></div>ニガテ (まだ正解なし)</div><div class="legend-count">' + cRed + '問</div></div>';
     html += '<div class="legend-item"><div class="legend-label"><div class="legend-dot gray"></div>未出題 (手つかず)</div><div class="legend-count">' + cGray + '問</div></div>';
     html += '</div></div>';
 
-    // よく間違える問題リスト
+    // よく間違える問題リスト (アコーディオン)
     weakQs.sort(function(a,b){
       if(a.rate !== b.rate) return a.rate - b.rate;
       return b.mistakes - a.mistakes;
     });
     weakQs = weakQs.slice(0, 10);
 
-    html += '<h3 style="margin-top:24px;">⚠️ よく間違える問題トップ10（復習おすすめ）</h3>';
+    html += '<details class="cat-accordion" style="margin-top:24px;border:2px solid rgba(239, 68, 68, 0.3);">';
+    html += '<summary style="color:#ef4444;font-size:14.5px;">▶︎ ⚠️ よく間違える問題トップ10（復習おすすめ）</summary>';
+    html += '<div class="cat-qlist">';
     if(weakQs.length === 0){
-      html += '<p class="desc" style="text-align:left;margin-bottom:24px;">現在、記録された間違いはありません。</p>';
+      html += '<p class="desc" style="text-align:left;margin-top:12px;">現在、記録された間違いはありません。</p>';
     } else {
-      html += '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px;">';
+      html += '<div style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">';
       weakQs.forEach(function(item){
         var isBm = bookmarkedIds.indexOf(item.id) !== -1;
         html += '<div style="background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:13px;display:flex;flex-direction:column;gap:8px;text-align:left;">';
@@ -1381,6 +1434,7 @@
       });
       html += '</div>';
     }
+    html += '</div></details>';
 
     // 従来の分野別正答率
     var rows = Object.keys(CATS).map(function(k){
