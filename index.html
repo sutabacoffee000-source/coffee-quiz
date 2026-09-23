@@ -11,125 +11,59 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="BAドリル">
+
+<!-- Firebase SDK (オンライン対戦用) -->
+<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-database-compat.js"></script>
+
 <style>
   :root{
-    --paper:#EFE6D2;
-    --paper-deep:#E2D5B7;
-    --card:#FBF7EC;
-    --ink:#2B1B12;
-    --ink-soft:#6B5644;
-    --forest:#1C3B32;
-    --forest-deep:#12241F;
-    --gold:#B98A3E;
-    --gold-soft:#E3C089;
-    --clay:#A8492E;
-    --line: rgba(43,27,18,0.14);
-    --tint-rgb:28,59,50;
-    --radius:20px;
+    --paper:#EFE6D2; --paper-deep:#E2D5B7; --card:#FBF7EC; --ink:#2B1B12; --ink-soft:#6B5644;
+    --forest:#1C3B32; --forest-deep:#12241F; --gold:#B98A3E; --gold-soft:#E3C089; --clay:#A8492E;
+    --line:rgba(43,27,18,0.14); --tint-rgb:28,59,50; --radius:20px;
     --font-display:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic Medium","Yu Gothic",YuGothic,Meiryo,sans-serif;
     --font-body:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic Medium","Yu Gothic",YuGothic,Meiryo,sans-serif;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
-    background:
-      radial-gradient(circle at 1px 1px, rgba(43,27,18,0.05) 1px, transparent 1.4px) 0 0/22px 22px,
-      linear-gradient(180deg, var(--paper) 0%, var(--paper-deep) 100%);
-    color:var(--ink);
-    font-family:var(--font-body);
-    min-height:100vh;
+    background: radial-gradient(circle at 1px 1px, rgba(43,27,18,0.05) 1px, transparent 1.4px) 0 0/22px 22px, linear-gradient(180deg, var(--paper) 0%, var(--paper-deep) 100%);
+    color:var(--ink); font-family:var(--font-body); min-height:100vh;
     padding:calc(32px + env(safe-area-inset-top)) 16px calc(64px + env(safe-area-inset-bottom));
   }
   .wrap{max-width:560px;margin:0 auto;}
-  .eyebrow{
-    font-size:11px;letter-spacing:.18em;color:var(--gold);font-weight:600;
-    text-align:center;margin-bottom:6px;
-  }
-  h1{
-    font-family:var(--font-display);
-    font-weight:800;
-    font-size:clamp(32px, 8vw, 42px);
-    text-align:center;margin:0 0 18px;
-    color:var(--forest-deep);
-    line-height:1.35;
-  }
-  .sub{
-    text-align:center;color:var(--ink-soft);font-size:13.5px;margin:16px 0 6px;
-  }
-  .update-note{
-    text-align:center;font-size:11.5px;color:var(--ink-soft);
-    background:rgba(var(--tint-rgb),0.06);border:1px solid rgba(var(--tint-rgb),0.14);
-    border-radius:14px;padding:6px 14px;
-    max-width:340px;margin:0 auto 22px;
-  }
-  .update-note summary{
-    cursor:pointer;padding:6px 2px;list-style:none;font-weight:700;color:var(--forest-deep);
-  }
+  .eyebrow{font-size:11px;letter-spacing:.18em;color:var(--gold);font-weight:600;text-align:center;margin-bottom:6px;}
+  h1{font-family:var(--font-display);font-weight:800;font-size:clamp(32px, 8vw, 42px);text-align:center;margin:0 0 18px;color:var(--forest-deep);line-height:1.35;}
+  .sub{text-align:center;color:var(--ink-soft);font-size:13.5px;margin:16px 0 6px;}
+  .update-note{text-align:center;font-size:11.5px;color:var(--ink-soft);background:rgba(var(--tint-rgb),0.06);border:1px solid rgba(var(--tint-rgb),0.14);border-radius:14px;padding:6px 14px;max-width:340px;margin:0 auto 22px;}
+  .update-note summary{cursor:pointer;padding:6px 2px;list-style:none;font-weight:700;color:var(--forest-deep);}
   .update-note summary::-webkit-details-marker{display:none;}
-  .update-note ul{
-    text-align:left;margin:0;padding:4px 0 10px 2px;list-style:none;
-    display:flex;flex-direction:column;gap:6px;
-  }
+  .update-note ul{text-align:left;margin:0;padding:4px 0 10px 2px;list-style:none;display:flex;flex-direction:column;gap:6px;}
   .update-note li{line-height:1.5;}
   .badges{display:flex;gap:8px;justify-content:center;margin-bottom:22px;flex-wrap:wrap;}
-  .badge{
-    background:var(--card);border:1px solid var(--line);border-radius:999px;
-    padding:6px 14px;font-size:12.5px;color:var(--ink-soft);
-    display:flex;align-items:center;gap:6px;
-  }
+  .badge{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:12.5px;color:var(--ink-soft);display:flex;align-items:center;gap:6px;}
   .badge b{color:var(--forest-deep);font-weight:700;}
-
-  .card{
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    padding:26px 22px;
-    box-shadow:0 14px 34px rgba(43,27,18,0.10);
-  }
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px 22px;box-shadow:0 14px 34px rgba(43,27,18,0.10);}
   .q-actions{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;}
   .q-tags{margin-bottom:2px;}
-  .bookmark-btn{
-    background:var(--paper);border:1px solid var(--line);border-radius:999px;cursor:pointer;
-    font-size:11.5px;padding:5px 12px;color:var(--ink-soft);font-family:var(--font-body);
-    white-space:nowrap;
-  }
+  .bookmark-btn{background:var(--paper);border:1px solid var(--line);border-radius:999px;cursor:pointer;font-size:11.5px;padding:5px 12px;color:var(--ink-soft);font-family:var(--font-body);white-space:nowrap;}
   .bookmark-btn:hover{border-color:var(--gold);}
   .bookmark-btn.active{background:rgba(var(--tint-rgb),0.10);border-color:var(--forest);color:var(--forest-deep);font-weight:700;}
-  .bookmark-btn:focus-visible{outline:2px solid var(--forest);outline-offset:2px;}
-  .tag{
-    display:inline-block;background:var(--gold-soft);color:#4A3212;
-    font-size:11px;font-weight:700;letter-spacing:.05em;
-    padding:4px 10px;border-radius:999px;margin-bottom:14px;margin-right:6px;
-  }
-  .tag.hot{
-    background:var(--clay);color:#FBEFE9;
-  }
+  .tag{display:inline-block;background:var(--gold-soft);color:#4A3212;font-size:11px;font-weight:700;letter-spacing:.05em;padding:4px 10px;border-radius:999px;margin-bottom:14px;margin-right:6px;}
+  .tag.hot{background:var(--clay);color:#FBEFE9;}
   .qnum{font-size:12px;color:var(--ink-soft);margin-bottom:6px;}
-  .qtext{
-    font-family:var(--font-display);
-    font-size:clamp(17px,4.4vw,20px);
-    line-height:1.6;font-weight:600;
-    margin:0 0 20px;color:var(--ink);
-  }
-  .question-map{
-    margin:0 auto 20px;display:flex;justify-content:center;
-  }
+  .qtext{font-family:var(--font-display);font-size:clamp(17px,4.4vw,20px);line-height:1.6;font-weight:600;margin:0 0 20px;color:var(--ink);}
+  .question-map{margin:0 auto 20px;display:flex;justify-content:center;}
   .question-map svg{width:100%;max-width:320px;height:auto;display:block;}
   .browse-map{margin:10px 0 2px;padding:10px;cursor:default;}
   .browse-map svg{max-width:200px;}
   .choices{display:flex;flex-direction:column;gap:10px;}
   .exam-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
   .exam-qnum{font-size:13px;font-weight:700;color:var(--ink-soft);}
-  .exam-timer{
-    font-family:"SFMono-Regular",Consolas,monospace;font-size:15px;font-weight:700;
-    color:var(--forest-deep);background:var(--paper);border-radius:8px;padding:4px 12px;
-  }
+  .exam-timer{font-family:"SFMono-Regular",Consolas,monospace;font-size:15px;font-weight:700;color:var(--forest-deep);background:var(--paper);border-radius:8px;padding:4px 12px;}
   .exam-timer.warn{color:#fff;background:var(--clay);}
   .exam-hint{font-size:12px;color:var(--ink-soft);margin:-10px 0 16px;}
-  .exam-history-box{
-    width:100%;background:var(--paper);border:1px solid var(--line);border-radius:14px;
-    padding:12px 16px;margin:14px 0 4px;text-align:left;
-  }
+  .exam-history-box{width:100%;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin:14px 0 4px;text-align:left;}
   .exam-history-summary{font-size:12.5px;color:var(--ink);line-height:1.6;}
   .exam-history-summary b{color:var(--forest-deep);}
   .exam-history-detail{margin-top:6px;}
@@ -137,237 +71,98 @@
   .exam-history-detail summary::-webkit-details-marker{display:none;}
   .exam-history-detail ul{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:5px;}
   .exam-history-detail li{font-size:12px;color:var(--ink-soft);}
-  .choice-btn.selected{background:rgba(var(--tint-rgb),0.10);border-color:var(--forest);}
-  .choice-btn.selected .mark{border-color:var(--forest);background:var(--forest);color:#fff;}
-  .mark.checkbox{border-radius:5px;}
-  .choice-btn{
-    text-align:left;
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:13px;
-    padding:13px 16px;
-    font-family:var(--font-body);
-    font-size:15px;
-    color:var(--ink);
-    cursor:pointer;
-    display:flex;gap:10px;align-items:flex-start;
-    transition:background .15s ease, border-color .15s ease, transform .1s ease;
-  }
+  .choice-btn{text-align:left;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:13px 16px;font-family:var(--font-body);font-size:15px;color:var(--ink);cursor:pointer;display:flex;gap:10px;align-items:flex-start;transition:all .15s ease;}
   .choice-btn:hover:not(:disabled){background:var(--paper);}
   .choice-btn:active:not(:disabled){transform:scale(0.99);}
-  .choice-btn:focus-visible{outline:2px solid var(--forest);outline-offset:2px;}
-  .choice-btn .mark{
-    flex:0 0 20px;height:20px;border-radius:50%;border:1.6px solid var(--line);
-    display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;
-    margin-top:1px;
-  }
+  .choice-btn .mark{flex:0 0 20px;height:20px;border-radius:50%;border:1.6px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;margin-top:1px;}
+  .mark.checkbox{border-radius:5px;}
+  .choice-btn.selected{background:rgba(var(--tint-rgb),0.10);border-color:var(--forest);}
+  .choice-btn.selected .mark{border-color:var(--forest);background:var(--forest);color:#fff;}
   .choice-btn.correct{background:rgba(var(--tint-rgb),0.10);border-color:var(--forest);}
   .choice-btn.correct .mark{border-color:var(--forest);background:var(--forest);color:#fff;}
   .choice-btn.wrong{background:rgba(168,73,46,0.10);border-color:var(--clay);}
   .choice-btn.wrong .mark{border-color:var(--clay);background:var(--clay);color:#fff;}
   .choice-btn:disabled{cursor:default;}
   .choice-btn.dim{opacity:.55;}
-
-  .note{
-    margin-top:16px;padding:12px 14px;border-radius:12px;
-    background:rgba(185,138,62,0.12);border:1px solid rgba(185,138,62,0.35);
-    font-size:13px;color:#4A3212;line-height:1.6;
-  }
+  .note{margin-top:16px;padding:12px 14px;border-radius:12px;background:rgba(185,138,62,0.12);border:1px solid rgba(185,138,62,0.35);font-size:13px;color:#4A3212;line-height:1.6;}
   .actions{display:flex;justify-content:flex-end;margin-top:20px;}
-  .btn{
-    font-family:var(--font-body);
-    font-weight:700;font-size:14px;
-    border:none;border-radius:999px;
-    padding:12px 24px;cursor:pointer;
-    background:var(--forest);color:#F6EFDD;
-    transition:background .15s ease, opacity .15s ease;
-  }
+  .btn{font-family:var(--font-body);font-weight:700;font-size:14px;border:none;border-radius:999px;padding:12px 24px;cursor:pointer;background:var(--forest);color:#F6EFDD;transition:all .15s ease;}
   .btn:hover{background:var(--forest-deep);}
-  .btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-  .btn.secondary{
-    background:transparent;color:var(--forest-deep);
-    border:1px solid var(--line);
-  }
+  .btn.secondary{background:transparent;color:var(--forest-deep);border:1px solid var(--line);}
   .btn.secondary:hover{background:var(--paper);}
   .btn.ghost{background:transparent;color:var(--clay);padding:8px 12px;font-weight:600;font-size:12.5px;}
-  .text-link-btn{
-    background:none;border:none;color:var(--ink-soft);font-size:12.5px;
-    text-decoration:underline;cursor:pointer;font-family:var(--font-body);
-    padding:6px 4px;
-  }
-  .text-link-btn:focus-visible{outline:2px solid var(--forest);outline-offset:2px;}
-
+  .text-link-btn{background:none;border:none;color:var(--ink-soft);font-size:12.5px;text-decoration:underline;cursor:pointer;font-family:var(--font-body);padding:6px 4px;}
   .center-col{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;}
   .mode-picker{display:flex;flex-direction:column;gap:10px;width:100%;max-width:340px;}
-  .mode-btn{
-    display:flex;flex-direction:column;align-items:flex-start;gap:3px;
-    text-align:left;width:100%;
-    background:var(--card);border:1.5px solid var(--line);border-radius:14px;
-    padding:13px 16px;cursor:pointer;font-family:var(--font-body);
-    transition:border-color .15s ease, background .15s ease;
-  }
+  .mode-btn{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;width:100%;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:13px 16px;cursor:pointer;font-family:var(--font-body);transition:all .15s ease;}
   .mode-btn b{font-size:14.5px;color:var(--ink);}
   .mode-btn span{font-size:11.5px;color:var(--ink-soft);font-weight:400;}
   .mode-btn:hover{background:var(--paper);}
   .mode-btn.active{border-color:var(--forest);background:rgba(var(--tint-rgb),0.07);}
   .mode-btn.active b{color:var(--forest-deep);}
-  .mode-btn:focus-visible{outline:2px solid var(--forest);outline-offset:2px;}
   .big-title{font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--forest-deep);}
   .desc{font-size:13.5px;color:var(--ink-soft);line-height:1.7;max-width:380px;}
-
   .score-big{font-family:var(--font-display);font-size:44px;font-weight:700;color:var(--forest-deep);margin:4px 0 0;}
   .score-sub{font-size:13px;color:var(--ink-soft);}
-
-  .stats-toggle{
-    text-align:center;margin-top:24px;
-  }
-  .stats-panel{
-    margin-bottom:24px;background:var(--card);border:1px solid var(--line);
-    border-radius:16px;padding:18px 20px;display:none;
-  }
+  .stats-toggle{text-align:center;margin-top:24px;}
+  .stats-panel{margin-bottom:24px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px;display:none;}
   .stats-panel.open{display:block;}
-  .browse-search{
-    width:100%;box-sizing:border-box;font-family:var(--font-body);font-size:14px;
-    padding:11px 14px;border:1.5px solid var(--line);border-radius:12px;
-    background:var(--card);color:var(--ink);margin:12px 0 6px;
-  }
+  .browse-search{width:100%;box-sizing:border-box;font-family:var(--font-body);font-size:14px;padding:11px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);margin:12px 0 6px;}
   .browse-search:focus{outline:none;border-color:var(--forest);}
-  .cat-accordion{
-    margin-top:12px;border:1px solid var(--line);border-radius:14px;
-    background:var(--card);overflow:hidden;
-  }
-  .cat-accordion summary{
-    cursor:pointer;padding:13px 16px;font-weight:700;font-size:14px;
-    color:var(--forest-deep);list-style:none;
-  }
+  .cat-accordion{margin-top:12px;border:1px solid var(--line);border-radius:14px;background:var(--card);overflow:hidden;}
+  .cat-accordion summary{cursor:pointer;padding:13px 16px;font-weight:700;font-size:14px;color:var(--forest-deep);list-style:none;}
   .cat-accordion summary::-webkit-details-marker{display:none;}
   .cat-accordion summary::before{content:"▸ ";color:var(--gold);}
   .cat-accordion[open] summary::before{content:"▾ ";}
   .cat-qlist{padding:0 16px 14px;}
   .flashcard{padding:0;border-top:1px solid var(--line);}
   .flashcard:first-child{border-top:none;}
-  .flashcard summary{
-    cursor:pointer;padding:12px 0 12px;font-size:13.5px;font-weight:600;
-    color:var(--ink);line-height:1.5;list-style:none;
-  }
+  .flashcard summary{cursor:pointer;padding:12px 0 12px;font-size:13.5px;font-weight:600;color:var(--ink);line-height:1.5;list-style:none;}
   .flashcard summary::-webkit-details-marker{display:none;}
-  .flashcard summary::after{
-    content:"答えを見る ▾";display:inline-block;margin-left:8px;
-    font-size:10px;font-weight:400;color:var(--gold);vertical-align:middle;
-  }
+  .flashcard summary::after{content:"答えを見る ▾";display:inline-block;margin-left:8px;font-size:10px;font-weight:400;color:var(--gold);vertical-align:middle;}
   .flashcard[open] summary::after{content:"閉じる ▴";}
   .flashcard-answer{padding:0 0 14px;}
-  .browse-answer{
-    display:inline-block;font-size:13px;font-weight:700;color:var(--forest-deep);
-    background:rgba(var(--tint-rgb),0.10);border-radius:8px;padding:6px 12px;
-  }
-  .browse-link-btn{
-    display:flex;flex-direction:column;align-items:center;gap:3px;
-    width:100%;max-width:340px;
-    background:var(--gold-soft);border:1.5px solid var(--gold);border-radius:14px;
-    padding:13px 16px;margin-top:16px;cursor:pointer;
-    font-family:var(--font-body);color:#4A3212;
-    transition:background .15s ease, transform .1s ease;
-  }
-  .browse-link-btn b{font-size:14.5px;}
-  .browse-link-btn span{font-size:11px;font-weight:400;color:#6b5230;}
+  .browse-answer{display:inline-block;font-size:13px;font-weight:700;color:var(--forest-deep);background:rgba(var(--tint-rgb),0.10);border-radius:8px;padding:6px 12px;}
+  .browse-link-btn, .exam-link-btn, .battle-link-btn{display:flex;flex-direction:column;align-items:center;gap:3px;width:100%;max-width:340px;border-radius:14px;padding:13px 16px;margin-top:10px;cursor:pointer;font-family:var(--font-body);transition:all .15s ease;}
+  .browse-link-btn{background:var(--gold-soft);border:1.5px solid var(--gold);color:#4A3212;}
   .browse-link-btn:hover{background:#e0bd82;}
-  .browse-link-btn:active{transform:scale(0.99);}
-  .browse-link-btn:focus-visible{outline:2px solid var(--forest);outline-offset:2px;}
-  .exam-link-btn{
-    display:flex;flex-direction:column;align-items:center;gap:3px;
-    width:100%;max-width:340px;
-    background:var(--forest);border:1.5px solid var(--forest-deep);border-radius:14px;
-    padding:13px 16px;margin-top:10px;cursor:pointer;
-    font-family:var(--font-body);color:#F6EFDD;
-    transition:background .15s ease, transform .1s ease;
-  }
-  .exam-link-btn b{font-size:14.5px;}
-  .exam-link-btn span{font-size:11px;font-weight:400;color:#CFE0DA;}
+  .exam-link-btn{background:var(--forest);border:1.5px solid var(--forest-deep);color:#F6EFDD;}
   .exam-link-btn:hover{background:var(--forest-deep);}
-  .exam-link-btn:active{transform:scale(0.99);}
-  .exam-link-btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-  .browse-note{
-    margin-top:8px;font-size:12px;color:#4A3212;
-    background:rgba(185,138,62,0.12);border-radius:8px;padding:8px 10px;line-height:1.6;
-  }
-  .stats-panel h3{
-    font-family:var(--font-display);font-size:14px;margin:0 0 12px;color:var(--forest-deep);
-  }
+  .battle-link-btn{background:#A8492E;border:1.5px solid #82341E;color:#FFF;}
+  .battle-link-btn:hover{background:#82341E;}
+  .browse-link-btn b, .exam-link-btn b, .battle-link-btn b{font-size:14.5px;}
+  .browse-link-btn span, .exam-link-btn span, .battle-link-btn span{font-size:11px;font-weight:400;}
+  .browse-link-btn span{color:#6b5230;} .exam-link-btn span{color:#CFE0DA;} .battle-link-btn span{color:#FBEFE9;}
+  .browse-note{margin-top:8px;font-size:12px;color:#4A3212;background:rgba(185,138,62,0.12);border-radius:8px;padding:8px 10px;line-height:1.6;}
+  .stats-panel h3{font-family:var(--font-display);font-size:14px;margin:0 0 12px;color:var(--forest-deep);}
   .cat-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:12.5px;}
   .cat-row .cat-name{flex:0 0 108px;color:var(--ink-soft);}
   .cat-bar-track{flex:1;height:8px;border-radius:5px;background:var(--paper-deep);overflow:hidden;}
   .cat-bar-fill{height:100%;background:linear-gradient(90deg, var(--gold), var(--forest));border-radius:5px;}
   .cat-pct{flex:0 0 34px;text-align:right;color:var(--ink-soft);}
-  .stats-foot{
-    margin-top:14px;padding-top:12px;border-top:1px solid var(--line);
-    display:flex;justify-content:space-between;font-size:12px;color:var(--ink-soft);
-  }
+  .stats-foot{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);display:flex;justify-content:space-between;font-size:12px;color:var(--ink-soft);}
   .reset-zone{margin-top:12px;text-align:right;}
   .confirm-row{display:flex;gap:8px;justify-content:flex-end;align-items:center;margin-top:8px;font-size:12.5px;}
-
   .footer-note{text-align:center;color:var(--ink-soft);font-size:11.5px;margin-top:26px;line-height:1.7;}
   .feedback-link{color:var(--forest-deep);font-weight:600;text-decoration:underline;}
-  .onboard-overlay{
-    position:fixed;inset:0;background:rgba(28,21,15,0.72);z-index:1000;
-    display:flex;align-items:center;justify-content:center;padding:20px;
-    -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
-  }
-  .onboard-card{
-    background:var(--card);border-radius:20px;padding:26px 22px;max-width:400px;width:100%;
-    max-height:86vh;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,0.35);
-  }
-  .onboard-title{
-    font-family:var(--font-display);font-size:19px;font-weight:700;color:var(--forest-deep);
-    text-align:center;margin:0 0 8px;line-height:1.4;
-  }
+  .onboard-overlay{position:fixed;inset:0;background:rgba(28,21,15,0.72);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px);}
+  .onboard-card{background:var(--card);border-radius:20px;padding:26px 22px;max-width:400px;width:100%;max-height:86vh;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,0.35);}
+  .onboard-title{font-family:var(--font-display);font-size:19px;font-weight:700;color:var(--forest-deep);text-align:center;margin:0 0 8px;line-height:1.4;}
   .onboard-lead{text-align:center;color:var(--ink-soft);font-size:12.5px;margin:0 0 16px;}
   .onboard-list{list-style:none;margin:0 0 20px;padding:0;display:flex;flex-direction:column;gap:12px;}
   .onboard-list li{font-size:13px;line-height:1.6;color:var(--ink);}
   .onboard-list b{color:var(--forest-deep);}
-  .reopen-guide-link{
-    display:block;text-align:center;font-size:11.5px;color:var(--ink-soft);
-    text-decoration:underline;margin:0 0 18px;cursor:pointer;background:none;border:none;
-    font-family:var(--font-body);width:100%;
-  }
-  #btnOnboardClose{display:block;margin:0 auto;}
-
-  @media (prefers-reduced-motion: reduce){
-    *{transition:none !important;}
-  }
-  @media (max-width:400px){
-    .card{padding:20px 16px;}
-    .choice-btn{padding:11px 13px;font-size:14px;}
-  }
-
+  .reopen-guide-link{display:block;text-align:center;font-size:11.5px;color:var(--ink-soft);text-decoration:underline;margin:0 0 18px;cursor:pointer;background:none;border:none;font-family:var(--font-body);width:100%;}
+  
   /* --- 進捗円グラフと新しい記録ボタンのスタイル --- */
-  .stats-toggle button {
-    display: flex; flex-direction: column; align-items: center; gap: 4px;
-    width: 100%; max-width: 340px; margin: 0 auto;
-    background: var(--card); border: 2px solid var(--forest); border-radius: 14px;
-    padding: 14px; font-family: var(--font-body); text-decoration: none;
-    cursor: pointer; transition: background .15s ease, transform .1s ease;
-  }
+  .stats-toggle button {display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; max-width: 340px; margin: 0 auto; background: var(--card); border: 2px solid var(--forest); border-radius: 14px; padding: 14px; font-family: var(--font-body); cursor: pointer; transition: all .15s ease;}
   .stats-toggle button:hover { background: rgba(var(--tint-rgb),0.05); }
   .stats-toggle button:active { transform: scale(0.99); }
   .stats-toggle button b { font-size: 14.5px; color: var(--forest-deep); }
   .stats-toggle button span { font-size: 11.5px; color: var(--ink-soft); }
-
-  .stats-overview {
-    display: flex; gap: 20px; align-items: center; margin-bottom: 24px;
-    background: var(--paper); padding: 16px; border-radius: 16px;
-    border: 1px solid var(--line);
-  }
-  .progress-donut {
-    width: 100px; height: 100px; border-radius: 50%;
-    position: relative; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: inset 0 2px 6px rgba(0,0,0,0.1);
-  }
-  .progress-donut::after {
-    content: ""; position: absolute; inset: 16px;
-    background: var(--paper); border-radius: 50%;
-  }
+  .stats-overview {display: flex; gap: 20px; align-items: center; margin-bottom: 24px; background: var(--paper); padding: 16px; border-radius: 16px; border: 1px solid var(--line);}
+  .progress-donut {width: 100px; height: 100px; border-radius: 50%; position: relative; flex-shrink: 0; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 2px 6px rgba(0,0,0,0.1);}
+  .progress-donut::after {content: ""; position: absolute; inset: 16px; background: var(--paper); border-radius: 50%;}
   .donut-inner { position: relative; z-index: 1; text-align: center; }
   .donut-pct { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--forest-deep); line-height: 1; }
   .donut-lbl { font-size: 10px; color: var(--ink-soft); margin-top: 2px; }
@@ -381,24 +176,36 @@
   .legend-dot.red { background: #ef4444; }
   .legend-dot.gray { background: #d1d5db; }
   .legend-count { font-weight: 600; font-family: var(--font-display); color: var(--ink); }
+  .map-wrapper {position: relative; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 14px rgba(28,59,50,0.15); background: #A0C4C9; margin: 0 auto;}
 
-  .map-wrapper {
-    position: relative; border-radius: 14px; overflow: hidden;
-    box-shadow: 0 4px 14px rgba(28,59,50,0.15);
-    background: #A0C4C9; 
-    margin: 0 auto;
+  /* --- BAバトル用スタイル --- */
+  .battle-board { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding:12px 16px; background:var(--paper); border-radius:14px; border:1px solid var(--line); }
+  .battle-player { display:flex; flex-direction:column; align-items:center; width:45%; }
+  .battle-name { font-size:12px; color:var(--ink-soft); font-weight:600; margin-bottom:4px; }
+  .battle-score { font-family:var(--font-display); font-size:28px; font-weight:800; color:var(--forest-deep); }
+  .battle-vs { font-size:14px; color:var(--gold); font-weight:bold; }
+  .buzzer-area { display:flex; justify-content:center; align-items:center; height:200px; margin:20px 0; }
+  .buzzer-btn { 
+    width:160px; height:160px; border-radius:50%; background:#E03B3B; color:#FFF; font-size:24px; font-weight:800; 
+    border:6px solid #B02828; box-shadow:0 12px 0 #7A1C1C, 0 16px 20px rgba(0,0,0,0.2); 
+    cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.05s ease;
+    font-family:var(--font-display);
   }
+  .buzzer-btn:active { transform:translateY(12px); box-shadow:0 0 0 #7A1C1C, 0 4px 10px rgba(0,0,0,0.2); }
+  .buzzer-btn:disabled { background:#ccc; border-color:#aaa; box-shadow:0 12px 0 #888; cursor:not-allowed; transform:translateY(0); }
+  .battle-status-msg { text-align:center; font-weight:700; color:var(--clay); font-size:18px; margin-bottom:16px; min-height:27px;}
+  .input-room { font-size:20px; padding:10px; width:140px; text-align:center; border:2px solid var(--line); border-radius:8px; font-family:var(--font-display); letter-spacing:0.2em; }
 </style>
 </head>
 <body>
 
-<!-- 起動時スプラッシュ画面 -->
+<!-- スプラッシュ -->
 <div id="splashScreen" style="position:fixed; inset:0; background:var(--paper); z-index:10000; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:opacity 0.5s ease;">
   <div style="font-family:var(--font-display); font-size:42px; font-weight:800; color:var(--forest-deep); margin-bottom:12px;">BAドリル</div>
   <div style="font-size:13px; color:var(--ink-soft); font-weight:600; letter-spacing:0.1em;">STARBUCKS COFFEE MASTER</div>
 </div>
 
-<div class="wrap">
+<div class="wrap" id="mainWrap">
   <div class="eyebrow">STARBUCKS COFFEE MASTER</div>
   <h1>BAドリル</h1>
 
@@ -414,10 +221,7 @@
   </details>
 
   <div class="badges" id="badges"></div>
-
-  <div class="card" id="stage">
-    <div class="center-col">読み込み中...</div>
-  </div>
+  <div class="card" id="stage"><div class="center-col">読み込み中...</div></div>
 
   <div class="stats-toggle" style="margin-top:24px;">
     <button id="statsToggleBtn" type="button">
@@ -447,6 +251,7 @@
       <li>📖 <b>「収録されている全問題の単語帳」</b>でいつでも一覧チェック（タップで答え表示）</li>
       <li>📝 <b>「模擬試験を受ける」</b>で本番そっくりの50問・制限時間30分にチャレンジ</li>
       <li>📊 <b>「これまでの記録」</b>で分野別の得意・不得意もひと目で分かります</li>
+      <li>🥊 <b>「BAバトル」</b>で友達とスマホを繋いでオンライン早押し対戦！</li>
     </ul>
     <button class="btn" id="btnOnboardClose" type="button">はじめる！</button>
   </div>
@@ -466,7 +271,6 @@
 (function(){
   "use strict";
 
-  /* ---------------- 問題バンク ---------------- */
   var QUESTIONS = [
     {id:1,c:'hist',q:'スターバックス1号店がオープンしたのは何年でしょう？',o:['1982年','1975年','1984年','1971年'],a:3,hot:true},
     {id:2,c:'hist',q:'スターバックス1号店がオープンした都市はどこでしょう？',o:['ニューヨーク','サンフランシスコ','シアトル','ポートランド'],a:2},
@@ -485,7 +289,6 @@
     {id:15,c:'hist',q:'TOKYOロースト（TYO）が発売されたのは何年でしょう？',o:['2014年','2017年','2021年','2019年'],a:3},
     {id:17,c:'hist',q:'スターバックス1号店のロゴに入っていた言葉は？',o:['Starbucks Coffee Company','Seattle Best Coffee','Pike Place Coffee','Starbucks Coffee Tea Spices'],a:3},
     {id:18,c:'hist',q:'初の自社農園「ハシエンダ アルサシア」があるのはどの国でしょう？',o:['グアテマラ','ブラジル','コスタリカ','コロンビア'],a:2},
-
     {id:19,c:'basic',q:'スターバックスが購買するコーヒー豆の品種は？',o:['リベリカ種のみ','アラビカ種とロブスタ種の両方','ロブスタ種のみ','アラビカ種のみ'],a:3,hot:true},
     {id:20,c:'basic',q:'世界のコーヒー生産量に占めるアラビカ種の割合はおよそ何%でしょう？',o:['40%','50%','60%','80%'],a:2},
     {id:21,c:'basic',q:'ロブスタ種のカフェイン含有量（重量比）はおよそ何%でしょう？',o:['0.5%','2%','4%','1%'],a:1},
@@ -501,7 +304,6 @@
     {id:32,c:'basic',q:'コーヒーの木は開花から収穫まで、およそ何か月かかるでしょう？',o:['3か月','12か月','9か月','6か月'],a:2},
     {id:33,c:'basic',q:'次のうち、ラテンアメリカ産コーヒーの風味特徴として正しいのは？',o:['フローラルさやシトラス感が際立つ','ナッツやココアの風味でバランスが良い','しっかりしたコクとハーブのような風味','強い発酵感が特徴'],a:1},
     {id:34,c:'basic',q:'次のうち、アフリカ産コーヒーの風味特徴として正しいのは？',o:['フローラル・シトラス・ベリー系の風味','酸味がほとんどない','ナッツやココア中心の風味','ハーブや大地を思わせる風味'],a:0},
-
     {id:35,c:'proc',q:'コーヒーチェリーの一番外側にある層は？',o:['粘液','果皮','果肉','パーチメント'],a:1,hot:true},
     {id:36,c:'proc',q:'コーヒー豆を保護する硬い層「内果皮」を何と呼ぶでしょう？',o:['パーチメント','ミューシレージ','グリーンビーン','シルバースキン'],a:0,hot:true},
     {id:37,c:'proc',q:'生豆の最後の薄くほとんど透明な保護層を何と呼ぶでしょう？',o:['シルバースキン','パーチメント','パルプ','ハスク'],a:0,hot:true},
@@ -518,7 +320,6 @@
     {id:48,c:'proc',q:'加工後に生豆を最終的に選別する加工場を何と呼ぶでしょう？',o:['ドライミル','ロースタリー','ウェットミル','FSC'],a:0},
     {id:49,c:'proc',q:'スターバックスのエイジドコーヒーが保存される倉庫があるのはどこでしょう？',o:['イギリス','日本','シンガポール','アメリカ'],a:2},
     {id:50,c:'proc',q:'エイジドコーヒーはおよそ何年熟成させるでしょう？',o:['3〜5年','7〜10年','10年以上','1〜2年'],a:0},
-
     {id:51,c:'cafe',q:'C.A.F.E.プラクティスの「C.A.F.E.」とは何の略でしょう？',o:['Coffee And Farm Excellence','Certified And Fair Ethics','Coffee Agriculture For Environment','Coffee And Farmer Equity'],a:3,hot:true},
     {id:52,c:'cafe',q:'スターバックスがコンサベーション・インターナショナルとパートナーシップを開始したのは何年でしょう？',o:['1998年','2004年','2001年','1996年'],a:0},
     {id:54,c:'cafe',q:'C.A.F.E.プラクティスで「必須条件」とされる2つの柱の組み合わせは？',o:['品質基準と経済的な透明性','品質基準と社会的責任','経済的な透明性と環境面でのリーダーシップ','社会的責任と環境面でのリーダーシップ'],a:0,hot:true},
@@ -532,7 +333,6 @@
     {id:62,c:'cafe',q:'スコアが60%未満でも、全必須項目に適合していれば得られるステータスは？',o:['対象外','ストラテジックサプライヤー','ベリファイドサプライヤー','プリファードサプライヤー'],a:2},
     {id:63,c:'cafe',q:'C.A.F.E.プラクティスを共同で作り上げた非営利団体は？',o:['コンサベーション・インターナショナル','グリーンピース','フェアトレードインターナショナル','WWF'],a:0},
     {id:64,c:'cafe',q:'「エシカル」の意味として正しいのは？',o:['経済的な','倫理的な','持続的な','効率的な'],a:1},
-
     {id:65,c:'supply',q:'世界中のスターバックスの生豆の購買を担当する会社は？',o:['SCS','SCTC','FSC','GCQ'],a:1,hot:true},
     {id:66,c:'supply',q:'SCTC（スターバックス コーヒー トレーディング カンパニー）の所在地は？',o:['イタリア・ミラノ','スイス・ローザンヌ','アメリカ・シアトル','オランダ・アムステルダム'],a:1,hot:true},
     {id:67,c:'supply',q:'レシピ管理・品質基準の策定・ブレンドレシピの作成を担当するチームは？',o:['GCQ','FSC','SCTC','SCS'],a:0,hot:true},
@@ -543,7 +343,6 @@
     {id:72,c:'supply',q:'生豆がロースト工場に到着した際にGCQが行うテイスティングを何と呼ぶでしょう？',o:['出荷前サンプル','カッピングサンプル','オファーサンプル','到着サンプル'],a:3},
     {id:73,c:'supply',q:'最初にファーマーサポートセンター（FSC）が開設された国は？',o:['ルワンダ','中国','コスタリカ','グアテマラ'],a:2},
     {id:74,c:'supply',q:'最初のファーマーサポートセンターが開設されたのは何年でしょう？',o:['2009年','1998年','2012年','2004年'],a:3},
-
     {id:76,c:'brew',q:'スターバックスが推奨する分量は、水180mlに対しコーヒー何gでしょう？',o:['15g','20g','10g','5g'],a:2,hot:true},
     {id:77,c:'brew',q:'コーヒー抽出に適したお湯の温度は？',o:['80〜90℃','96〜100℃','90〜96℃','70〜80℃'],a:2,hot:true},
     {id:78,c:'brew',q:'コーヒーのおよそ何%は水でできているでしょう？',o:['90%','98%','100%','80%'],a:1,hot:true},
@@ -552,7 +351,6 @@
     {id:83,c:'brew',q:'「18対1」というコーヒーの抽出比率レシピを考案したのは誰（どこ）でしょう？',o:['スターバックス','SCAA','Coffee Brewing Center','ハワード・シュルツ'],a:2,hot:true,n:'「18対1」はスターバックス独自の考案ではなく、1945年にCoffee Brewing Centerが消費者調査に基づいて算出したレシピです。'},
     {id:84,c:'brew',q:'コーヒープレスで淹れたコーヒーのおいしさが保たれるのはおよそ何分でしょう？',o:['30分','60分','10分','20分'],a:3,hot:true},
     {id:85,c:'brew',q:'コーヒーメーカーで抽出したコーヒーのおいしさが保たれるのはおよそ何分でしょう？',o:['45分','30分','10分','20分'],a:1,hot:true},
-
     {id:86,c:'equip',q:'コーヒープレスの推奨挽き具合（マルコニックグラインダー）は何番でしょう？',o:['8番','13番','5番','10番'],a:1,hot:true},
     {id:87,c:'equip',q:'カッピングの推奨挽き具合（マルコニックグラインダー）は何番でしょう？',o:['5番','3番','8番','10番'],a:1,hot:true},
     {id:88,c:'equip',q:'サイフォンの推奨挽き具合（マルコニックグラインダー）は何番でしょう？',o:['5番','13番','8番','3番'],a:2},
@@ -563,7 +361,6 @@
     {id:94,c:'equip',q:'エスプレッソの「4つのM」のうち、「マノ」はイタリア語で何を意味するでしょう？',o:['コーヒー','マシン','手','グラインダー'],a:2},
     {id:95,c:'equip',q:'メリタ式ドリッパーを考案したのはどこの国の人でしょう？',o:['ドイツ','フランス','イタリア','日本'],a:0},
     {id:96,c:'equip',q:'カリタ式ドリッパーの抽出口はいくつでしょう？',o:['3個','1個','2個','4個'],a:0},
-
     {id:97,c:'core',q:'パイクプレイス ロースト（EDB）のロースト分類は？',o:['Dark','分類なし','Medium','Blonde'],a:2,hot:true},
     {id:98,c:'core',q:'スマトラ（SUM）のロースト分類は？',o:['Medium','分類なし','Dark','Blonde'],a:2,hot:true},
     {id:99,c:'core',q:'カフェ ベロナ（VER）のロースト分類は？',o:['分類なし','Medium','Blonde','Dark'],a:3,hot:true},
@@ -575,7 +372,6 @@
     {id:105,c:'core',q:'TOKYOロースト（TYO）の加工法は？',o:['半水洗式のみ','乾燥式のみ','水洗式＋半水洗式','水洗式のみ'],a:2},
     {id:108,c:'core',q:'次のうち、ダークローストに分類されないコーヒーは？',o:['ESP（エスプレッソロースト）','SUM（スマトラ）','VER（カフェベロナ）','BRK（ブレックファーストブレンド）'],a:3,n:'BRK（ブレックファースト ブレンド）はミディアムローストに分類されます。'},
     {id:109,c:'core',q:'次のうち、ブロンドローストに分類されるコーヒーは？',o:['SUM（スマトラ）','LNB（ライトノートブレンド）','BRK（ブレックファーストブレンド）','HOU（ハウスブレンド）'],a:1},
-
     {id:110,c:'misc',q:'フェアトレード認証の目的として正しいのは？',o:['消費者に安さを提供すること','生産地を観光地化すること','生産者による協同組合の運営を支援すること','企業の利益を最大化すること'],a:2},
     {id:111,c:'misc',q:'フェアトレードの生産者に保証されるものは？',o:['無制限に生産できる特別な枠','無償で生豆を提供してもらえること','市場価格を超えるプレミアム価格','輸出入にかかる税金の免除'],a:2},
     {id:113,c:'misc',q:'「軽めのコクと穏やかな風味」が特徴のローストレベルは？',o:['ミディアム','ブロンド','ダーク','フレンチ'],a:1},
@@ -586,7 +382,6 @@
     {id:118,c:'misc',q:'ディカフェのカフェイン除去法「ダイレクトコンタクト法」で使用される薬剤は？',o:['液体二酸化炭素','クエン酸','塩化メチレン','エタノール'],a:2},
     {id:119,c:'misc',q:'DHO（ディカフェ ハウスブレンド）の現在のカフェイン除去法は？',o:['酵素分解法','二酸化炭素抽出法（ナチュラル除去法）','スイスウォータープロセス','ダイレクトコンタクト法'],a:2,hot:true,n:'2026年7月頃から、従来の二酸化炭素抽出法からスイスウォータープロセスに変更されています。'},
     {id:502,c:'misc',q:'カフェイン除去法「スイスウォータープロセス」の特徴として正しいのは？',o:['化学薬剤を使わず、水と活性炭フィルターだけでカフェインを除去する','塩化メチレンという薬剤に生豆を浸してカフェインを除去する','水と液体二酸化炭素を高圧で使いカフェインを溶かし出す','生豆を高温で焙煎することでカフェインを飛ばす'],a:0,n:'化学薬剤不使用が特徴の除去法で、DHO（ディカフェ ハウスブレンド）にも採用されています。'},
-
     {id:120,c:'mission',q:'OUR MISSIONの一文「『最高』のコーヒー体験を届けるかけがえのない存在となり、人々の心を（  ）にするためにー」の空欄に入る言葉は？',o:['特別で贅沢なもの','便利で快適なもの','豊かで活力あるもの','穏やかで安らげるもの'],a:2,hot:true},
     {id:121,c:'mission',q:'OUR MISSIONの一文「ひとりのお客様、この一杯、そして（  ）から」の空欄に入る言葉は？',o:['ひとつの街','ひとつの物語','ひとつのチーム','ひとつのコミュニティ'],a:3,hot:true},
     {id:122,c:'mission',q:'OUR MISSIONのタイトルの下に添えられている副題は？',o:['私たちがここにいる理由','私たちの約束','私たちの行動指針','私たちがともに目指す姿'],a:0,hot:true},
@@ -597,7 +392,6 @@
     {id:133,c:'mission',q:'OUR VALUESの「思いをかたちにする」はどの言葉に当たるでしょう？',o:['BELONGING','COURAGE','CRAFT','RESULTS'],a:2,hot:true},
     {id:135,c:'mission',q:'OUR VALUESの「勇気をもって向き合う」はどの言葉に当たるでしょう？',o:['RESULTS','BELONGING','COURAGE','JOY'],a:2,hot:true},
     {id:137,c:'mission',q:'OUR VALUESの「楽しむことを力に」はどの言葉に当たるでしょう？',o:['JOY','BELONGING','COURAGE','RESULTS'],a:0,hot:true},
-
     {id:139,c:'news2026',q:'2026年8月2日、スターバックスは日本上陸から何周年を迎えるでしょう？',o:['30周年','25周年','35周年','20周年'],a:0,hot:true,n:'1996年8月2日、東京・銀座の日本1号店オープンが起点です。'},
     {id:140,c:'news2026',q:'2026年9月9日に全国のスターバックス店舗で発売された、創業年の数字を冠した新しい定番（コア）コーヒーの商品名は？',o:['スターバックス 1971 ダーク ロースト','スターバックス クラシック 1971','パイクプレイス アニバーサリー ロースト','スターバックス オリジン ダーク'],a:0,hot:true},
     {id:141,c:'news2026',q:'「スターバックス 1971 ダーク ロースト」の商品名にある「1971」が表しているのは？',o:['商品化までの開発日数','スターバックスがシアトルで創業した年','使用しているコーヒー豆の産地数','発売年'],a:1,hot:true},
@@ -610,7 +404,6 @@
     {id:148,c:'news2026',q:'2026年4月17日より、日本上陸30周年“WHY NOT COFFEE?”の第1弾としてリニューアル発売された定番ビバレッジは？',o:['キャラメル マキアート','カフェラテ','ホワイトモカ','カプチーノ'],a:0,hot:true},
     {id:149,c:'news2026',q:'2026年時点で、スターバックスが日本国内に展開する店舗数はおよそどれくらいでしょう？',o:['約3,000店舗','約1,500店舗','約2,100店舗','約1,000店舗'],a:2,hot:true,n:'全国47都道府県、約30万人のパートナーとともに約2,100店舗を展開しています。'},
     {id:150,c:'news2026',q:'日本上陸30周年を記念し、地域とともに未来を育むことを目的に2026年8月から始動したプログラムは？',o:['STARBUCKS JIMOTO PROGRAM','STARBUCKS COMMUNITY FUND','LOCAL ROOTS PROJECT','ONE VILLAGE ONE STORE'],a:0,hot:true},
-
     {id:151,c:'core',q:'グアテマラ アンティグア（GUA）のパッケージに描かれている、グアテマラの国鳥でもある鳥は？',o:['ケツァール','フラミンゴ','ハチドリ','アンデスコンドル'],a:0,n:'よく似た問題でLNB（ライトノートブレンド）の鳥はハチドリです。混同しないよう注意しましょう。'},
     {id:152,c:'core',q:'スターバックス ライトノートブレンド（LNB）のパッケージに描かれている、ラテンアメリカの農園でよく見られる鳥は？',o:['アンデスコンドル','ペリカン','ケツァール','ハチドリ'],a:3,n:'グアテマラ アンティグア（GUA）の鳥ケツァールと混同しないよう注意しましょう。'},
     {id:153,c:'core',q:'ケニア（KEN）のパッケージに描かれている動物は？',o:['キリン','アフリカゾウ','サイ','ライオン'],a:1},
@@ -624,7 +417,6 @@
     {id:161,c:'core',q:'ブレックファースト ブレンド（BRK）のパッケージに描かれているモチーフの組み合わせとして正しいのは？',o:['星・月・雲','海・貝殻・波','火山・虹・花','太陽・山・鳥'],a:3},
     {id:162,c:'core',q:'サイレンブレンド（SRN）のパッケージデザインが敬意を表しているのは？',o:['パートナー（従業員）全員','スターバックスの創業者たち','コーヒー業界で活躍する女性たち','世界中の生産者'],a:2},
     {id:163,c:'core',q:'スマトラ（SUM）のパッケージデザインが着目しているのは？',o:['スマトラ島の火山の形','ジャコウネコの模様','コモドドラゴンのうろこ模様','スマトラトラの縞模様とヤシの葉の形の共通点'],a:3},
-
     {id:164,c:'vocab',q:'コーヒー用語「BALANCED（バランスの良い）」の説明として正しいのは？',o:['後味のほとんど残らないコーヒー','酸味、コク、風味が心地よく交わりあって調和をなす','舌に重量感を感じるコーヒー','野生のマッシュルームを思わせる香りや風味'],a:1,hot:true},
     {id:165,c:'vocab',q:'コーヒー用語「BRIGHT（鮮やかな）」の説明として正しいのは？',o:['煙や炭を思わせるスモーキーさ','口の中前方で感じるキリッとした酸味','舌に残る重さをほとんど感じないコーヒー','赤ワインやフルーツに似た風味や香り'],a:1,hot:true,n:'標高の高い農園で生産されたコーヒーによく見られる特徴とされています。'},
     {id:166,c:'vocab',q:'コーヒー用語「CLEAN（さっぱりとした）」の説明として正しいのは？',o:['後味のほとんど残らないコーヒーを指す','舌の上で酸味が踊り、素早く消える感覚','コクがしっかりしていて後味が長く残る','ナッツ類を思わせる心地よい風味'],a:0,hot:true},
@@ -643,62 +435,50 @@
     {id:179,c:'vocab',q:'コーヒーの濃度を示す指標「総溶解固形物量」を意味する略称は？',o:['TBR','TDS','TDT','TCR'],a:1,n:'Total Dissolved Solidsの略で、液体中に溶け出した化合物の総量（濃度）を測る指標です。'},
     {id:180,c:'vocab',q:'エスプレッソ抽出前に、コーヒー粉をポルタフィルター内で均一に分布させるテクニック（道具）を何と呼ぶ？',o:['WDR','WDT','WFT','WMT'],a:1,n:'均一に分布させることで、抽出のムラを防ぎ安定したショットにつながります。'},
     {id:181,c:'vocab',q:'コーヒーチェリーの果皮や果肉を乾燥させて作る、ハーブティーのように飲用される飲み物を何と呼ぶ？',o:['ジャバナ','パルプドナチュラル','カスカラ','ハニープロセス'],a:2,n:'コーヒー生産で通常廃棄されるチェリーの果皮・果肉を再利用した飲み物です。'},
-
     {id:182,c:'core',q:'スターバックス シングルオリジン エチオピア（ETH）の風味キーワードとして正しいのは？',o:['メイヤーレモンやカカオニブを思わせる風味','タンジェリンやレモンバームを思わせる風味','スイカや煎茶を思わせる風味','チョコレートヌガーやマカダミアナッツを思わせる風味'],a:1,hot:true},
     {id:183,c:'core',q:'ETH（シングルオリジン エチオピア）の相性の良い風味の組み合わせとして正しいのは？',o:['さくら、バニラ、チョコレート','キャラメル、ミルクチョコレート、ピーナッツバター','オレンジ、バニラ、ミント、ジンジャー','ナッツ、ソフトチーズ、シトラス'],a:2,hot:true},
     {id:184,c:'core',q:'スターバックス シングルオリジン エチオピア（ETH）のロースト分類は？',o:['Blonde','Dark','Medium','分類なし'],a:0,n:'こちらは新たにBlondeローストで紹介されているシングルオリジン エチオピアです。'},
     {id:185,c:'core',q:'エチオピアの伝統的なコーヒーの飲み方に関する説明として正しいのは？',o:['エスプレッソマシンで手早く抽出する','天日で乾燥させた豆をそのまま噛んで食べる','鉄鍋で焙煎し、挽いた豆を粘土製のジャバナでいれる','冷水でじっくり時間をかけて抽出する'],a:2,n:'家族やコミュニティが集うコーヒーセレモニーという伝統で、友情・敬意・もてなしの象徴とされています。'},
     {id:186,c:'core',q:'今回、エチオピア産コーヒーをブロンドローストで紹介した狙いとして正しいのは？',o:['賞味期限を延ばすため','新しい風味の体験を提供するため','コスト削減のため','カフェイン含有量を減らすため'],a:1},
-
     {id:187,c:'core',q:'グアテマラ カシ シエロ（GCC）の風味キーワードとして正しいのは？',o:['ハニーブッシュやココアを思わせる風味','メイヤーレモンやカカオニブを思わせる風味','タンジェリンやレモンバームを思わせる風味','クルミや焦がした砂糖のような香ばしい甘みと深み'],a:1,hot:true},
     {id:188,c:'core',q:'GCC（グアテマラ カシ シエロ）の相性の良い風味の組み合わせとして正しいのは？',o:['ナッツ、ソフトチーズ、シトラス','はちみつ、アーモンド','オレンジ、バニラ、ミント、ジンジャー','ハーブ、チーズ'],a:0,hot:true},
     {id:189,c:'core',q:'「カシ シエロ」の意味として正しいのは？',o:['イタリア語で「至福のひととき」','スペイン語で「天国のような」という意味','ハワイ語で「天国のコーヒー」','フランス語で「特別な瞬間」'],a:1},
     {id:190,c:'core',q:'グアテマラ カシ シエロが開発された目的として正しいのは？',o:['エスプレッソ専用に開発するため','クリスマスシーズンの定番にするため','レストラン「キャンリス」のデザートに合わせるため','アイスコーヒー向けに開発するため'],a:2},
-
     {id:191,c:'core',q:'カフェ ベロナ（VER）の風味キーワードとして正しいのは？',o:['タンジェリンやレモンバームを思わせる風味','ダークココアのような風味とローストの甘みと深み','メイヤーレモンやカカオニブを思わせる風味','キャンディードピーカンやセージを思わせる風味'],a:1,hot:true},
     {id:192,c:'core',q:'VER（カフェ ベロナ）の相性の良い風味の組み合わせとして正しいのは？',o:['ミルクチョコレート、ダークチョコレート、カラメル','ハーブ、チーズ','ナッツ、ソフトチーズ、シトラス','はちみつ、アーモンド'],a:0,hot:true},
     {id:193,c:'core',q:'カフェ ベロナが最初に開発された目的として正しいのは？',o:['アイスコーヒー向けに開発された','レストランの濃厚なチョコレートケーキに合うよう開発された','クリスマス限定として開発された','グアテマラ産の豆を紹介するため開発された'],a:1},
     {id:194,c:'core',q:'カフェ ベロナの元となった「80/20ブレンド」の内訳として正しいのは？',o:['パイクプレイス80%とエスプレッソロースト20%','コロンビア80%とスマトラ20%','ハウスブレンド80%とフレンチロースト20%','ユーコンブレンド80%とイタリアンロースト20%'],a:3},
-
     {id:195,c:'core',q:'スプリング シーズン ブレンド（SSB）の風味キーワードとして正しいのは？',o:['クルミや焦がした砂糖のような香ばしい甘みと深み','スイカや煎茶を思わせる風味','グレープフルーツや赤いベリーを思わせる風味','ハニーブッシュやココアを思わせる風味'],a:3,hot:true},
     {id:196,c:'core',q:'SSB（スプリング シーズン ブレンド）の相性の良い風味の組み合わせとして正しいのは？',o:['キャラメル、バター風味のペストリー、チョコレート、トロピカルフルーツ','さくら、バニラ、チョコレート','はちみつ、アーモンド','ナッツ、ソフトチーズ、シトラス'],a:1,hot:true},
     {id:197,c:'core',q:'SSB（スプリング シーズン ブレンド）はもともと2011年、何周年記念のトリビュートブレンドと同じレシピだったか？',o:['50周年','30周年','25周年','40周年'],a:3},
     {id:198,c:'core',q:'2024年にSSB（スプリング シーズン ブレンド）が採用した新レシピの特徴として正しいのは？',o:['単一産地に絞ったレシピ','より深煎りにして力強さを増したレシピ','軽い焙煎でやわらかな風味を生み出すレシピ','カフェインレスに変更したレシピ'],a:2},
-
     {id:199,c:'core',q:'コペラニ ブレンド（KLB）の風味キーワードとして正しいのは？',o:['チョコレートヌガーやマカダミアナッツを思わせる風味','ブラウンシュガーやミルクチョコレートを思わせる風味','ダークココアのような風味とローストの甘みと深み','グレープフルーツや赤いベリーを思わせる風味'],a:0,hot:true},
     {id:200,c:'core',q:'KLB（コペラニ ブレンド）の相性の良い風味の組み合わせとして正しいのは？',o:['キャラメル、ペストリー、チョコレート、トロピカルフルーツ','はちみつ、アーモンド、キャラメル、シナモン','さくら、バニラ、チョコレート、キャラメル','ハーブ、チーズ、ダークチョコレート、カラメル'],a:0,hot:true},
     {id:201,c:'core',q:'「コペラニ」の意味として正しいのは？',o:['スワヒリ語で「〜の間」','イタリア語で「特別な瞬間」','スペイン語で「天国のような」','ハワイ語で「至福のコーヒー」という意味'],a:3},
     {id:202,c:'core',q:'コペラニ ブレンドに関する説明として正しいのは？',o:['日本先行で開発されたブレンドである','コスタリカ産の豆のみを使用している','2026年に初めて発売された','アラスカ・ホライズン航空との提携で開発された'],a:3,n:'FY19サマーPh1に続き、今回で2回目の登場です。'},
-
     {id:203,c:'core',q:'アイスコーヒー ブレンド（ICB）の風味キーワードとして正しいのは？',o:['ハニーブッシュやココアを思わせる風味','タンジェリンやレモンバームを思わせる風味','クルミや焦がした砂糖のような香ばしい甘みと深み','ブラウンシュガーやミルクチョコレートを思わせる風味'],a:3,hot:true},
     {id:204,c:'core',q:'ICB（アイスコーヒー ブレンド）の相性の良い風味の組み合わせとして正しいのは？',o:['オレンジ、バニラ、ミント、ジンジャー','ナッツ、ソフトチーズ、シトラス','はちみつ、アーモンド','キャラメル、ミルクチョコレート、ピーナッツバター'],a:3,hot:true},
     {id:205,c:'core',q:'ICB（アイスコーヒー ブレンド）は2006年に何という名前で登場したか？',o:['ガゼボ ブレンド','ハウスブレンド','ユーコン ブレンド','テラッツァ ブレンド'],a:3,n:'2026年で登場から20周年を迎えました。'},
     {id:206,c:'core',q:'現在のICB（アイスコーヒー ブレンド）に新しく加わった要素として正しいのは？',o:['エチオピア産のシングルオリジン豆','半水洗式のインドネシア産コーヒー','乾燥式加工法のブラジル産コーヒー','水洗式加工法のケニア産コーヒー'],a:2},
-
     {id:207,c:'core',q:'カティカティ ブレンド（EAB）の風味キーワードとして正しいのは？',o:['ハニーブッシュやココアを思わせる風味','キャンディードピーカンやセージを思わせる風味','チョコレートヌガーやマカダミアナッツを思わせる風味','グレープフルーツや赤いベリーを思わせる風味'],a:3,hot:true},
     {id:208,c:'core',q:'EAB（カティカティ ブレンド）の相性の良い風味の組み合わせとして正しいのは？',o:['シトラス、チョコレート','はちみつ、アーモンド','ハーブ、チーズ','キャラメル、ミルクチョコレート、ピーナッツバター'],a:0,hot:true},
     {id:209,c:'core',q:'「カティカティ」という名前の由来として正しいのは？',o:['スワヒリ語で「太陽」を意味する','創業者の名前に由来する','スワヒリ語で「〜の間」を意味する言葉','現地の言葉で「収穫」を意味する'],a:2,n:'エチオピアとケニアの間で調達されたコーヒーへの敬意を込めて名付けられました。'},
     {id:210,c:'core',q:'2025年からEAB（カティカティ ブレンド）に新たに加えられた豆として正しいのは？',o:['タンザニアのハニープロセスコーヒー','エチオピアの乾燥式コーヒー','ルワンダの半水洗式コーヒー','ケニアの水洗式コーヒー'],a:1,n:'あわせて軽めの焙煎（Blondeロースト）に変更されています。'},
-
     {id:211,c:'core',q:'スマトラ マサデパン（SMD）の風味キーワードとして正しいのは？',o:['クルミや焦がした砂糖のような香ばしい甘みと深み','グレープフルーツや赤いベリーを思わせる風味','ハニーブッシュやココアを思わせる風味','スイカや煎茶を思わせる風味'],a:3,hot:true},
     {id:212,c:'core',q:'SMD（スマトラ マサデパン）の相性の良い風味の組み合わせとして正しいのは？',o:['ナッツ、ソフトチーズ、シトラス','トロピカルフルーツ、ハーブ、バニラ、ベリー','はちみつ、アーモンド','ハーブ、チーズ'],a:1,hot:true},
     {id:213,c:'core',q:'スマトラ マサデパン（SMD）が掲げるテーマとして正しいのは？',o:['「伝統」と「継承」','「感謝」と「絆」','「挑戦」と「革新」','「未来」と「共創」'],a:3},
     {id:214,c:'core',q:'SMD（スマトラ マサデパン）の100g挽き豆パッケージの挽き具合として正しいのは？',o:['中細挽き（マルコニックグラインダー5番程度）','極細挽き（マルコニックグラインダー1番程度）','粗挽き（マルコニックグラインダー13番程度）','中挽き（マルコニックグラインダー10番程度）'],a:3},
-
     {id:215,c:'core',q:'スターバックス 1971 ダーク ロースト（EDR）の相性の良い風味の組み合わせとして正しいのは？',o:['ハーブ、チーズ','はちみつ、アーモンド','ナッツ、ソフトチーズ、シトラス','ダークチョコレート、カラメル'],a:3,hot:true},
     {id:216,c:'core',q:'スリーレターコード「EDR（スターバックス 1971 ダーク ロースト）」の意味として正しいのは？',o:['Everyday Dark Roast','Ethiopia Dark Roast','Estate Dark Roast','Extra Dark Roast'],a:0},
     {id:217,c:'core',q:'スターバックス 1971 ダーク ロースト（EDR）の開発の着想として正しいのは？',o:['世界大会の優勝レシピを採用した','単一農園の豆のみを使用することにこだわった','創業当初のように複数の生産地の豆をブレンドした','消費者アンケートによって配合比率を決定した'],a:2,n:'パイクプレイスストアで量り売りしていた創業当初のスタイルにならったものです。'},
-
     {id:218,c:'core',q:'オータムブレンド（AUB）の風味キーワードとして正しいのは？',o:['スイカや煎茶を思わせる風味','ハニーブッシュやココアを思わせる風味','ダークココアのような風味とローストの甘みと深み','キャンディードピーカンやセージを思わせる風味'],a:3,hot:true},
     {id:219,c:'core',q:'AUB（オータムブレンド）の相性の良い風味の組み合わせとして正しいのは？',o:['ダークチョコレート、カラメル','ナッツ、ソフトチーズ、シトラス','はちみつ、アーモンド','ハーブ、チーズ'],a:3,hot:true},
     {id:220,c:'core',q:'オータムブレンド（AUB）に使われる三大コーヒー生産地の豆の組み合わせとして正しいのは？',o:['ブラジル「セラード」、コロンビア「ウイラ」、コスタリカ「タラス」','インドネシア「スマトラ」、エチオピア「シダマ」、グアテマラ「アンティグア」','ケニア「ニエリ」、ルワンダ「フイエ」、タンザニア「キリマンジャロ」','ベトナム「ダクラク」、インドネシア「ジャワ」、中国「雲南」'],a:1},
     {id:221,c:'core',q:'オータムブレンド（AUB）が最初に開発された背景として正しいのは？',o:['日本限定で企画された','クリスマス商戦向けに開発された','2008年、北米で感謝祭向けに開発された','母の日ギフト向けに開発された'],a:2,n:'シェフのトム・ダグラス氏とグリーンコーヒークオリティチームが共同開発しました。'},
-
     {id:222,c:'core',q:'ハシエンダ アルサシア（HAC）の風味キーワードとして正しいのは？',o:['キャンディードシトラスやミルクチョコレートを思わせる風味','グレープフルーツや赤いベリーを思わせる風味','スイカや煎茶を思わせる風味','チョコレートヌガーやマカダミアナッツを思わせる風味'],a:0,hot:true},
     {id:223,c:'core',q:'HAC（ハシエンダ アルサシア）の相性の良い風味の組み合わせとして正しいのは？',o:['ダークチョコレート、カラメル','はちみつ、アーモンド','ハーブ、チーズ','シトラス、チョコレート'],a:1,hot:true},
     {id:224,c:'core',q:'コスタリカのポアス火山の斜面に広がる、スターバックス初の自社農園が担う役割として正しいのは？',o:['観光客誘致のみを目的とすること','スターバックスの本社機能を置くこと','コーヒー豆の全量をここだけで生産し自給自足すること','気候変動や病害に強い品種を研究し、生産者と知見を共有すること'],a:3},
     {id:225,c:'core',q:'ハシエンダ アルサシアのスリーレターコードは？',o:['HAC','ALS','CRC','HAL'],a:0},
-
     {id:226,c:'core',q:'ライトノートブレンド（LNB）の風味キーワードとして正しいのは？',o:['グレープフルーツやブラックカラントを思わせる風味','キャンディードアップルやチョコレートを思わせる甘みのある風味','軽めのコクとミルクチョコレートのような風味','1日のはじまりにふさわしいシトラスを思わせる風味'],a:2,hot:true},
     {id:227,c:'core',q:'LNB（ライトノートブレンド）の相性の良い風味の組み合わせとして正しいのは？',o:['グレープフルーツ、ベリー類、カラント','レモン、オレンジ、キャラメル','ミルクチョコレート、煎ったナッツ','ナッツ、リンゴ、ブルーベリー、レモン'],a:2,hot:true},
     {id:228,c:'core',q:'ブロンド エスプレッソ ロースト（BEB）の風味キーワードとして正しいのは？',o:['キャンディードアップルやチョコレートを思わせる甘みのある風味','ほのかな香ばしさとなめらかな口あたり','ココアやスパイスを思わせる洗練された風味','軽めのコクとミルクチョコレートのような風味'],a:0,hot:true},
@@ -730,9 +510,7 @@
     {id:257,c:'core',q:'ITA（イタリアン ロースト）の相性の良い風味の組み合わせとして正しいのは？',o:['キャラメル、チョコレート、スパイス、ナッツ','煎ったナッツ、ローストした野菜、カラメル','ダークチョコレート、カラメル、スパイス','ミルクチョコレート、ダークチョコレート、カラメル'],a:2},
     {id:258,c:'core',q:'フレンチ ロースト（FRE）の風味キーワードとして正しいのは？',o:['豊かな風味とキャラメルのような甘み','大地を思わせる風味としっかりとしたコク','スモーキーさと個性的で力強い風味','ロースト感のある甘みとカラメルのような風味'],a:2},
     {id:259,c:'core',q:'FRE（フレンチ ロースト）の相性の良い風味の組み合わせとして正しいのは？',o:['ダークチョコレート、カラメル、スパイス','キャラメル、チョコレート、スパイス、ナッツ','シナモン、メープル、バター、チーズ、ハーブ','煎ったナッツ、ローストした野菜、カラメル'],a:3},
-
     {id:260,c:'core',q:'次の地図はハワイ島を表しています。コペラニ ブレンド（KLB）に使われるコナ地区の位置として正しいのはどこでしょう？',o:['③','④','①','②'],a:2,map:'<div class="map-wrapper"><svg viewBox="0 0 300 260" xmlns="http://www.w3.org/2000/svg" style="display:block;"><defs><filter id="sh1" x="-10%" y="-10%" width="130%" height="130%"><feDropShadow dx="2" dy="5" stdDeviation="4" flood-color="#1C3B32" flood-opacity="0.3"/></filter><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#EADDCA"/><stop offset="100%" stop-color="#D4B883"/></linearGradient></defs><path d="M0,65 L300,65 M0,130 L300,130 M0,195 L300,195 M100,0 L100,260 M200,0 L200,260" stroke="#FFF" stroke-width="0.8" stroke-dasharray="4,4" opacity="0.4"/><path d="M105,42 Q165,30 205,58 Q248,65 255,110 Q275,130 253,155 Q265,185 225,198 Q205,228 165,215 Q135,240 100,218 Q65,220 52,188 Q28,168 50,138 Q35,100 72,85 Q72,55 105,42 Z" fill="url(#g1)" stroke="#8A6B4E" stroke-width="1.5" filter="url(#sh1)"/><circle cx="65" cy="150" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="65" y="154" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">①</text><circle cx="225" cy="135" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="225" y="139" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">②</text><circle cx="155" cy="52" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="155" y="56" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">③</text><circle cx="125" cy="212" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="125" y="216" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">④</text></svg></div>',n:'コナ地区はハワイ島の西側（火山の風下にあたる西海岸）に位置し、コナコーヒーの産地として知られています。'},
-
     {id:503,c:'roast',q:'スターバックス1号店（1971年、シアトル）は、実際にはどのようなお店だった？',o:['カフェとして飲食を提供する店','焙煎したコーヒー豆を量り売りする専門店','コーヒー器具の販売店','紅茶専門店'],a:1,hot:true},
     {id:504,c:'roast',q:'アメリカにおける「スペシャルティコーヒーの父」と呼ばれ、創業者たちに焙煎を教えた人物は？',o:['ハワード・シュルツ','デイブ・オルセン','アルフレッド・ピート','ゴードン・バウカー'],a:2},
     {id:505,c:'roast',q:'世界5ヵ所にあるSTARBUCKS RESERVE ROASTERYの立ち上げメンバーが、シアトルで受けた研修期間は？',o:['3ヵ月','6ヵ月','9ヵ月','12ヵ月'],a:2},
@@ -752,60 +530,45 @@
     {id:519,c:'roast',q:'日本国内のスターバックス店舗で販売されるコーヒー豆の焙煎について、正しいのは？',o:['現在もすべてアメリカ本国で焙煎し輸入している','1996年の日本上陸以来、常に国内焙煎だった','以前はアメリカ本国で焙煎していたが、現在はほぼすべて国内で焙煎している','焙煎は行わず生豆のまま販売している'],a:2},
     {id:520,c:'roast',q:'STARBUCKS RESERVE ROASTERY TOKYOの焙煎機で、コーヒー豆1回あたりの焙煎にかかる時間はおよそ何分？',o:['約3分','約10分','約30分','約60分'],a:1},
     {id:522,c:'roast',q:'木戸田直子さんは、アジアで何人しかいないマスターロースターの一人か？',o:['1人','2人','3人','5人'],a:1},
-
     {id:523,c:'core',q:'次の地図はコスタリカを表しています。スターバックス初の自社農園「ハシエンダ アルサシア」があるポアス火山周辺の位置として正しいのはどこでしょう？',o:['②','①','④','③'],a:1,map:'<div class="map-wrapper"><svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" style="display:block;"><defs><filter id="sh2" x="-10%" y="-10%" width="130%" height="130%"><feDropShadow dx="2" dy="5" stdDeviation="4" flood-color="#1C3B32" flood-opacity="0.3"/></filter><linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#EADDCA"/><stop offset="100%" stop-color="#D4B883"/></linearGradient></defs><path d="M0,50 L340,50 M0,100 L340,100 M0,150 L340,150 M113,0 L113,200 M226,0 L226,200" stroke="#FFF" stroke-width="0.8" stroke-dasharray="4,4" opacity="0.4"/><path d="M55,95 Q30,90 25,72 Q45,62 60,72 Q50,50 75,45 Q95,55 90,78 Q120,35 160,42 Q200,30 240,45 Q275,42 305,65 Q325,85 310,105 Q320,128 295,138 Q280,158 250,150 Q225,168 195,155 Q165,165 135,150 Q105,158 80,140 Q55,145 55,120 Q40,115 55,95 Z" fill="url(#g2)" stroke="#8A6B4E" stroke-width="1.5" filter="url(#sh2)"/><circle cx="160" cy="75" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="160" y="79" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">①</text><circle cx="285" cy="85" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="285" y="89" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">②</text><circle cx="40" cy="75" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="40" y="79" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">③</text><circle cx="255" cy="130" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="255" y="134" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">④</text></svg></div>',n:'ハシエンダ アルサシア農園はコスタリカ・アラフエラ州のポアス火山の斜面にあり、2013年にスターバックスが購入した初の自社農園です。'},
     {id:524,c:'core',q:'次の地図はインドネシアの主な島々を表しています。スマトラ島の位置として正しいのはどこでしょう？',o:['④','①','②','③'],a:1,map:'<div class="map-wrapper"><svg viewBox="0 0 340 260" xmlns="http://www.w3.org/2000/svg" style="display:block;"><defs><filter id="sh3" x="-10%" y="-10%" width="130%" height="130%"><feDropShadow dx="2" dy="5" stdDeviation="4" flood-color="#1C3B32" flood-opacity="0.3"/></filter><linearGradient id="g3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#EADDCA"/><stop offset="100%" stop-color="#D4B883"/></linearGradient></defs><path d="M0,65 L340,65 M0,130 L340,130 M0,195 L340,195 M113,0 L113,260 M226,0 L226,260" stroke="#FFF" stroke-width="0.8" stroke-dasharray="4,4" opacity="0.4"/><g filter="url(#sh3)"><path d="M35,45 Q52,55 48,90 Q60,100 52,130 Q64,145 54,175 Q62,192 50,212 Q40,190 44,165 Q30,150 38,125 Q24,110 34,88 Q20,72 35,45 Z" fill="url(#g3)" stroke="#8A6B4E" stroke-width="1.5"/><path d="M90,205 Q130,198 175,208 Q195,213 210,208 Q170,222 125,220 Q100,218 90,205 Z" fill="url(#g3)" stroke="#8A6B4E" stroke-width="1.5"/><path d="M115,55 Q160,42 200,55 Q225,68 222,100 Q228,130 200,150 Q165,158 140,145 Q115,135 108,105 Q102,78 115,55 Z" fill="url(#g3)" stroke="#8A6B4E" stroke-width="1.5"/><path d="M255,80 Q270,65 260,45 Q275,40 280,55 Q290,45 288,65 Q300,70 290,85 Q310,90 300,110 Q285,115 275,105 Q278,130 260,135 Q255,155 240,145 Q245,125 255,115 Q230,120 225,100 Q240,95 255,100 Q245,85 255,80 Z" fill="url(#g3)" stroke="#8A6B4E" stroke-width="1.5"/></g><circle cx="45" cy="120" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="45" y="124" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">①</text><circle cx="150" cy="212" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="150" y="216" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">②</text><circle cx="165" cy="105" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="165" y="109" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">③</text><circle cx="265" cy="92" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="265" y="96" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">④</text></svg></div>',n:'スマトラ島はインドネシア西部にある大きな島で、半水洗式加工の代表的な産地として知られています。'},
     {id:525,c:'core',q:'次の地図はアフリカ大陸を表しています。ケニアの位置として正しいのはどこでしょう？',o:['①','③','②','④'],a:2,map:'<div class="map-wrapper"><svg viewBox="0 0 300 360" xmlns="http://www.w3.org/2000/svg" style="display:block;"><defs><filter id="sh4" x="-10%" y="-10%" width="130%" height="130%"><feDropShadow dx="2" dy="5" stdDeviation="4" flood-color="#1C3B32" flood-opacity="0.3"/></filter><linearGradient id="g4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#EADDCA"/><stop offset="100%" stop-color="#D4B883"/></linearGradient></defs><path d="M0,90 L300,90 M0,180 L300,180 M0,270 L300,270 M100,0 L100,360 M200,0 L200,360" stroke="#FFF" stroke-width="0.8" stroke-dasharray="4,4" opacity="0.4"/><path d="M95,15 Q120,8 140,10 Q165,8 190,18 Q205,22 215,30 Q228,36 240,45 Q258,55 270,70 Q292,82 285,90 Q278,100 265,105 Q258,118 250,130 Q248,145 245,160 Q238,178 225,195 Q218,212 210,230 Q198,250 185,270 Q175,288 165,305 Q160,320 150,330 Q142,318 135,310 Q128,292 120,275 Q112,258 105,240 Q100,222 95,205 Q92,192 100,180 Q112,177 130,175 Q120,168 110,160 Q98,155 85,150 Q70,143 60,135 Q52,122 55,110 Q60,100 75,95 Q68,82 70,70 Q75,58 85,45 Q88,30 95,15 Z" fill="url(#g4)" stroke="#8A6B4E" stroke-width="1.5" filter="url(#sh4)"/><circle cx="272" cy="78" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="272" y="82" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">①</text><circle cx="243" cy="140" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="243" y="144" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">②</text><circle cx="175" cy="165" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="175" y="169" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">③</text><circle cx="215" cy="185" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="215" y="189" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">④</text></svg></div>',n:'ケニアはエチオピアの南に位置する東アフリカの国で、グレープフルーツやベリー、カラントを思わせる風味の水洗式コーヒーで知られています。'},
     {id:526,c:'core',q:'次の地図はアフリカ大陸を表しています。エチオピアの位置として正しいのはどこでしょう？',o:['③','④','①','②'],a:2,map:'<div class="map-wrapper"><svg viewBox="0 0 300 360" xmlns="http://www.w3.org/2000/svg" style="display:block;"><defs><filter id="sh5" x="-10%" y="-10%" width="130%" height="130%"><feDropShadow dx="2" dy="5" stdDeviation="4" flood-color="#1C3B32" flood-opacity="0.3"/></filter><linearGradient id="g5" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#EADDCA"/><stop offset="100%" stop-color="#D4B883"/></linearGradient></defs><path d="M0,90 L300,90 M0,180 L300,180 M0,270 L300,270 M100,0 L100,360 M200,0 L200,360" stroke="#FFF" stroke-width="0.8" stroke-dasharray="4,4" opacity="0.4"/><path d="M95,15 Q120,8 140,10 Q165,8 190,18 Q205,22 215,30 Q228,36 240,45 Q258,55 270,70 Q292,82 285,90 Q278,100 265,105 Q258,118 250,130 Q248,145 245,160 Q238,178 225,195 Q218,212 210,230 Q198,250 185,270 Q175,288 165,305 Q160,320 150,330 Q142,318 135,310 Q128,292 120,275 Q112,258 105,240 Q100,222 95,205 Q92,192 100,180 Q112,177 130,175 Q120,168 110,160 Q98,155 85,150 Q70,143 60,135 Q52,122 55,110 Q60,100 75,95 Q68,82 70,70 Q75,58 85,45 Q88,30 95,15 Z" fill="url(#g5)" stroke="#8A6B4E" stroke-width="1.5" filter="url(#sh5)"/><circle cx="272" cy="78" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="272" y="82" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">①</text><circle cx="243" cy="140" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="243" y="144" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">②</text><circle cx="175" cy="165" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="175" y="169" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">③</text><circle cx="215" cy="185" r="14" fill="#1C3B32" stroke="#FFF" stroke-width="2.5"/><text x="215" y="189" text-anchor="middle" font-size="13" font-weight="700" fill="#FFF">④</text></svg></div>',n:'エチオピアは「アフリカの角」と呼ばれる地域にある、アラビカ種発祥の地とされる国です。'},
-
     {id:527,c:'equip',q:'グラスドリップコーヒーメーカーの推奨挽き具合（マルコニックグラインダー）は？',o:['3～4番','8～10番（推奨8番）','13番','ディッティング5番'],a:1,hot:true},
     {id:528,c:'equip',q:'グラスドリップコーヒーメーカーの特徴として正しいのは？',o:['専用フィルターを使え、ふたはドリッパー置きにもなる','紙フィルターの使用はできない設計になっている','1杯分しか抽出できない小型サイズである','冷蔵庫での抽出にのみ対応している'],a:0},
     {id:529,c:'equip',q:'グラスドリップコーヒーメーカーは、日本オリジナルと世界共通のどちらの商品でしょう？',o:['世界共通の商品である','日本オリジナルの商品である','中国限定の商品である','アメリカ限定の商品である'],a:1},
-
     {id:530,c:'equip',q:'スターバックス ソロフィルターの推奨挽き具合（マルコニックグラインダー）は？',o:['5番','8番','10番','13番'],a:0,hot:true},
     {id:531,c:'equip',q:'スターバックス ソロフィルターで使用するコーヒー粉とお湯の量（ホットの場合）は？',o:['10g・180ml','20g・250ml','15g・150ml','10g・90ml'],a:0,n:'アイスの場合は、コーヒー粉10gに対してお湯90mlを使用します。'},
     {id:532,c:'equip',q:'スターバックス ソロフィルターの特徴として正しいのは？',o:['底面の細かい穴からお湯がシャワー状に流れ、コツ不要で抽出できる','ペーパーフィルターを別途購入する必要がある','2杯分を同時に抽出できる','ステンレス製で紙を使わない'],a:0},
-
     {id:533,c:'equip',q:'オリジナル ステンレスコーンフィルターの推奨挽き具合（マルコニックグラインダー）は？',o:['5番','8～10番（推奨10番）','13番','1～2番'],a:1},
     {id:534,c:'equip',q:'オリジナル ステンレスコーンフィルターの特徴として正しいのは？',o:['ステンレス製で紙を使わず風味を抽出できる','使い捨てのペーパーフィルターである','電動でお湯を注ぐ機能がついている','エスプレッソ専用の器具である'],a:0},
     {id:535,c:'equip',q:'オリジナル ステンレスコーンフィルターは、どの抽出器具専用の付属品でしょう？',o:['コーヒープレス','グラスドリップコーヒーメーカー','コールドブリューストレーナー','サイフォン'],a:1},
-
     {id:536,c:'equip',q:'コールドブリューストレーナーの推奨挽き具合（マルコニックグラインダー）は？',o:['5番','8番','10番','13番'],a:2,hot:true},
     {id:537,c:'equip',q:'コールドブリューストレーナーで使用する分量（中挽きの粉と水）は？',o:['80g・720ml','50g・500ml','100g・1000ml','30g・300ml'],a:0},
     {id:538,c:'equip',q:'コールドブリューストレーナーの使い方として正しいのは？',o:['ピッチャーと組み合わせ、冷蔵庫で長時間抽出する','電子レンジで温めながら抽出する','エスプレッソマシンに装着して使う','熱湯を注いですぐに抽出が完了する'],a:0,n:'目安の抽出時間は冷蔵庫で約12時間です。'},
-
     {id:539,c:'equip',q:'BALMUDA The Brew STARBUCKS RESERVE LIMITED EDITIONの説明として正しいのは？',o:['家電メーカーのバルミューダ社とスターバックスが共同開発した','スターバックス単独で開発した家庭用エスプレッソマシンである','コーヒープレス専用のアクセサリーである','電気を使わない手動式のドリッパーである'],a:0},
     {id:540,c:'equip',q:'BALMUDA The Brewの抽出方法として正しいのは？',o:['オープンドリップ式で5回に分けて注湯される','浸漬式でコーヒー粉を一度に浸す','エスプレッソ式で高圧抽出する','水出し式で常温抽出する'],a:0},
     {id:541,c:'equip',q:'BALMUDA The Brewのサイズ・モードの組み合わせとして正しいのは？',o:['Short/Tallのみ、Hot/Iced/Cleaningの3モード','Short/Tall/Grandeの3サイズ、Hotのみ','全サイズ対応、Icedのみ','Tallのみ、Hotのみ'],a:0},
-
     {id:543,c:'misc',q:'スイスウォータープロセスの工程順序として正しいのは？',o:['生豆を水に浸ける→カーボンフィルターでカフェインを除去→残った水で生豆を味付けする','生豆を焙煎する→冷水で急冷する→乾燥させる','生豆に液体二酸化炭素を注入する→高圧で抽出する→乾燥させる','生豆を塩化メチレンに浸す→乾燥させる→焙煎する'],a:0,hot:true},
     {id:544,c:'misc',q:'スイスウォータープロセスにおける「味付け」とは何を指すか？',o:['カフェイン以外の成分を生豆に戻すこと','人工香料を生豆に添加すること','焙煎後にシロップをかけること','塩を加えて風味を調整すること'],a:0},
     {id:545,c:'misc',q:'スイスウォータープロセスで、水に溶け出したカフェインだけを捕らえるために使われるフィルターは？',o:['カーボンフィルター','ペーパーフィルター','ステンレスフィルター','逆浸透膜フィルター'],a:0,n:'活性炭フィルターとも呼ばれます。'},
-
     {id:546,c:'misc',q:'平均気温が1℃上昇すると、コーヒーの収量はおよそどれくらい低下すると言われているか？',o:['約5%','約14%','約30%','約50%'],a:1,hot:true},
     {id:547,c:'misc',q:'コーヒーの「2050年問題」とは何を指すか？',o:['気候変動により2050年までにアラビカ栽培適地が半減する問題','2050年にコーヒーの価格が現在の半額になる問題','2050年までに世界のコーヒー消費量が半減する問題','2050年に主要生産国の人口が半減する問題'],a:0,hot:true},
-
     {id:548,c:'misc',q:'コーヒー品種「スターマヤ」の特徴として正しいのは？',o:['種子から栽培できる、世界初のF1ハイブリッド品種である','エチオピア原産の伝統的な在来品種（エアルーム種）である','遺伝子組み換え技術で作られた品種である','ロブスタ種とアラビカ種を交配した品種である'],a:0},
     {id:549,c:'misc',q:'スターマヤの開発に関わった機関の組み合わせとして正しいのは？',o:['フランスのCIRADとコーヒー商社のECOM','スターバックスとワールドコーヒーリサーチ','コンサベーション・インターナショナルとFSC','SCAとCQI'],a:0},
     {id:550,c:'misc',q:'スターマヤの片方の親である「マルセレサ種」の特徴として正しいのは？',o:['さび病への耐性があり、樹高が低い（矮性）品種である','非常に樹高が高く、収穫に手間がかかる品種である','カフェインを含まない品種である','水洗式でしか加工できない品種である'],a:0},
-
     {id:551,c:'misc',q:'「凍結蒸留ミルク（フリーズディスティレーション）」の説明として正しいのは？',o:['牛乳を凍らせて解凍し、濃厚な部分だけ取り出す技術','牛乳を高温で煮詰めて水分を飛ばす技術','牛乳にアルコールを加えて蒸留する技術','牛乳を粉末状に加工する技術'],a:0,n:'英語ではFreeze Distilled Milk、学術的にはFreeze Concentrated Milk（凍結濃縮乳）とも呼ばれます。'},
     {id:552,c:'misc',q:'凍結蒸留ミルクの最大の特徴として正しいのは？',o:['加熱せずに濃縮でき、コンデンスミルクのような甘みと濃厚さが得られる','冷凍することでミルクの賞味期限が半永久的になる','通常のミルクよりカロリーが大幅に高くなる','製造に大規模な工場設備が必須である'],a:0},
-
     {id:553,c:'misc',q:'「ファインロブスタ」の説明として正しいのは？',o:['CQIのRグレーダーが「Fine」と評価した高品質ロブスタ種','ロブスタ種とアラビカ種を交配した新品種','スターバックスが独自に開発したロブスタ種','焙煎度がブロンドのロブスタ種のみを指す言葉'],a:0},
     {id:554,c:'misc',q:'ファインロブスタと評価されるためのCQI評価基準のスコアの目安は？',o:['80点以上','50点以上','95点以上','60点以上'],a:0},
-
     {id:556,c:'basic',q:'世界の人々は1年におよそ何杯のコーヒーを飲んでいると言われているか？',o:['5億杯','500億杯','5000億杯','5兆杯'],a:2,hot:true},
     {id:557,c:'basic',q:'コーヒー栽培における「シェードツリー」とは何か？',o:['コーヒーの木に直射日光を遮る日陰を作るために植えられる背の高い樹木','コーヒーチェリーを乾燥させるための木製の棚','焙煎後のコーヒー豆を保管する木箱','コーヒーの木を支えるための添え木'],a:0,hot:true},
     {id:558,c:'basic',q:'シェードツリーを使った栽培（シェードグロウン）の利点として正しいのは？',o:['直射日光を和らげ、チェリーがゆっくり熟し風味が発達する','コーヒーチェリーの収穫量を必ず2倍にする','病害虫を完全に防ぎ、農薬が一切不要になる','焙煎時間を大幅に短縮できる'],a:0},
     {id:559,c:'basic',q:'シェードツリーがもたらす環境面でのメリットとして正しいのは？',o:['野鳥や生き物の生息地となり、土壌の浸食や乾燥を防ぐ','コーヒーの木の寿命を縮める','周辺の水源を枯渇させる','土壌の栄養分をすべて奪ってしまう'],a:0},
-
     {id:560,c:'cafe',q:'スターバックスのサプライヤーに義務付けられている、生豆の支払いに関する証明書の提出について正しいのは？',o:['生産者への直接支払いを示す「領収書」の提出も含まれる','支払い証明の提出は義務ではなく任意である','証明書には生産者の署名は不要である','支払いはすべて現金で行うことが義務付けられている'],a:0,hot:true},
-
     {id:561,c:'misc',q:'スターバックス コーヒートラベラーの説明として正しいのは？',o:['出来立てのドリップコーヒーを専用の持ち帰り容器に入れて提供するサービス','エスプレッソドリンクを氷とシェイクして提供するサービス','コーヒー豆を量り売りする対面サービス','店頭受け取り専用のモバイルオーダーサービス'],a:0,hot:true},
     {id:562,c:'misc',q:'コーヒートラベラー1つに入っているドリップコーヒーの量は、ショートサイズ換算でおよそ何杯分？',o:['約6杯分','約12杯分','約20杯分','約30杯分'],a:1},
     {id:563,c:'misc',q:'コーヒートラベラーの容器の特徴として正しいのは？',o:['FSC認証紙製の使い捨て容器で、店舗への返却が不要','ステンレス製で繰り返し使え、返却が必要','ガラス製のため取り扱いに注意が必要','プラスチック製でリサイクル不可の容器'],a:0},
-
     {id:564,c:'basic',q:'次のうち、ラテンアメリカ産コーヒーの風味の特徴として正しいのは？',o:['さっぱりとした鮮やかな酸味があり、バランスがよく、ナッツやココアのような風味','フローラルさやシトラス感のあるジューシーな風味から、ベリーやスパイシーな味わいまで幅広い','重量感のあるコクで、シロップのようになめらかな味わいとハーブや大地を思わせる風味','スモーキーで力強く、酸味がほとんど感じられない風味'],a:0,hot:true},
     {id:565,c:'basic',q:'次のうち、アフリカ産コーヒーの風味の特徴として正しいのは？',o:['フローラルさやシトラス感のあるジューシーな風味から、ベリーやスパイシーな味わいまで個性的','さっぱりとした鮮やかな酸味があり、バランスがよく、ナッツやココアのような風味','重量感のあるコクで、シロップのようになめらかな味わいとハーブや大地を思わせる風味','酸味が強く、渋みが際立つ風味'],a:0,hot:true},
     {id:566,c:'basic',q:'次のうち、アジア・太平洋産コーヒーの風味の特徴として正しいのは？',o:['重量感のあるコクで、シロップのようになめらかな味わいとハーブや大地を思わせる風味','さっぱりとした鮮やかな酸味があり、バランスがよく、ナッツやココアのような風味','フローラルさやシトラス感のあるジューシーな風味から、ベリーやスパイシーな味わいまで幅広い','酸味が強く、フルーティーな香りが特徴'],a:0,hot:true},
@@ -845,7 +608,7 @@
     {id:600,c:'hist',q:'1995年に北米で初めて「フラペチーノ®」が発売された当初、ベースとなるコーヒーとして使用されていたのは次のうちどれでしょう？',o:['イタリアン ロースト','エスプレッソ ロースト','フレンチ ロースト','ハウス ブレンド'],a:0}
   ];
 
-  /* --- 問題の選択肢を毎回シャッフルする処理 --- */
+  /* --- 問題の選択肢を毎回シャッフル --- */
   QUESTIONS.forEach(function(q){
     if(typeof q.a === 'number'){
       var correctText = q.o[q.a];
@@ -865,7 +628,6 @@
   };
   var DAILY_COUNT = 15;
 
-  /* ---------------- 模擬試験専用：複数選択問題（10問・全問正解で得点） ---------------- */
   var EXAM_MULTI = [
     {q:'次のうち、C.A.F.E.プラクティスの「社会的責任」の指標に当てはまるものをすべて選んでください。',o:['賃金と労働','気候変動','教育へのアクセス','水域の保護'],a:[0,2]},
     {q:'次のうち、水洗式加工の特徴として正しいものをすべて選んでください。',o:['発酵の工程を経る','果肉をつけたまま乾燥させる','際立つ酸味が特徴である','半水洗式より水の使用量が少ない'],a:[0,2]},
@@ -879,60 +641,26 @@
     {q:'次のうち、GCQ（グローバルコーヒークオリティチーム）の役割に含まれるものをすべて選んでください。',o:['生豆の全購買量の管理','レシピ管理','品質基準の策定','輸送スケジュールの手配'],a:[1,2]}
   ];
 
-  /* ---------------- ユーティリティ ---------------- */
-  function fmtDate(d){
-    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-  }
+  function fmtDate(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
   function todayStr(){ return fmtDate(new Date()); }
   function yesterdayStr(){ var d=new Date(); d.setDate(d.getDate()-1); return fmtDate(d); }
 
-  /* ---------------- 保存（ブラウザ標準の localStorage を使用。Claudeログイン不要） ---------------- */
-  function loadJSON(key, fallback){
-    try{
-      var v = localStorage.getItem(key);
-      if(v === null) return fallback;
-      return JSON.parse(v);
-    }catch(e){ return fallback; }
-  }
-  function saveJSON(key, val){
-    try{ localStorage.setItem(key, JSON.stringify(val)); }
-    catch(e){ console.error('save failed', key, e); }
-  }
-  function deleteKey(key){
-    try{ localStorage.removeItem(key); }catch(e){}
-  }
-  function listKeysWithPrefix(prefix){
-    var keys = [];
-    try{
-      for(var i=0;i<localStorage.length;i++){
-        var k = localStorage.key(i);
-        if(k && k.indexOf(prefix)===0) keys.push(k);
-      }
-    }catch(e){}
-    return keys;
-  }
-  function getQ(id){
-    for(var i=0;i<QUESTIONS.length;i++){ if(QUESTIONS[i].id===id) return QUESTIONS[i]; }
-    return null;
-  }
+  function loadJSON(key, fallback){ try{ var v = localStorage.getItem(key); if(v === null) return fallback; return JSON.parse(v); }catch(e){ return fallback; } }
+  function saveJSON(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); } catch(e){ console.error('save failed', key, e); } }
+  function deleteKey(key){ try{ localStorage.removeItem(key); }catch(e){} }
+  function listKeysWithPrefix(prefix){ var keys = []; try{ for(var i=0;i<localStorage.length;i++){ var k = localStorage.key(i); if(k && k.indexOf(prefix)===0) keys.push(k); } }catch(e){} return keys; }
+  function getQ(id){ for(var i=0;i<QUESTIONS.length;i++){ if(QUESTIONS[i].id===id) return QUESTIONS[i]; } return null; }
 
-  /* ---------------- クリップボード コピー用 fallback ---------------- */
   function fallbackCopy(text) {
     if(navigator.clipboard){
-      navigator.clipboard.writeText(text).then(function(){
-        alert("進捗をコピーしました！LINEなどに貼り付けて報告できます✨");
-      }).catch(function(){});
+      navigator.clipboard.writeText(text).then(function(){ alert("進捗をコピーしました！LINEなどに貼り付けて報告できます✨"); }).catch(function(){});
     } else {
-      var textArea = document.createElement("textarea");
-      textArea.value = text;
-      document.body.appendChild(textArea);
-      textArea.select();
+      var textArea = document.createElement("textarea"); textArea.value = text; document.body.appendChild(textArea); textArea.select();
       try { document.execCommand('copy'); alert("進捗をコピーしました！LINEなどに貼り付けて報告できます✨"); } catch(e){}
       document.body.removeChild(textArea);
     }
   }
 
-  /* ---------------- 状態 ---------------- */
   var stats = {};          
   var streak = {lastDate:null, count:0};
   var daily = null;        
@@ -948,7 +676,6 @@
   var examHistory = []; 
   var examLastResult = null; 
 
-  /* ---------------- 模擬試験モード用の状態 ---------------- */
   var examQuestions = [];   
   var examAnswers = [];     
   var examIndex = 0;
@@ -957,10 +684,15 @@
   var EXAM_DURATION_SEC = 30*60;
   var examQuitConfirm = false;
 
+  var firebaseApp = null;
+  var db = null;
+  var bRoom = null;
+  var bMe = null; 
+  var bState = null; 
+
   function currentList(){ return mode==='daily' ? daily.ids : practiceIds; }
   function currentAnswers(){ return mode==='daily' ? daily.answers : practiceAnswers; }
 
-  /* ---------------- 出題選択（重み付き） ---------------- */
   function weightFor(q){
     var s = stats[q.id];
     var base;
@@ -973,17 +705,10 @@
   }
   function pickSet(filterCat){
     var pool;
-    if(filterCat === 'bookmark'){
-      pool = QUESTIONS.filter(function(q){ return bookmarkedIds.indexOf(q.id) !== -1; });
-    } else if(filterCat){
-      pool = QUESTIONS.filter(function(q){ return q.c===filterCat; });
-    } else {
-      pool = QUESTIONS;
-    }
-    var keyed = pool.map(function(q){
-      var w = weightFor(q);
-      return {id:q.id, key: Math.pow(Math.random(), 1/w)};
-    });
+    if(filterCat === 'bookmark'){ pool = QUESTIONS.filter(function(q){ return bookmarkedIds.indexOf(q.id) !== -1; }); }
+    else if(filterCat){ pool = QUESTIONS.filter(function(q){ return q.c===filterCat; }); }
+    else { pool = QUESTIONS; }
+    var keyed = pool.map(function(q){ return {id:q.id, key: Math.pow(Math.random(), 1/weightFor(q))}; });
     keyed.sort(function(a,b){ return b.key - a.key; });
     var n = Math.min(DAILY_COUNT, pool.length);
     return keyed.slice(0, n).map(function(x){ return x.id; });
@@ -995,7 +720,6 @@
     saveJSON('bac-bookmarks', bookmarkedIds);
   }
 
-  /* ---------------- 初期化 ---------------- */
   async function init(){
     stats = await loadJSON('bac-stats', {});
     streak = await loadJSON('bac-streak', {lastDate:null,count:0});
@@ -1012,10 +736,7 @@
 
     setTimeout(function(){
       var sp = document.getElementById('splashScreen');
-      if(sp) {
-        sp.style.opacity = '0';
-        setTimeout(function(){ sp.style.display = 'none'; }, 500);
-      }
+      if(sp) { sp.style.opacity = '0'; setTimeout(function(){ sp.style.display = 'none'; }, 500); }
     }, 2500); 
 
     setTimeout(function(){
@@ -1040,13 +761,8 @@
   }
 
   var toastCloseBtn = document.getElementById('toastClose');
-  if(toastCloseBtn){
-    toastCloseBtn.onclick = function(){
-      document.getElementById('toastBanner').style.bottom = '-120px';
-    };
-  }
+  if(toastCloseBtn){ toastCloseBtn.onclick = function(){ document.getElementById('toastBanner').style.bottom = '-120px'; }; }
 
-  /* ---------------- 回答処理 ---------------- */
   async function selectAnswer(idx){
     if(answeredThisQ) return;
     var list = currentList();
@@ -1058,19 +774,11 @@
     currentAnswers().push({id:q.id, choice:idx, correct:correct});
 
     if(!stats[q.id]) stats[q.id] = {seen:0, correct:0, streak:0};
-    if(stats[q.id].streak === undefined) {
-      stats[q.id].streak = stats[q.id].correct >= 2 ? 2 : (stats[q.id].correct === 1 ? 1 : 0);
-    }
-    
+    if(stats[q.id].streak === undefined) { stats[q.id].streak = stats[q.id].correct >= 2 ? 2 : (stats[q.id].correct === 1 ? 1 : 0); }
     stats[q.id].seen += 1;
-    if(correct){
-      stats[q.id].correct += 1;
-      stats[q.id].streak += 1;
-    } else {
-      stats[q.id].streak = 0;
-    }
+    if(correct){ stats[q.id].correct += 1; stats[q.id].streak += 1; }
+    else { stats[q.id].streak = 0; }
     await saveJSON('bac-stats', stats);
-
     if(mode==='daily'){ await saveJSON('bac-daily-'+daily.date, daily); }
     render();
   }
@@ -1084,13 +792,9 @@
         daily.completed = true;
         await saveJSON('bac-daily-'+daily.date, daily);
         var t = todayStr(), y = yesterdayStr();
-        if(streak.lastDate === t){
-          /* already counted */
-        } else if(streak.lastDate === y){
-          streak.count += 1; streak.lastDate = t;
-        } else {
-          streak.count = 1; streak.lastDate = t;
-        }
+        if(streak.lastDate === t){ }
+        else if(streak.lastDate === y){ streak.count += 1; streak.lastDate = t; }
+        else { streak.count = 1; streak.lastDate = t; }
         await saveJSON('bac-streak', streak);
       }
       screen = 'summary';
@@ -1098,59 +802,13 @@
     render();
   }
 
-  function startDaily(){
-    mode = 'daily';
-    qIndex = daily.answers.length;
-    screen = 'question';
-    answeredThisQ = null;
-    render();
-  }
-  function viewTodaySummary(){
-    mode = 'daily';
-    screen = 'summary';
-    render();
-  }
-  function startPractice(){
-    mode = 'practice';
-    practiceIds = pickSet(daily && daily.categoryFilter);
-    practiceAnswers = [];
-    qIndex = 0;
-    answeredThisQ = null;
-    screen = 'question';
-    render();
-  }
-  function startRepeat(){
-    var sameIds = currentList().slice();
-    mode = 'practice';
-    practiceIds = sameIds;
-    practiceAnswers = [];
-    qIndex = 0;
-    answeredThisQ = null;
-    screen = 'question';
-    render();
-  }
-  function goHome(){
-    mode = 'daily';
-    screen = 'home';
-    answeredThisQ = null;
-    render();
-  }
-
-  /* ---------------- リセット ---------------- */
-  async function doReset(){
-    deleteKey('bac-stats');
-    deleteKey('bac-streak');
-    listKeysWithPrefix('bac-daily-').forEach(function(k){ deleteKey(k); });
-    stats = {}; streak = {lastDate:null,count:0};
-    daily = null; 
-    mode='daily'; screen='home'; answeredThisQ=null; pendingResetConfirm=false; pendingMode='all';
-    render();
-  }
-
-  /* ---------------- 描画 ---------------- */
-  function esc(s){
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
+  function startDaily(){ mode = 'daily'; qIndex = daily.answers.length; screen = 'question'; answeredThisQ = null; render(); }
+  function viewTodaySummary(){ mode = 'daily'; screen = 'summary'; render(); }
+  function startPractice(){ mode = 'practice'; practiceIds = pickSet(daily && daily.categoryFilter); practiceAnswers = []; qIndex = 0; answeredThisQ = null; screen = 'question'; render(); }
+  function startRepeat(){ var sameIds = currentList().slice(); mode = 'practice'; practiceIds = sameIds; practiceAnswers = []; qIndex = 0; answeredThisQ = null; screen = 'question'; render(); }
+  function goHome(){ mode = 'daily'; screen = 'home'; answeredThisQ = null; if(db && bRoom) { db.ref('rooms/'+bRoom).off(); bRoom = null; bState = null; } render(); }
+  async function doReset(){ deleteKey('bac-stats'); deleteKey('bac-streak'); listKeysWithPrefix('bac-daily-').forEach(function(k){ deleteKey(k); }); stats = {}; streak = {lastDate:null,count:0}; daily = null; mode='daily'; screen='home'; answeredThisQ=null; pendingResetConfirm=false; pendingMode='all'; render(); }
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
   function updateHeader(){
     var badges = document.getElementById('badges');
@@ -1159,18 +817,17 @@
     var modeBadge = '';
     if(daily && daily.categoryFilter==='core'){ modeBadge = '<div class="badge">☕ コーヒー豆モード</div>'; }
     else if(daily && daily.categoryFilter==='bookmark'){ modeBadge = '<div class="badge">🔖 苦手克服モード</div>'; }
-    badges.innerHTML =
-      '<div class="badge">'+streakTxt+'</div>'+
-      '<div class="badge">☕ 本日 <b>'+doneToday+'/'+DAILY_COUNT+'</b></div>' + modeBadge;
+    badges.innerHTML = '<div class="badge">'+streakTxt+'</div><div class="badge">☕ 本日 <b>'+doneToday+'/'+DAILY_COUNT+'</b></div>' + modeBadge;
   }
 
   function render(){
-    var examScreen = (screen==='examIntro' || screen==='examQuestion' || screen==='examResult');
+    var isExamOrBattle = (screen==='examIntro' || screen==='examQuestion' || screen==='examResult' || screen==='battleLobby' || screen==='battleRoom');
     var badgesEl = document.getElementById('badges');
     var statsToggleEl = document.querySelector('.stats-toggle');
-    if(badgesEl) badgesEl.style.display = examScreen ? 'none' : '';
-    if(statsToggleEl) statsToggleEl.style.display = examScreen ? 'none' : '';
-    if(!examScreen){ updateHeader(); }
+    if(badgesEl) badgesEl.style.display = isExamOrBattle ? 'none' : '';
+    if(statsToggleEl) statsToggleEl.style.display = isExamOrBattle ? 'none' : '';
+    if(!isExamOrBattle){ updateHeader(); }
+    
     var stage = document.getElementById('stage');
     if(screen==='home'){ stage.innerHTML = renderHome(); bindHome(); }
     else if(screen==='question'){ stage.innerHTML = renderQuestion(); bindQuestion(); }
@@ -1179,81 +836,53 @@
     else if(screen==='examIntro'){ stage.innerHTML = renderExamIntro(); bindExamIntro(); }
     else if(screen==='examQuestion'){ stage.innerHTML = renderExamQuestion(); bindExamQuestion(); }
     else if(screen==='examResult'){ stage.innerHTML = renderExamResult(); bindExamResult(); }
-    if(!examScreen){ renderStatsPanel(); }
+    else if(screen==='battleLobby'){ stage.innerHTML = renderBattleLobby(); bindBattleLobby(); }
+    else if(screen==='battleRoom'){ stage.innerHTML = renderBattleRoom(); bindBattleRoom(); }
+    
+    if(!isExamOrBattle){ renderStatsPanel(); }
   }
 
-  function browseLinkHtml(){
-    return '<button class="browse-link-btn" id="btnBrowseAll" type="button">'+
-           '<b>📖 収録されている全問題の単語帳</b><span>タップして確認（'+QUESTIONS.length+'問）</span></button>';
-  }
-  function bindBrowseLink(){
-    var ba = document.getElementById('btnBrowseAll');
-    if(ba) ba.onclick = function(){ screen='browse'; render(); };
-  }
-  function examLinkHtml(){
-    return '<button class="exam-link-btn" id="btnExamEntry" type="button">'+
-           '<b>📝 模擬試験を受ける</b><span>本番形式・50問・制限時間30分</span></button>';
-  }
-  function bindExamLink(){
-    var eb = document.getElementById('btnExamEntry');
-    if(eb) eb.onclick = function(){ screen='examIntro'; render(); };
-  }
+  function browseLinkHtml(){ return '<button class="browse-link-btn" id="btnBrowseAll" type="button"><b>📖 収録されている全問題の単語帳</b><span>タップして確認（'+QUESTIONS.length+'問）</span></button>'; }
+  function bindBrowseLink(){ var ba = document.getElementById('btnBrowseAll'); if(ba) ba.onclick = function(){ screen='browse'; render(); }; }
+  function examLinkHtml(){ return '<button class="exam-link-btn" id="btnExamEntry" type="button"><b>📝 模擬試験を受ける</b><span>本番形式・50問・制限時間30分</span></button>'; }
+  function bindExamLink(){ var eb = document.getElementById('btnExamEntry'); if(eb) eb.onclick = function(){ screen='examIntro'; render(); }; }
+  function battleLinkHtml(){ return '<button class="battle-link-btn" id="btnBattleEntry" type="button"><b>🥊 BAバトル（オンライン早押し対戦）</b><span>友達とルームを作ってリアルタイム対決！</span></button>'; }
+  function bindBattleLink(){ var bb = document.getElementById('btnBattleEntry'); if(bb) bb.onclick = function(){ screen='battleLobby'; render(); }; }
 
   function renderHome(){
     if(!daily || daily.completed){
       var isFirstRound = !daily;
       var html = '<div class="center-col">';
       if(isFirstRound){
-        html += '<div class="big-title">今日のドリル</div>';
-        html += '<p class="desc">1周'+DAILY_COUNT+'問、ランダムに出題されます。苦手な問題は繰り返し出やすくなります。</p>';
+        html += '<div class="big-title">今日のドリル</div><p class="desc">1周'+DAILY_COUNT+'問、ランダムに出題されます。苦手な問題は繰り返し出やすくなります。</p>';
       } else {
         var doneToday = daily.answers.length;
         var correctCount = daily.answers.filter(function(a){ return a.correct; }).length;
-        html += '<div class="big-title">お疲れさまでした！</div>';
-        html += '<p class="desc">本日1周目：'+correctCount+'/'+doneToday+'問正解 連続記録 🔥'+streak.count+'日<br>もう1周する場合は、モードを選んでください。</p>';
+        html += '<div class="big-title">お疲れさまでした！</div><p class="desc">本日1周目：'+correctCount+'/'+doneToday+'問正解 連続記録 🔥'+streak.count+'日<br>もう1周する場合は、モードを選んでください。</p>';
       }
       html += '<div class="mode-picker">';
-      html += '<button class="mode-btn'+(pendingMode==='all'?' active':'')+'" data-mode="all" type="button">'+
-              '<b>🎯 通常モード</b><span>全分野からランダムに出題</span></button>';
-      html += '<button class="mode-btn'+(pendingMode==='core'?' active':'')+'" data-mode="core" type="button">'+
-              '<b>☕ コーヒー豆を覚える</b><span>コア豆・プロモ豆の情報だけを出題</span></button>';
-      html += '<button class="mode-btn'+(pendingMode==='bookmark'?' active':'')+'" data-mode="bookmark" type="button">'+
-              '<b>🔖 苦手な問題だけ</b><span>ブックマークした問題だけを出題（現在'+bookmarkedIds.length+'問）</span></button>';
+      html += '<button class="mode-btn'+(pendingMode==='all'?' active':'')+'" data-mode="all" type="button"><b>🎯 通常モード</b><span>全分野からランダムに出題</span></button>';
+      html += '<button class="mode-btn'+(pendingMode==='core'?' active':'')+'" data-mode="core" type="button"><b>☕ コーヒー豆を覚える</b><span>コア豆・プロモ豆の情報だけを出題</span></button>';
+      html += '<button class="mode-btn'+(pendingMode==='bookmark'?' active':'')+'" data-mode="bookmark" type="button"><b>🔖 苦手な問題だけ</b><span>ブックマークした問題だけを出題（現在'+bookmarkedIds.length+'問）</span></button>';
       html += '</div>';
-      if(pendingMode==='bookmark' && bookmarkedIds.length===0){
-        html += '<p class="desc" style="color:var(--clay);font-size:12px;margin-top:-4px;">まだ苦手フラグが登録されていません。問題画面右上の📑アイコンで登録できます。</p>';
-      }
-      html += '<button class="btn" id="btnPrimary" type="button" style="margin-top:10px;"'+
-              (pendingMode==='bookmark' && bookmarkedIds.length===0 ? ' disabled' : '') + '>'+
-              (isFirstRound ? '今日の'+DAILY_COUNT+'問を始める' : 'このモードでもう1周する（'+DAILY_COUNT+'問）') +
-              '</button>';
-      if(!isFirstRound){
-        html += '<button class="text-link-btn" id="btnViewSummary" type="button">本日1周目の結果をもう一度見る</button>';
-      }
-      html += browseLinkHtml();
-      html += examLinkHtml();
-      html += '</div>';
+      if(pendingMode==='bookmark' && bookmarkedIds.length===0){ html += '<p class="desc" style="color:var(--clay);font-size:12px;margin-top:-4px;">まだ苦手フラグが登録されていません。問題画面右上の📑アイコンで登録できます。</p>'; }
+      html += '<button class="btn" id="btnPrimary" type="button" style="margin-top:10px;"'+(pendingMode==='bookmark' && bookmarkedIds.length===0 ? ' disabled' : '') + '>'+(isFirstRound ? '今日の'+DAILY_COUNT+'問を始める' : 'このモードでもう1周する（'+DAILY_COUNT+'問）') + '</button>';
+      if(!isFirstRound){ html += '<button class="text-link-btn" id="btnViewSummary" type="button">本日1周目の結果をもう一度見る</button>'; }
+      html += browseLinkHtml(); html += examLinkHtml(); html += battleLinkHtml(); html += '</div>';
       return html;
     }
     var doneToday = daily.answers.length;
     var primaryLabel = '続きから解く（'+doneToday+'/'+DAILY_COUNT+'）';
     var primaryHint = '今日の'+DAILY_COUNT+'問の途中です。残り '+(DAILY_COUNT-doneToday)+' 問。';
-    var html2 = '<div class="center-col">';
-    html2 += '<div class="big-title">今日のドリル</div>';
-    html2 += '<p class="desc">'+esc(primaryHint)+'</p>';
-    html2 += '<button class="btn" id="btnPrimary" type="button" style="margin-top:6px;">'+esc(primaryLabel)+'</button>';
-    html2 += browseLinkHtml();
-    html2 += examLinkHtml();
-    html2 += '</div>';
+    var html2 = '<div class="center-col"><div class="big-title">今日のドリル</div><p class="desc">'+esc(primaryHint)+'</p><button class="btn" id="btnPrimary" type="button" style="margin-top:6px;">'+esc(primaryLabel)+'</button>'+browseLinkHtml()+examLinkHtml()+battleLinkHtml()+'</div>';
     return html2;
   }
+
   function bindHome(){
     if(!daily || daily.completed){
       var isFirstRound = !daily;
       var modeBtns = document.querySelectorAll('.mode-btn');
-      modeBtns.forEach(function(b){
-        b.onclick = function(){ pendingMode = b.getAttribute('data-mode'); render(); };
-      });
+      modeBtns.forEach(function(b){ b.onclick = function(){ pendingMode = b.getAttribute('data-mode'); render(); }; });
       document.getElementById('btnPrimary').onclick = function(){
         if(pendingMode==='bookmark' && bookmarkedIds.length===0){ return; }
         var filter = (pendingMode==='core' || pendingMode==='bookmark') ? pendingMode : null;
@@ -1262,27 +891,228 @@
           daily = {date:t, ids:pickSet(filter), answers:[], completed:false, categoryFilter:filter};
           saveJSON('bac-daily-'+t, daily);
           startDaily();
-        } else {
-          mode = 'practice';
-          practiceIds = pickSet(filter);
-          practiceAnswers = [];
-          qIndex = 0;
-          answeredThisQ = null;
-          screen = 'question';
-          render();
-        }
+        } else { mode = 'practice'; practiceIds = pickSet(filter); practiceAnswers = []; qIndex = 0; answeredThisQ = null; screen = 'question'; render(); }
       };
       var vs = document.getElementById('btnViewSummary');
       if(vs) vs.onclick = viewTodaySummary;
-      bindBrowseLink();
-      bindExamLink();
+      bindBrowseLink(); bindExamLink(); bindBattleLink();
       return;
     }
     document.getElementById('btnPrimary').onclick = function(){ startDaily(); };
-    bindBrowseLink();
-    bindExamLink();
+    bindBrowseLink(); bindExamLink(); bindBattleLink();
   }
 
+  /* ---------------- BAバトルモード 実装 ---------------- */
+  function initFirebase() {
+    if(firebaseApp) return true;
+    try {
+      const firebaseConfig = {
+        apiKey: "AIzaSyCLkWHo77ieQ5BibY0rOUrJEGu0h0dpHhI",
+        authDomain: "ba-battle-7f2e6.firebaseapp.com",
+        databaseURL: "https://ba-battle-7f2e6-default-rtdb.asia-northeast1.firebasedatabase.app",
+        projectId: "ba-battle-7f2e6",
+        storageBucket: "ba-battle-7f2e6.firebasestorage.app",
+        messagingSenderId: "308868646795",
+        appId: "1:308868646795:web:d360aa348f8241ea2c518e"
+      };
+      firebaseApp = firebase.initializeApp(firebaseConfig);
+      db = firebase.database();
+      return true;
+    } catch(e) { console.error(e); alert("通信設定エラー: Firebaseの接続に失敗しました。"); return false; }
+  }
+
+  function renderBattleLobby() {
+    var savedName = localStorage.getItem('bac-nickname') || '';
+    var html = '<div class="center-col" style="padding-top:10px;">';
+    html += '<div class="big-title" style="color:#A8492E;">🥊 BAバトルロビー</div>';
+    html += '<p class="desc" style="margin-bottom:4px;">友達とリアルタイムで早押し対決！</p>';
+    html += '<input type="text" id="inputNickname" class="browse-search" placeholder="あなたのニックネーム" value="'+esc(savedName)+'" style="text-align:center; font-weight:bold;">';
+    html += '<div style="background:var(--paper); padding:20px; border-radius:14px; border:1px solid var(--line); width:100%; margin:12px 0;">';
+    html += '<p style="font-size:13px; font-weight:bold; color:var(--ink); margin:0 0 10px;">👑 新しくルームを作る</p>';
+    html += '<div style="display:flex; gap:10px; margin-bottom:12px;">';
+    html += '<label style="font-size:11px; flex:1; color:var(--ink-soft); font-weight:bold;">問題数 (3〜30)<br><input type="number" id="inputMaxQuestions" min="3" max="30" value="10" class="browse-search" style="margin-top:6px; padding:10px; text-align:center;"></label>';
+    html += '<label style="font-size:11px; flex:1; color:var(--ink-soft); font-weight:bold;">参加人数 (2〜8)<br><input type="number" id="inputMaxPlayers" min="2" max="8" value="2" class="browse-search" style="margin-top:6px; padding:10px; text-align:center;"></label>';
+    html += '</div>';
+    html += '<button class="btn" id="btnCreateRoom" type="button" style="background:#A8492E; width:100%; margin-bottom:16px;">ルームを作る</button>';
+    html += '<hr style="border:none; border-top:1px dashed var(--line); margin:0 0 16px;">';
+    html += '<p style="font-size:13px; font-weight:bold; color:var(--ink); margin:0 0 10px;">💬 友達の部屋に入る</p>';
+    html += '<input type="number" id="inputRoomId" class="input-room" placeholder="部屋番号" style="margin-bottom:10px; width:100%;">';
+    html += '<button class="btn secondary" id="btnJoinRoom" type="button" style="width:100%; border-color:#A8492E; color:#A8492E;">入室する</button>';
+    html += '</div><button class="text-link-btn" id="btnBattleCancel" type="button">ホーム画面に戻る</button></div>';
+    return html;
+  }
+
+  function bindBattleLobby() {
+    document.getElementById('btnBattleCancel').onclick = goHome;
+    document.getElementById('btnCreateRoom').onclick = function() {
+      var name = document.getElementById('inputNickname').value.trim() || 'ホスト';
+      localStorage.setItem('bac-nickname', name);
+      var maxQ = parseInt(document.getElementById('inputMaxQuestions').value, 10) || 10;
+      var maxP = parseInt(document.getElementById('inputMaxPlayers').value, 10) || 2;
+      if(maxQ < 3 || maxQ > 30) return alert('問題数は3〜30問にしてください');
+      if(maxP < 2 || maxP > 8) return alert('参加人数は2〜8人にしてください');
+      if(!initFirebase()) return;
+      var roomId = Math.floor(1000 + Math.random() * 9000).toString();
+      var qIds = pickSet(null).slice(0, maxQ); 
+      bMe = 'p_' + Math.random().toString(36).substr(2, 9);
+      var players = {}; players[bMe] = { name: name, score: 0 };
+      var newRoom = { status: 'waiting', settings: { maxQuestions: maxQ, maxPlayers: maxP }, players: players, qIds: qIds, currentQ: 0, state: 'reading', buzzer: '', winner: '' };
+      db.ref('rooms/' + roomId).set(newRoom).then(function(){ bRoom = roomId; listenBattleRoom(); }).catch(function(e){ alert("エラー: " + e.message); });
+    };
+
+    document.getElementById('btnJoinRoom').onclick = function() {
+      var name = document.getElementById('inputNickname').value.trim() || 'ゲスト';
+      localStorage.setItem('bac-nickname', name);
+      var roomId = document.getElementById('inputRoomId').value.trim();
+      if(roomId.length !== 4) return alert("4桁の部屋番号を入力してください");
+      if(!initFirebase()) return;
+      db.ref('rooms/' + roomId).once('value').then(function(snap){
+        if(!snap.exists()){ return alert("部屋が見つかりません"); }
+        var r = snap.val();
+        if(r.status !== 'waiting'){ return alert("すでにゲームが開始されているか、終了しています"); }
+        var pKeys = Object.keys(r.players || {});
+        if(pKeys.length >= r.settings.maxPlayers){ return alert("この部屋は満員です"); }
+        bMe = 'p_' + Math.random().toString(36).substr(2, 9);
+        var updates = {}; updates['players/' + bMe] = { name: name, score: 0 };
+        if(pKeys.length + 1 >= r.settings.maxPlayers) { updates['status'] = 'playing'; }
+        db.ref('rooms/' + roomId).update(updates).then(function(){ bRoom = roomId; listenBattleRoom(); });
+      });
+    };
+  }
+
+  function listenBattleRoom() {
+    screen = 'battleRoom';
+    db.ref('rooms/' + bRoom).on('value', function(snap){
+      bState = snap.val();
+      if(!bState) return goHome();
+      render();
+    });
+  }
+
+  function doBuzz() {
+    if(bState.state !== 'reading' || bState.buzzer !== '') return;
+    db.ref('rooms/' + bRoom + '/buzzer').transaction(function(current){ if (current === '') { return bMe; } return; });
+  }
+
+  function submitBattleAnswer(idx) {
+    var q = getQ(bState.qIds[bState.currentQ]);
+    var correct = (idx === q.a);
+    var pScoreRef = db.ref('rooms/' + bRoom + '/players/' + bMe + '/score');
+    db.ref('rooms/' + bRoom).update({ state: 'answered' });
+    if(correct) {
+      pScoreRef.transaction(function(s){ return (s||0) + 10; }).then(function(){ setTimeout(function(){ advanceBattleTurn(); }, 3000); });
+    } else { setTimeout(function(){ advanceBattleTurn(); }, 3000); }
+  }
+
+  function advanceBattleTurn() {
+    var nextQ = bState.currentQ + 1;
+    if(nextQ >= bState.settings.maxQuestions) { db.ref('rooms/' + bRoom).update({ status: 'finished' }); }
+    else { db.ref('rooms/' + bRoom).update({ currentQ: nextQ, state: 'reading', buzzer: '' }); }
+  }
+
+  function renderBattleRoom() {
+    if(!bState) return '<div class="center-col">読み込み中...</div>';
+    var html = '';
+    var pKeys = Object.keys(bState.players || {});
+    var isHost = pKeys.length > 0 && pKeys[0] === bMe;
+
+    if(bState.status === 'waiting') {
+      html += '<div class="center-col" style="padding:40px 0;">';
+      html += '<div class="big-title">部屋番号: <span style="color:#A8492E;font-size:42px;">' + bRoom + '</span></div>';
+      html += '<p class="desc" style="margin-bottom:24px;">この番号を相手に教えてください</p>';
+      html += '<p class="desc" style="font-weight:bold;">参加者 (' + pKeys.length + '/' + bState.settings.maxPlayers + '人)</p>';
+      html += '<div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:24px;">';
+      pKeys.forEach(function(k){ html += '<span style="background:var(--card); border:1px solid var(--line); padding:6px 16px; border-radius:20px; font-size:14px; font-weight:bold;">' + esc(bState.players[k].name) + '</span>'; });
+      html += '</div>';
+      if(isHost) { html += '<button class="btn" id="btnStartManual" type="button" style="background:var(--forest); margin-bottom:12px; width:100%; max-width:300px;">この人数でゲーム開始</button>'; }
+      html += '<div class="loader" style="font-size:40px; margin:10px 0; animation:spin 1s linear infinite;">⏳</div>';
+      html += '<p class="desc" style="font-size:12px;">全員揃うと自動で始まります...</p>';
+      html += '<button class="text-link-btn" id="btnBattleCancel" type="button" style="margin-top:20px;">やめる</button>';
+      html += '</div>';
+      return html;
+    }
+
+    if(bState.status === 'finished') {
+      var maxScore = -1; var winners = [];
+      pKeys.forEach(function(k){
+        var s = bState.players[k].score;
+        if(s > maxScore) { maxScore = s; winners = [bState.players[k].name]; }
+        else if(s === maxScore) { winners.push(bState.players[k].name); }
+      });
+      var isWin = winners.indexOf(bState.players[bMe].name) !== -1;
+      html += '<div class="center-col" style="padding:40px 0;">';
+      html += '<div class="big-title" style="color:'+(isWin?'var(--forest-deep)':'var(--clay)')+'; font-size:36px;">' + (isWin ? 'WINNER 🎉' : 'LOSE 💦') + '</div>';
+      html += '<p class="desc" style="font-weight:bold; margin-bottom:24px;">勝者: ' + esc(winners.join(' & ')) + ' (' + maxScore + 'pt)</p>';
+      html += '<div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; width:100%; margin-bottom:24px;">';
+      pKeys.forEach(function(k){
+        var isMe = k === bMe;
+        html += '<div style="flex:1 1 40%; min-width:100px; background:'+(isMe?'rgba(28,59,50,0.1)':'var(--card)')+'; border:1px solid '+(isMe?'var(--forest)':'var(--line)')+'; border-radius:12px; padding:12px; text-align:center;">';
+        html += '<div style="font-size:12px; color:var(--ink-soft); font-weight:'+(isMe?'bold':'normal')+'; margin-bottom:4px;">' + esc(bState.players[k].name) + '</div>';
+        html += '<div style="font-size:24px; font-weight:bold; color:var(--forest-deep);">' + bState.players[k].score + '</div></div>';
+      });
+      html += '</div><button class="btn" id="btnBattleCancel" type="button">ホームに戻る</button></div>';
+      return html;
+    }
+
+    html += '<div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px;">';
+    pKeys.forEach(function(k){
+      var isMe = k === bMe;
+      html += '<div style="flex:1; min-width:70px; background:'+(isMe?'rgba(28,59,50,0.1)':'var(--card)')+'; border:1px solid '+(isMe?'var(--forest)':'var(--line)')+'; border-radius:8px; padding:6px; text-align:center;">';
+      html += '<div style="font-size:10px; color:var(--ink-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:'+(isMe?'bold':'normal')+';">' + esc(bState.players[k].name) + '</div>';
+      html += '<div style="font-size:16px; font-weight:bold; color:var(--forest-deep);">' + bState.players[k].score + '</div></div>';
+    });
+    html += '</div>';
+
+    var q = getQ(bState.qIds[bState.currentQ]);
+    html += '<div class="qnum" style="text-align:center;font-weight:bold; font-size:14px; margin-bottom:8px;">第 ' + (bState.currentQ + 1) + ' 問 / 全' + bState.settings.maxQuestions + '問</div>';
+    
+    var msg = '問題を読んでいます...';
+    if (bState.state === 'reading') { msg = '早押しスタンバイ！'; }
+    if (bState.buzzer !== '') { var buzzerName = bState.players[bState.buzzer] ? bState.players[bState.buzzer].name : ''; msg = (bState.buzzer === bMe) ? 'あなたの解答！' : esc(buzzerName) + ' が解答中...'; }
+    if (bState.state === 'answered') { msg = '正解発表！'; }
+
+    html += '<div class="battle-status-msg" id="battleStatusMsg">' + msg + '</div>';
+    html += '<div style="min-height:100px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--card); border-radius:14px; padding:16px; margin-bottom:16px; border:2px solid var(--line);">';
+    html += '<p class="qtext" style="margin:0 0 10px; text-align:center; width:100%;">' + esc(q.q) + '</p>';
+    if(q.img){ html += '<img src="'+esc(q.img)+'" style="max-width:100%; border-radius:8px; margin-bottom:10px;">'; }
+    if(q.map){ html += '<div class="question-map" style="margin:0;">'+q.map+'</div>'; }
+    html += '</div>';
+
+    if (bState.state === 'reading') {
+      html += '<div class="buzzer-area"><button class="buzzer-btn" id="btnBuzz" type="button">押す！</button></div>';
+    } else if (bState.buzzer !== '') {
+      if (bState.buzzer === bMe && bState.state !== 'answered') {
+        html += '<div class="choices">';
+        for(var i=0; i<q.o.length; i++){ html += '<button class="choice-btn" data-idx="'+i+'" type="button"><span class="mark"></span><span>'+esc(q.o[i])+'</span></button>'; }
+        html += '</div>';
+      } else if (bState.state === 'answered') {
+        html += '<div class="choices">';
+        for(var j=0; j<q.o.length; j++){
+          var cls = 'choice-btn'; if(j === q.a) { cls += ' correct'; }
+          html += '<button class="'+cls+'" disabled type="button"><span class="mark">'+(j===q.a?'✓':'')+'</span><span>'+esc(q.o[j])+'</span></button>';
+        }
+        html += '</div>';
+        if(q.n) { html += '<div class="note">💡 '+esc(q.n)+'</div>'; }
+        if (isHost) { html += '<div style="text-align:center; margin-top:20px;"><button class="btn secondary" id="btnForceNext" style="padding:6px 12px; font-size:12px;">次の問題へ (進行が止まった場合)</button></div>'; }
+      } else {
+        html += '<div class="center-col" style="padding:40px 0;"><div class="loader" style="font-size:40px; animation:spin 1s linear infinite;">🤔</div></div>';
+      }
+    }
+    html += '<div style="text-align:center; margin-top:20px;"><button class="text-link-btn" id="btnBattleQuit" type="button">部屋から退出する</button></div>';
+    return html;
+  }
+
+  function bindBattleRoom() {
+    var cBtn = document.getElementById('btnBattleCancel'); if(cBtn) cBtn.onclick = goHome;
+    var qBtn = document.getElementById('btnBattleQuit'); if(qBtn) qBtn.onclick = goHome;
+    var sBtn = document.getElementById('btnStartManual'); if(sBtn) sBtn.onclick = function() { db.ref('rooms/' + bRoom).update({ status: 'playing' }); };
+    var buzzBtn = document.getElementById('btnBuzz'); if(buzzBtn) buzzBtn.onclick = doBuzz;
+    var choiceBtns = document.querySelectorAll('.choice-btn:not(:disabled)');
+    choiceBtns.forEach(function(b){ b.onclick = function(){ submitBattleAnswer(parseInt(b.getAttribute('data-idx'),10)); }; });
+    var fn = document.getElementById('btnForceNext'); if(fn) fn.onclick = advanceBattleTurn;
+  }
+
+  /* ---------------- 質問と回答表示のロジック ---------------- */
   function renderQuestion(){
     var list = currentList();
     var qi = qIndex;
@@ -1292,61 +1122,38 @@
     html += '<div class="q-actions">';
     html += '<button class="bookmark-btn'+(bm?' active':'')+'" id="btnBookmark" type="button">'+(bm?'✅ 苦手登録済み':'🔖 苦手登録')+'</button>';
     html += '<button class="text-link-btn" id="btnQuitToHome" type="button">ホーム画面に戻る</button>';
-    html += '</div>';
-    html += '<div class="q-tags">';
-    html += '<span class="tag">'+esc(CATS[q.c])+'</span>';
+    html += '</div><div class="q-tags"><span class="tag">'+esc(CATS[q.c])+'</span>';
     if(q.hot){ html += '<span class="tag hot">🔥 出題頻度高め！</span>'; }
-    html += '</div>';
-    html += '<div class="qnum">'+(qi+1)+' / '+list.length+' 問目'+(mode==='practice' ? '（復習ラウンド）' : '')+'</div>';
+    html += '</div><div class="qnum">'+(qi+1)+' / '+list.length+' 問目'+(mode==='practice' ? '（復習ラウンド）' : '')+'</div>';
     html += '<p class="qtext">'+esc(q.q)+'</p>';
     if(q.img){ html += '<div class="question-map"><img src="'+esc(q.img)+'" style="max-width:100%; border-radius:12px; display:block; margin:0 auto;"></div>'; }
     if(q.map){ html += '<div class="question-map">'+q.map+'</div>'; }
     html += '<div class="choices">';
     for(var i=0;i<q.o.length;i++){
-      var cls = 'choice-btn';
-      var mark = '';
-      var disabled = '';
+      var cls = 'choice-btn'; var mark = ''; var disabled = '';
       if(answeredThisQ){
         disabled = 'disabled';
         if(i===q.a){ cls += ' correct'; mark='✓'; }
         else if(i===answeredThisQ.choice){ cls += ' wrong'; mark='✕'; }
         else { cls += ' dim'; }
       }
-      html += '<button class="'+cls+'" '+disabled+' data-idx="'+i+'" type="button">'+
-              '<span class="mark">'+mark+'</span><span>'+esc(q.o[i])+'</span></button>';
+      html += '<button class="'+cls+'" '+disabled+' data-idx="'+i+'" type="button"><span class="mark">'+mark+'</span><span>'+esc(q.o[i])+'</span></button>';
     }
     html += '</div>';
-    if(answeredThisQ && q.n){
-      html += '<div class="note">💡 '+esc(q.n)+'</div>';
-    }
+    if(answeredThisQ && q.n){ html += '<div class="note">💡 '+esc(q.n)+'</div>'; }
     html += '<div class="actions">';
-    if(answeredThisQ){
-      var isLast = (qi+1) >= list.length;
-      html += '<button class="btn" id="btnNext" type="button">'+(isLast ? '結果を見る' : '次の問題へ')+'</button>';
-    } else {
-      html += '<button class="btn secondary" disabled type="button" style="opacity:.5;cursor:default;">選択肢を選んでください</button>';
-    }
+    if(answeredThisQ){ var isLast = (qi+1) >= list.length; html += '<button class="btn" id="btnNext" type="button">'+(isLast ? '結果を見る' : '次の問題へ')+'</button>'; }
+    else { html += '<button class="btn secondary" disabled type="button" style="opacity:.5;cursor:default;">選択肢を選んでください</button>'; }
     html += '</div>';
     return html;
   }
   function bindQuestion(){
-    var qb = document.getElementById('btnQuitToHome');
-    if(qb) qb.onclick = goHome;
+    var qb = document.getElementById('btnQuitToHome'); if(qb) qb.onclick = goHome;
     var bm = document.getElementById('btnBookmark');
-    if(bm){
-      bm.onclick = function(){
-        var list = currentList();
-        var q = getQ(list[qIndex]);
-        toggleBookmark(q.id);
-        render();
-      };
-    }
+    if(bm){ bm.onclick = function(){ var list = currentList(); var q = getQ(list[qIndex]); toggleBookmark(q.id); render(); }; }
     var btns = document.querySelectorAll('.choice-btn');
-    btns.forEach(function(b){
-      b.onclick = function(){ selectAnswer(parseInt(b.getAttribute('data-idx'),10)); };
-    });
-    var nb = document.getElementById('btnNext');
-    if(nb) nb.onclick = nextQuestion;
+    btns.forEach(function(b){ b.onclick = function(){ selectAnswer(parseInt(b.getAttribute('data-idx'),10)); }; });
+    var nb = document.getElementById('btnNext'); if(nb) nb.onclick = nextQuestion;
   }
 
   function renderSummary(){
@@ -1354,7 +1161,6 @@
     var correctCount = answers.filter(function(a){return a.correct;}).length;
     var total = answers.length;
     var pct = total ? Math.round((correctCount/total)*100) : 0;
-
     var byCat = {};
     answers.forEach(function(a){
       var q = getQ(a.id);
@@ -1370,76 +1176,48 @@
 
     var html = '<div class="center-col">';
     html += '<div class="big-title">'+(mode==='practice' ? '復習ラウンド 結果' : '本日の結果')+'</div>';
-    html += '<div class="score-big">'+correctCount+' / '+total+'</div>';
-    html += '<div class="score-sub">正答率 '+pct+'%</div>';
-    if(weakest && total>=4){
-      html += '<p class="desc">今回とくに間違いが多かった分野は「<b>'+esc(CATS[weakest.cat])+'</b>」でした。次回はそこを重点的にチェックしましょう。</p>';
-    }
-    if(mode==='daily'){
-      html += '<p class="desc" style="margin-top:2px;">連続記録：🔥 '+streak.count+' 日</p>';
-    }
+    html += '<div class="score-big">'+correctCount+' / '+total+'</div><div class="score-sub">正答率 '+pct+'%</div>';
+    if(weakest && total>=4){ html += '<p class="desc">今回とくに間違いが多かった分野は「<b>'+esc(CATS[weakest.cat])+'</b>」でした。次回はそこを重点的にチェックしましょう。</p>'; }
+    if(mode==='daily'){ html += '<p class="desc" style="margin-top:2px;">連続記録：🔥 '+streak.count+' 日</p>'; }
     html += '<p class="desc" style="margin-top:8px;">このあとどうしますか？</p>';
     html += '<button class="btn" id="btnRepeatSame" type="button">🔁 同じ'+total+'問をもう一度解く</button>';
     html += '<button class="btn secondary" id="btnPracticeAgain" type="button">🎲 違う問題でランダム学習する</button>';
-    html += '<button class="text-link-btn" id="btnBackHome" type="button">ホーム画面に戻る</button>';
-    html += '</div>';
+    html += '<button class="text-link-btn" id="btnBackHome" type="button">ホーム画面に戻る</button></div>';
     return html;
   }
   function bindSummary(){
-    var bh = document.getElementById('btnBackHome');
-    if(bh) bh.onclick = goHome;
-    var pa = document.getElementById('btnPracticeAgain');
-    if(pa) pa.onclick = startPractice;
-    var rs = document.getElementById('btnRepeatSame');
-    if(rs) rs.onclick = startRepeat;
+    var bh = document.getElementById('btnBackHome'); if(bh) bh.onclick = goHome;
+    var pa = document.getElementById('btnPracticeAgain'); if(pa) pa.onclick = startPractice;
+    var rs = document.getElementById('btnRepeatSame'); if(rs) rs.onclick = startRepeat;
   }
 
   /* ---------------- 分野別スタッツ & よく間違える問題 ---------------- */
   function renderStatsPanel(){
     var panel = document.getElementById('statsPanel');
-
     var totalQ = QUESTIONS.length;
     var cBlue = 0, cGreen = 0, cOrange = 0, cRed = 0, cGray = 0;
-    var weakQs = [];
-    var totalSeen = 0, totalCorrect = 0;
+    var weakQs = []; var totalSeen = 0, totalCorrect = 0;
     
     QUESTIONS.forEach(function(q){
       var s = stats[q.id];
       if(!s || s.seen === 0){ cGray++; } 
       else {
         var strk = s.streak !== undefined ? s.streak : (s.correct >= 2 ? 2 : (s.correct === 1 ? 1 : 0));
-        if(s.correct >= 3){ cBlue++; } 
-        else if(strk >= 2){ cGreen++; } 
-        else if(s.correct > 0){ cOrange++; } 
-        else { cRed++; } 
-
+        if(s.correct >= 3){ cBlue++; } else if(strk >= 2){ cGreen++; } else if(s.correct > 0){ cOrange++; } else { cRed++; } 
         var mistakes = s.seen - s.correct;
-        if(mistakes > 0){
-          weakQs.push({id: q.id, q: q, s: s, mistakes: mistakes, rate: s.correct/s.seen});
-        }
-        totalSeen += s.seen;
-        totalCorrect += s.correct;
+        if(mistakes > 0){ weakQs.push({id: q.id, q: q, s: s, mistakes: mistakes, rate: s.correct/s.seen}); }
+        totalSeen += s.seen; totalCorrect += s.correct;
       }
     });
 
-    var pBlue = (cBlue / totalQ) * 100;
-    var pGreen = (cGreen / totalQ) * 100;
-    var pOrange = (cOrange / totalQ) * 100;
-    var pRed = (cRed / totalQ) * 100;
-
-    var deg1 = pBlue;
-    var deg2 = deg1 + pGreen;
-    var deg3 = deg2 + pOrange;
-    var deg4 = deg3 + pRed;
-
+    var pBlue = (cBlue / totalQ) * 100; var pGreen = (cGreen / totalQ) * 100; var pOrange = (cOrange / totalQ) * 100; var pRed = (cRed / totalQ) * 100;
+    var deg1 = pBlue; var deg2 = deg1 + pGreen; var deg3 = deg2 + pOrange; var deg4 = deg3 + pRed;
     var gradient = 'conic-gradient(#3b82f6 0% '+deg1+'%, #10b981 '+deg1+'% '+deg2+'%, #f59e0b '+deg2+'% '+deg3+'%, #ef4444 '+deg3+'% '+deg4+'%, #d1d5db '+deg4+'% 100%)';
     var masteredPct = Math.round(pBlue + pGreen);
 
-    var html = '<h3>全体のマスター進捗</h3>';
-    html += '<div class="stats-overview">';
+    var html = '<h3>全体のマスター進捗</h3><div class="stats-overview">';
     html += '<div class="progress-donut" style="background:' + gradient + ';">';
-    html += '<div class="donut-inner"><div class="donut-pct">' + masteredPct + '%</div><div class="donut-lbl">マスター</div></div>';
-    html += '</div>';
+    html += '<div class="donut-inner"><div class="donut-pct">' + masteredPct + '%</div><div class="donut-lbl">マスター</div></div></div>';
     html += '<div class="pie-legend">';
     html += '<div class="legend-item"><div class="legend-label"><div class="legend-dot blue"></div>完璧 (3回以上正解)</div><div class="legend-count">' + cBlue + '問</div></div>';
     html += '<div class="legend-item"><div class="legend-label"><div class="legend-dot green"></div>覚えた (2回連続正解)</div><div class="legend-count">' + cGreen + '問</div></div>';
@@ -1450,10 +1228,7 @@
 
     html += '<button id="btnShareProgress" type="button" style="width:100%; padding:14px; margin-bottom:24px; background:var(--forest); color:var(--card); border:none; border-radius:12px; font-family:var(--font-body); font-weight:700; font-size:14.5px; cursor:pointer; box-shadow:0 4px 12px rgba(28,59,50,0.2);">📣 現在の進捗をコピーしてシェア</button>';
 
-    weakQs.sort(function(a,b){
-      if(a.rate !== b.rate) return a.rate - b.rate;
-      return b.mistakes - a.mistakes;
-    });
+    weakQs.sort(function(a,b){ if(a.rate !== b.rate) return a.rate - b.rate; return b.mistakes - a.mistakes; });
     weakQs = weakQs.slice(0, 10);
 
     html += '<details class="cat-accordion" style="margin-top:24px;border:2px solid rgba(239, 68, 68, 0.3);">';
@@ -1479,11 +1254,7 @@
 
     var rows = Object.keys(CATS).map(function(k){
       var seen=0, correct=0;
-      QUESTIONS.forEach(function(q){
-        if(q.c!==k) return;
-        var s = stats[q.id];
-        if(s){ seen += s.seen; correct += s.correct; }
-      });
+      QUESTIONS.forEach(function(q){ if(q.c!==k) return; var s = stats[q.id]; if(s){ seen += s.seen; correct += s.correct; } });
       var rate = seen ? correct/seen : 0;
       return {cat:k, seen:seen, correct:correct, rate:rate};
     });
@@ -1492,61 +1263,38 @@
     html += '<h3 style="margin-top:24px;">分野別 正答率</h3>';
     rows.forEach(function(r){
       var pct = Math.round(r.rate*100);
-      html += '<div class="cat-row">'+
-        '<div class="cat-name">'+esc(CATS[r.cat])+'</div>'+
-        '<div class="cat-bar-track"><div class="cat-bar-fill" style="width:'+(r.seen? pct : 0)+'%;"></div></div>'+
-        '<div class="cat-pct">'+(r.seen ? pct+'%' : '—')+'</div>'+
-      '</div>';
+      html += '<div class="cat-row"><div class="cat-name">'+esc(CATS[r.cat])+'</div><div class="cat-bar-track"><div class="cat-bar-fill" style="width:'+(r.seen? pct : 0)+'%;"></div></div><div class="cat-pct">'+(r.seen ? pct+'%' : '—')+'</div></div>';
     });
     html += '<div class="stats-foot"><span>累計回答数：'+totalSeen+'問</span><span>累計正答率：'+(totalSeen? Math.round(totalCorrect/totalSeen*100):0)+'%</span></div>';
 
-    if(!pendingResetConfirm){
-      html += '<div class="reset-zone"><button class="btn ghost" id="btnResetAsk" type="button">学習記録をリセットする</button></div>';
-    } else {
-      html += '<div class="confirm-row">本当にすべての記録を削除しますか？'+
-        '<button class="btn ghost" id="btnResetYes" type="button" style="color:var(--forest-deep);">はい、削除する</button>'+
-        '<button class="btn ghost" id="btnResetNo" type="button">キャンセル</button></div>';
-    }
+    if(!pendingResetConfirm){ html += '<div class="reset-zone"><button class="btn ghost" id="btnResetAsk" type="button">学習記録をリセットする</button></div>'; } 
+    else { html += '<div class="confirm-row">本当にすべての記録を削除しますか？<button class="btn ghost" id="btnResetYes" type="button" style="color:var(--forest-deep);">はい、削除する</button><button class="btn ghost" id="btnResetNo" type="button">キャンセル</button></div>'; }
     panel.innerHTML = html;
 
     var shareBtn = document.getElementById('btnShareProgress');
     if(shareBtn){
       shareBtn.onclick = function(){
         var text = "☕️ BAドリル学習記録\n現在のマスター率: " + masteredPct + "%！\n🔥連続 " + streak.count + " 日学習中！\n(累計回答数: " + totalSeen + "問)\n#BAドリル";
-        if (navigator.share) {
-          navigator.share({ text: text }).catch(function(){ fallbackCopy(text); });
-        } else {
-          fallbackCopy(text);
-        }
+        if (navigator.share) { navigator.share({ text: text }).catch(function(){ fallbackCopy(text); }); } else { fallbackCopy(text); }
       };
     }
 
     var bmBtns = panel.querySelectorAll('.weak-bookmark-btn');
     bmBtns.forEach(function(b){
-      b.onclick = function(){
-        var id = parseInt(b.getAttribute('data-id'), 10);
-        toggleBookmark(id);
-        renderStatsPanel(); 
-      };
+      b.onclick = function(){ var id = parseInt(b.getAttribute('data-id'), 10); toggleBookmark(id); renderStatsPanel(); };
     });
 
-    var ask = document.getElementById('btnResetAsk');
-    if(ask) ask.onclick = function(){ pendingResetConfirm=true; renderStatsPanel(); };
-    var yes = document.getElementById('btnResetYes');
-    if(yes) yes.onclick = doReset;
-    var no = document.getElementById('btnResetNo');
-    if(no) no.onclick = function(){ pendingResetConfirm=false; renderStatsPanel(); };
+    var ask = document.getElementById('btnResetAsk'); if(ask) ask.onclick = function(){ pendingResetConfirm=true; renderStatsPanel(); };
+    var yes = document.getElementById('btnResetYes'); if(yes) yes.onclick = doReset;
+    var no = document.getElementById('btnResetNo'); if(no) no.onclick = function(){ pendingResetConfirm=false; renderStatsPanel(); };
   }
 
   /* ---------------- 全問題ブラウズ画面 ---------------- */
   function renderBrowse(){
-    var html = '<div>';
-    html += '<button class="text-link-btn" id="btnBrowseBack" type="button">← ホーム画面に戻る</button>';
+    var html = '<div><button class="text-link-btn" id="btnBrowseBack" type="button">← ホーム画面に戻る</button>';
     html += '<div class="big-title" style="margin-top:10px;text-align:left;">収録されている全問題の単語帳（'+QUESTIONS.length+'問）</div>';
     html += '<input type="text" id="browseSearchInput" class="browse-search" placeholder="🔍 キーワードで検索（例：カティカティ、C.A.F.E.）">';
-    html += '<div id="browseResults">';
-    html += buildBrowseResults('');
-    html += '</div></div>';
+    html += '<div id="browseResults">' + buildBrowseResults('') + '</div></div>';
     return html;
   }
   
@@ -1554,22 +1302,15 @@
     var html = '';
     var q2 = query.trim().toLowerCase();
     if(q2){
-      var matches = QUESTIONS.filter(function(q){
-        return q.q.toLowerCase().indexOf(q2)!==-1 || q.o[q.a].toLowerCase().indexOf(q2)!==-1;
-      });
-      html += '<p class="desc" style="text-align:left;max-width:none;">'+matches.length+'件ヒットしました</p>';
-      html += '<div class="cat-qlist" style="padding:0;">';
+      var matches = QUESTIONS.filter(function(q){ return q.q.toLowerCase().indexOf(q2)!==-1 || q.o[q.a].toLowerCase().indexOf(q2)!==-1; });
+      html += '<p class="desc" style="text-align:left;max-width:none;">'+matches.length+'件ヒットしました</p><div class="cat-qlist" style="padding:0;">';
       matches.forEach(function(q, idx){
-        html += '<details class="flashcard">';
-        html += '<summary><span class="tag" style="margin-right:6px;margin-bottom:0;">'+esc(CATS[q.c])+'</span>'+(idx+1)+'. '+(q.hot?'🔥 ':'')+esc(q.q);
+        html += '<details class="flashcard"><summary><span class="tag" style="margin-right:6px;margin-bottom:0;">'+esc(CATS[q.c])+'</span>'+(idx+1)+'. '+(q.hot?'🔥 ':'')+esc(q.q);
         if(q.img){ html += '<div class="question-map browse-map"><img src="'+esc(q.img)+'" style="max-width:100%; border-radius:8px;"></div>'; }
         if(q.map){ html += '<div class="question-map browse-map">'+q.map+'</div>'; }
-        html += '</summary>';
-        html += '<div class="flashcard-answer">';
-        html += '<div class="browse-answer">'+esc(q.o[q.a])+'</div>';
+        html += '</summary><div class="flashcard-answer"><div class="browse-answer">'+esc(q.o[q.a])+'</div>';
         if(q.n){ html += '<div class="browse-note">💡 '+esc(q.n)+'</div>'; }
-        html += '</div>';
-        html += '</details>';
+        html += '</div></details>';
       });
       html += '</div>';
     } else {
@@ -1577,20 +1318,14 @@
       Object.keys(CATS).forEach(function(catKey){
         var qs = QUESTIONS.filter(function(q){ return q.c===catKey; });
         if(!qs.length) return;
-        html += '<details class="cat-accordion">';
-        html += '<summary>'+esc(CATS[catKey])+'（'+qs.length+'問）</summary>';
-        html += '<div class="cat-qlist">';
+        html += '<details class="cat-accordion"><summary>'+esc(CATS[catKey])+'（'+qs.length+'問）</summary><div class="cat-qlist">';
         qs.forEach(function(q, idx){
-          html += '<details class="flashcard">';
-          html += '<summary>'+(idx+1)+'. '+(q.hot?'🔥 ':'')+esc(q.q);
+          html += '<details class="flashcard"><summary>'+(idx+1)+'. '+(q.hot?'🔥 ':'')+esc(q.q);
           if(q.img){ html += '<div class="question-map browse-map"><img src="'+esc(q.img)+'" style="max-width:100%; border-radius:8px;"></div>'; }
           if(q.map){ html += '<div class="question-map browse-map">'+q.map+'</div>'; }
-          html += '</summary>';
-          html += '<div class="flashcard-answer">';
-          html += '<div class="browse-answer">'+esc(q.o[q.a])+'</div>';
+          html += '</summary><div class="flashcard-answer"><div class="browse-answer">'+esc(q.o[q.a])+'</div>';
           if(q.n){ html += '<div class="browse-note">💡 '+esc(q.n)+'</div>'; }
-          html += '</div>';
-          html += '</details>';
+          html += '</div></details>';
         });
         html += '</div></details>';
       });
@@ -1601,24 +1336,11 @@
   function bindBrowse(){
     document.getElementById('btnBrowseBack').onclick = function(){ screen='home'; render(); };
     var searchInput = document.getElementById('browseSearchInput');
-    if(searchInput){
-      searchInput.oninput = function(){
-        var resultsDiv = document.getElementById('browseResults');
-        if(resultsDiv){
-          resultsDiv.innerHTML = buildBrowseResults(searchInput.value);
-        }
-      };
-    }
+    if(searchInput){ searchInput.oninput = function(){ var resultsDiv = document.getElementById('browseResults'); if(resultsDiv){ resultsDiv.innerHTML = buildBrowseResults(searchInput.value); } }; }
   }
 
   /* ---------------- 模擬試験モード ---------------- */
-  function shuffleArrayInPlace(arr){
-    for(var i=arr.length-1;i>0;i--){
-      var j = Math.floor(Math.random()*(i+1));
-      var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
-    }
-    return arr;
-  }
+  function shuffleArrayInPlace(arr){ for(var i=arr.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=arr[i]; arr[i]=arr[j]; arr[j]=t; } return arr; }
   function shuffleMultiQuestion(q){
     var order = shuffleArrayInPlace([0,1,2,3]);
     var newOpts = order.map(function(i){ return q.o[i]; });
@@ -1639,16 +1361,11 @@
   }
   function beginExam(){
     examQuitConfirm = false;
-    var forty = buildExamForty().map(function(q){
-      return {q:q.q, o:q.o.slice(), a:q.a, multi:false};
-    });
+    var forty = buildExamForty().map(function(q){ return {q:q.q, o:q.o.slice(), a:q.a, multi:false}; });
     var ten = shuffleArrayInPlace(EXAM_MULTI.slice()).map(shuffleMultiQuestion);
     examQuestions = forty.concat(ten);
     examAnswers = examQuestions.map(function(){ return null; });
-    examIndex = 0;
-    examStartTs = Date.now();
-    mode = 'exam';
-    screen = 'examQuestion';
+    examIndex = 0; examStartTs = Date.now(); mode = 'exam'; screen = 'examQuestion';
     render();
     if(examTimerInterval) clearInterval(examTimerInterval);
     examTimerInterval = setInterval(tickExamTimer, 1000);
@@ -1658,30 +1375,19 @@
     var remaining = Math.max(0, EXAM_DURATION_SEC - elapsed);
     var mm = Math.floor(remaining/60), ss = remaining%60;
     var el = document.getElementById('examTimerDisplay');
-    if(el){
-      el.textContent = (mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
-      el.classList.toggle('warn', remaining<=300);
-    }
-    if(remaining<=0){
-      clearInterval(examTimerInterval);
-      examTimerInterval = null;
-      submitExam();
-    }
+    if(el){ el.textContent = (mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss; el.classList.toggle('warn', remaining<=300); }
+    if(remaining<=0){ clearInterval(examTimerInterval); examTimerInterval = null; submitExam(); }
   }
   async function submitExam(){
     if(examTimerInterval){ clearInterval(examTimerInterval); examTimerInterval = null; }
-    var correctCount = 0;
-    var details = [];
+    var correctCount = 0; var details = [];
     examQuestions.forEach(function(q, i){
-      var ans = examAnswers[i];
-      var isCorrect;
+      var ans = examAnswers[i]; var isCorrect;
       if(q.multi){
         var a = (ans ? ans.slice() : []).sort(function(x,y){ return x-y; });
         var c = q.a.slice().sort(function(x,y){ return x-y; });
         isCorrect = a.length===c.length && a.every(function(v,idx){ return v===c[idx]; });
-      } else {
-        isCorrect = ans===q.a;
-      }
+      } else { isCorrect = ans===q.a; }
       if(isCorrect) correctCount++;
       details.push({q:q, ans:ans, isCorrect:isCorrect});
     });
@@ -1689,36 +1395,22 @@
     examHistory.push({date:todayStr(), score:examLastResult.score, correct:correctCount, total:examQuestions.length});
     if(examHistory.length > 30){ examHistory = examHistory.slice(-30); }
     await saveJSON('bac-exam-history', examHistory);
-    mode = 'daily';
-    screen = 'examResult';
+    mode = 'daily'; screen = 'examResult';
     render();
   }
   function examHistoryBoxHtml(){
     if(!examHistory.length) return '';
     var best = Math.max.apply(null, examHistory.map(function(h){ return h.score; }));
     var last = examHistory[examHistory.length-1];
-    var html = '<div class="exam-history-box">';
-    html += '<div class="exam-history-summary">これまで <b>'+examHistory.length+'回</b> 受験 自己ベスト <b>'+best+'点</b> 直近 <b>'+last.score+'点</b>（'+esc(last.date)+'）</div>';
-    html += '<details class="exam-history-detail"><summary>過去の結果を見る</summary><ul>';
-    examHistory.slice().reverse().slice(0,10).forEach(function(h){
-      html += '<li>'+esc(h.date)+'：'+h.score+'点（'+h.correct+'/'+h.total+'問正解）</li>';
-    });
+    var html = '<div class="exam-history-box"><div class="exam-history-summary">これまで <b>'+examHistory.length+'回</b> 受験 自己ベスト <b>'+best+'点</b> 直近 <b>'+last.score+'点</b>（'+esc(last.date)+'）</div><details class="exam-history-detail"><summary>過去の結果を見る</summary><ul>';
+    examHistory.slice().reverse().slice(0,10).forEach(function(h){ html += '<li>'+esc(h.date)+'：'+h.score+'点（'+h.correct+'/'+h.total+'問正解）</li>'; });
     html += '</ul></details></div>';
     return html;
   }
   function renderExamIntro(){
-    var html = '<div class="center-col">';
-    html += '<div class="big-title">📝 模擬試験モード</div>';
-    html += '<p class="desc" style="text-align:left;">本番に近い形式で50問に挑戦します。<br>'+
-            '・問1〜40：4択から1つ選ぶ形式<br>'+
-            '・問41〜50：4択のうち正しいものを全て選ぶ形式（部分点なし）<br>'+
-            '・制限時間30分（開始と同時にタイマーが始まります）<br>'+
-            '・回答はその場で正誤を表示せず、最後にまとめて採点します<br><br>'+
-            '合格ラインの目安は74点（100点満点）です。腕試しのつもりでどうぞ。</p>';
+    var html = '<div class="center-col"><div class="big-title">📝 模擬試験モード</div><p class="desc" style="text-align:left;">本番に近い形式で50問に挑戦します。<br>・問1〜40：4択から1つ選ぶ形式<br>・問41〜50：4択のうち正しいものを全て選ぶ形式（部分点なし）<br>・制限時間30分（開始と同時にタイマーが始まります）<br>・回答はその場で正誤を表示せず、最後にまとめて採点します<br><br>合格ラインの目安は74点（100点満点）です。腕試しのつもりでどうぞ。</p>';
     html += examHistoryBoxHtml();
-    html += '<button class="btn" id="btnExamStart" type="button">試験を開始する</button>';
-    html += '<button class="text-link-btn" id="btnExamCancel" type="button">やめてホーム画面に戻る</button>';
-    html += '</div>';
+    html += '<button class="btn" id="btnExamStart" type="button">試験を開始する</button><button class="text-link-btn" id="btnExamCancel" type="button">やめてホーム画面に戻る</button></div>';
     return html;
   }
   function bindExamIntro(){
@@ -1727,19 +1419,10 @@
   }
   function renderExamQuestion(){
     if(examQuitConfirm){
-      var hq = '<div class="center-col">';
-      hq += '<div class="big-title">試験を中断しますか？</div>';
-      hq += '<p class="desc">ここまでの回答内容は保存されず、スコアも記録されません。</p>';
-      hq += '<button class="btn" id="btnQuitYes" type="button">中断してホーム画面に戻る</button>';
-      hq += '<button class="text-link-btn" id="btnQuitNo" type="button">試験を続ける</button>';
-      hq += '</div>';
-      return hq;
+      return '<div class="center-col"><div class="big-title">試験を中断しますか？</div><p class="desc">ここまでの回答内容は保存されず、スコアも記録されません。</p><button class="btn" id="btnQuitYes" type="button">中断してホーム画面に戻る</button><button class="text-link-btn" id="btnQuitNo" type="button">試験を続ける</button></div>';
     }
-    var q = examQuestions[examIndex];
-    var ans = examAnswers[examIndex];
-    var html = '';
-    html += '<div class="exam-topbar"><span class="exam-qnum">問 '+(examIndex+1)+' / '+examQuestions.length+'</span>'+
-            '<span class="exam-timer" id="examTimerDisplay">30:00</span></div>';
+    var q = examQuestions[examIndex]; var ans = examAnswers[examIndex]; var html = '';
+    html += '<div class="exam-topbar"><span class="exam-qnum">問 '+(examIndex+1)+' / '+examQuestions.length+'</span><span class="exam-timer" id="examTimerDisplay">30:00</span></div>';
     html += '<button class="text-link-btn" id="btnExamQuit" type="button" style="margin:-6px 0 14px;">試験を中断してホームに戻る</button>';
     html += '<p class="qtext">'+esc(q.q)+'</p>';
     if(q.multi){ html += '<p class="exam-hint">※正しいものをすべて選んでください（複数選択・部分点なし）</p>'; }
@@ -1747,28 +1430,19 @@
     q.o.forEach(function(opt, i){
       var selected = q.multi ? (ans && ans.indexOf(i)!==-1) : (ans===i);
       var markCls = q.multi ? 'mark checkbox' : 'mark';
-      html += '<button class="choice-btn'+(selected?' selected':'')+'" data-idx="'+i+'" type="button">'+
-              '<span class="'+markCls+'">'+(selected?'✓':'')+'</span><span>'+esc(opt)+'</span></button>';
+      html += '<button class="choice-btn'+(selected?' selected':'')+'" data-idx="'+i+'" type="button"><span class="'+markCls+'">'+(selected?'✓':'')+'</span><span>'+esc(opt)+'</span></button>';
     });
-    html += '</div>';
-    html += '<div class="actions" style="justify-content:space-between;">';
+    html += '</div><div class="actions" style="justify-content:space-between;">';
     html += examIndex>0 ? '<button class="btn secondary" id="btnExamPrev" type="button">戻る</button>' : '<span></span>';
-    html += '<button class="btn" id="btnExamNext" type="button">'+(examIndex===examQuestions.length-1?'採点する':'次へ')+'</button>';
-    html += '</div>';
+    html += '<button class="btn" id="btnExamNext" type="button">'+(examIndex===examQuestions.length-1?'採点する':'次へ')+'</button></div>';
     return html;
   }
   function bindExamQuestion(){
     if(examQuitConfirm){
-      document.getElementById('btnQuitYes').onclick = function(){
-        examQuitConfirm = false;
-        if(examTimerInterval){ clearInterval(examTimerInterval); examTimerInterval = null; }
-        mode = 'daily'; screen = 'home'; render();
-      };
-      document.getElementById('btnQuitNo').onclick = function(){ examQuitConfirm = false; render(); };
-      return;
+      document.getElementById('btnQuitYes').onclick = function(){ examQuitConfirm = false; if(examTimerInterval){ clearInterval(examTimerInterval); examTimerInterval = null; } mode = 'daily'; screen = 'home'; render(); };
+      document.getElementById('btnQuitNo').onclick = function(){ examQuitConfirm = false; render(); }; return;
     }
-    var quitBtn = document.getElementById('btnExamQuit');
-    if(quitBtn) quitBtn.onclick = function(){ examQuitConfirm = true; render(); };
+    var quitBtn = document.getElementById('btnExamQuit'); if(quitBtn) quitBtn.onclick = function(){ examQuitConfirm = true; render(); };
     var q = examQuestions[examIndex];
     var btns = document.querySelectorAll('.choice-btn');
     btns.forEach(function(b){
@@ -1779,47 +1453,27 @@
           var pos = cur.indexOf(idx);
           if(pos===-1){ cur.push(idx); } else { cur.splice(pos,1); }
           examAnswers[examIndex] = cur;
-        } else {
-          examAnswers[examIndex] = idx;
-        }
+        } else { examAnswers[examIndex] = idx; }
         render();
       };
     });
-    var prevBtn = document.getElementById('btnExamPrev');
-    if(prevBtn) prevBtn.onclick = function(){ examIndex--; render(); };
-    document.getElementById('btnExamNext').onclick = function(){
-      if(examIndex < examQuestions.length-1){ examIndex++; render(); }
-      else { submitExam(); }
-    };
+    var prevBtn = document.getElementById('btnExamPrev'); if(prevBtn) prevBtn.onclick = function(){ examIndex--; render(); };
+    document.getElementById('btnExamNext').onclick = function(){ if(examIndex < examQuestions.length-1){ examIndex++; render(); } else { submitExam(); } };
   }
   function renderExamResult(){
-    var correctCount = examLastResult.correctCount;
-    var details = examLastResult.details;
-    var score = examLastResult.score;
-    var pass = score>=74;
-    var prevAttempts = examHistory.slice(0, -1);
-    var bestBadge = '';
+    var correctCount = examLastResult.correctCount; var details = examLastResult.details; var score = examLastResult.score; var pass = score>=74;
+    var prevAttempts = examHistory.slice(0, -1); var bestBadge = '';
     if(prevAttempts.length){
       var bestPrev = Math.max.apply(null, prevAttempts.map(function(h){ return h.score; }));
-      bestBadge = score > bestPrev
-        ? '<div class="exam-history-summary">🎉 自己ベスト更新！（これまでの最高：'+bestPrev+'点）</div>'
-        : '<div class="exam-history-summary">自己ベストは '+bestPrev+'点 です。</div>';
+      bestBadge = score > bestPrev ? '<div class="exam-history-summary">🎉 自己ベスト更新！（これまでの最高：'+bestPrev+'点）</div>' : '<div class="exam-history-summary">自己ベストは '+bestPrev+'点 です。</div>';
     }
-    var html = '<div class="center-col">';
-    html += '<div class="big-title">模擬試験 結果</div>';
-    html += '<div class="score-big">'+score+'<span style="font-size:20px;"> / 100</span></div>';
-    html += '<div class="score-sub">正解 '+correctCount+' / '+examQuestions.length+'問 '+
-            (pass ? '🎉 合格ラインを突破しました！' : '合格ラインまであと'+(74-score)+'点') + '</div>';
-    html += bestBadge;
-    html += '<p class="desc">合格ラインの目安（74点）と比較した参考結果です。実際の合否ラインとは異なる場合があります。</p>';
-    html += '<button class="btn" id="btnExamReview" type="button">回答を見直す</button>';
-    html += '<button class="text-link-btn" id="btnExamHome" type="button">ホーム画面に戻る</button>';
-    html += '</div>';
+    var html = '<div class="center-col"><div class="big-title">模擬試験 結果</div><div class="score-big">'+score+'<span style="font-size:20px;"> / 100</span></div>';
+    html += '<div class="score-sub">正解 '+correctCount+' / '+examQuestions.length+'問 '+(pass ? '🎉 合格ラインを突破しました！' : '合格ラインまであと'+(74-score)+'点') + '</div>';
+    html += bestBadge + '<p class="desc">合格ラインの目安（74点）と比較した参考結果です。実際の合否ラインとは異なる場合があります。</p>';
+    html += '<button class="btn" id="btnExamReview" type="button">回答を見直す</button><button class="text-link-btn" id="btnExamHome" type="button">ホーム画面に戻る</button></div>';
     html += '<div id="examReviewList" style="display:none;margin-top:16px;">';
     details.forEach(function(d, i){
-      html += '<details class="flashcard">';
-      html += '<summary>'+(d.isCorrect?'✅':'❌')+' 問'+(i+1)+'. '+esc(d.q.q)+'</summary>';
-      html += '<div class="flashcard-answer">';
+      html += '<details class="flashcard"><summary>'+(d.isCorrect?'✅':'❌')+' 問'+(i+1)+'. '+esc(d.q.q)+'</summary><div class="flashcard-answer">';
       if(d.q.multi){
         html += '<div class="browse-answer">正解：'+d.q.a.map(function(idx){ return esc(d.q.o[idx]); }).join('、')+'</div>';
         var yourAns = (d.ans && d.ans.length) ? d.ans.map(function(idx){ return esc(d.q.o[idx]); }).join('、') : '（未回答）';
@@ -1835,28 +1489,17 @@
     return html;
   }
   function bindExamResult(){
-    document.getElementById('btnExamReview').onclick = function(){
-      var el = document.getElementById('examReviewList');
-      el.style.display = (el.style.display==='none') ? 'block' : 'none';
-    };
-    document.getElementById('btnExamHome').onclick = function(){
-      mode='daily'; screen='home'; render();
-    };
+    document.getElementById('btnExamReview').onclick = function(){ var el = document.getElementById('examReviewList'); el.style.display = (el.style.display==='none') ? 'block' : 'none'; };
+    document.getElementById('btnExamHome').onclick = function(){ mode='daily'; screen='home'; render(); };
   }
 
-  document.getElementById('statsToggleBtn').onclick = function(){
-    var panel = document.getElementById('statsPanel');
-    panel.classList.toggle('open');
-  };
+  document.getElementById('statsToggleBtn').onclick = function(){ document.getElementById('statsPanel').classList.toggle('open'); };
 
   init();
 })();
 
-/* PWA: サービスワーカーを登録（オフライン対応・ホーム画面追加のため） */
 if('serviceWorker' in navigator){
-  window.addEventListener('load', function(){
-    navigator.serviceWorker.register('sw.js').catch(function(e){ console.error('SW register failed', e); });
-  });
+  window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(e){}); });
 }
 </script>
 </body>
