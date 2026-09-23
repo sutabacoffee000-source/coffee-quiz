@@ -49,7 +49,6 @@
   .bookmark-btn{background:var(--paper);border:1px solid var(--line);border-radius:999px;cursor:pointer;font-size:11.5px;padding:5px 12px;color:var(--ink-soft);font-family:var(--font-body);white-space:nowrap;}
   .bookmark-btn:hover{border-color:var(--gold);}
   .bookmark-btn.active{background:rgba(var(--tint-rgb),0.10);border-color:var(--forest);color:var(--forest-deep);font-weight:700;}
-  .bookmark-btn:focus-visible{outline:2px solid var(--forest);outline-offset:2px;}
   .tag{display:inline-block;background:var(--gold-soft);color:#4A3212;font-size:11px;font-weight:700;letter-spacing:.05em;padding:4px 10px;border-radius:999px;margin-bottom:14px;margin-right:6px;}
   .tag.hot{background:var(--clay);color:#FBEFE9;}
   .qnum{font-size:12px;color:var(--ink-soft);margin-bottom:6px;}
@@ -77,6 +76,9 @@
   .choice-btn:active:not(:disabled){transform:scale(0.99);}
   .choice-btn:focus-visible{outline:2px solid var(--forest);outline-offset:2px;}
   .choice-btn .mark{flex:0 0 20px;height:20px;border-radius:50%;border:1.6px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;margin-top:1px;}
+  .mark.checkbox{border-radius:5px;}
+  .choice-btn.selected{background:rgba(var(--tint-rgb),0.10);border-color:var(--forest);}
+  .choice-btn.selected .mark{border-color:var(--forest);background:var(--forest);color:#fff;}
   .choice-btn.correct{background:rgba(var(--tint-rgb),0.10);border-color:var(--forest);}
   .choice-btn.correct .mark{border-color:var(--forest);background:var(--forest);color:#fff;}
   .choice-btn.wrong{background:rgba(168,73,46,0.10);border-color:var(--clay);}
@@ -153,6 +155,7 @@
   .onboard-list b{color:var(--forest-deep);}
   .reopen-guide-link{display:block;text-align:center;font-size:11.5px;color:var(--ink-soft);text-decoration:underline;margin:0 0 18px;cursor:pointer;background:none;border:none;font-family:var(--font-body);width:100%;}
   
+  /* --- 進捗円グラフ --- */
   .stats-toggle button {display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; max-width: 340px; margin: 0 auto; background: var(--card); border: 2px solid var(--forest); border-radius: 14px; padding: 14px; font-family: var(--font-body); cursor: pointer; transition: all .15s ease;}
   .stats-toggle button:hover { background: rgba(var(--tint-rgb),0.05); }
   .stats-toggle button:active { transform: scale(0.99); }
@@ -196,6 +199,8 @@
   
   @keyframes shrinkBar { from { width: 100%; } to { width: 0%; } }
   .answer-bar { height: 100%; background: var(--clay); animation: shrinkBar 5s linear forwards; }
+  
+  @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 </style>
 </head>
 <body>
@@ -318,7 +323,7 @@
     {id:47,c:'proc',q:'エチオピア・イエメン・ブラジルで代表的な加工法は？',o:['ウォッシュド','半水洗式','乾燥式','水洗式'],a:2,hot:true},
     {id:48,c:'proc',q:'加工後に生豆を最終的に選別する加工場を何と呼ぶでしょう？',o:['ドライミル','ロースタリー','ウェットミル','FSC'],a:0},
     {id:49,c:'proc',q:'スターバックスのエイジドコーヒーが保存される倉庫があるのはどこでしょう？',o:['イギリス','日本','シンガポール','アメリカ'],a:2},
-    {id:50,c:'proc',q:'エイジドコーヒーはおよそ何年熟成させるでしょう？',o:['3〜5年','7〜10年','10年以上','1〜2年'],a:0},
+    {id:50,c:'エイジドコーヒーはおよそ何年熟成させるでしょう？',o:['3〜5年','7〜10年','10年以上','1〜2年'],a:0},
     {id:51,c:'cafe',q:'C.A.F.E.プラクティスの「C.A.F.E.」とは何の略でしょう？',o:['Coffee And Farm Excellence','Certified And Fair Ethics','Coffee Agriculture For Environment','Coffee And Farmer Equity'],a:3,hot:true},
     {id:52,c:'cafe',q:'スターバックスがコンサベーション・インターナショナルとパートナーシップを開始したのは何年でしょう？',o:['1998年','2004年','2001年','1996年'],a:0},
     {id:54,c:'cafe',q:'C.A.F.E.プラクティスで「必須条件」とされる2つの柱の組み合わせは？',o:['品質基準と経済的な透明性','品質基準と社会的責任','経済的な透明性と環境面でのリーダーシップ','社会的責任と環境面でのリーダーシップ'],a:0,hot:true},
@@ -598,7 +603,7 @@
     {id:591,c:'core',q:'フレンチ ロースト（FRE）のコク（BODY）はどのように表現されているでしょう？',o:['Light（ライト）','Medium（ミディアム）','Full（フル）','Heavy（ヘビー）'],a:0,n:'スターバックスで最も深煎りですが、極限までローストされるためコクは「ライト」と表現されます。'},
     {id:592,c:'core',q:'3月8日の「国際女性デー」にフォーカスし、コーヒー産業に携わる女性たちへの敬意を込めて開発されたブレンドは次のうちどれでしょう？',o:['サイレン ブレンド','カティカティ ブレンド','コペラニ ブレンド','フェアトレード イタリアン ロースト'],a:0,n:'パッケージデザインも、コーヒー業界で活躍する女性たちへ敬意を表しています。'},
     {id:593,c:'equip',q:'エスプレッソの抽出方法の一つ「リストレット」の特徴として正しいのはどれでしょう？',o:['通常と同じ豆の量で、お湯の量を少なめにして抽出する','通常の半分の豆の量で、お湯の量は同じにして抽出する','通常の豆の量で、お湯の量を多めにして抽出する','通常の半分の豆の量とお湯の量で抽出する'],a:0,n:'通常より少ないお湯で抽出するため、甘みとコクが凝縮された濃厚なショットになります。'},
-    {id:594,c:'equip',q:'店舗でのエスプレッソマシンの品質確認（ショットの抽出秒数などのチェック）を行うタイミングとして、正しいのは次のうちどれでしょう？',o:['オープン作業時、挽具合調整時、および1時間に1回','オープン作業時とクローズ作業時のみ','豆の袋を新しく開けた時のみ','1日に1回、ピークタイムの前'],a:0},
+    {id:594,c:'equip',q:'店舗でのエスプレッソマシンの品質確認（ショットの抽出秒数などのチェック）を行うタイミングとして、正しいのは次のうちどれでしょう？',o:['オープン作業時、挽き具合調整時、および1時間に1回','オープン作業時とクローズ作業時のみ','豆の袋を新しく開けた時のみ','1日に1回、ピークタイムの前'],a:0},
     {id:595,c:'brew',q:'コーヒープレスを使って店舗で「アイスコーヒー」をプレスサービスで提供する際の正しいレシピ（分量）は次のうちどれでしょう？',o:['コーヒー豆28g：お湯250ml','コーヒー豆20g：お湯300ml','コーヒー豆28g：お湯540ml','コーヒー豆15g：お湯180ml'],a:0,n:'半分のお湯（250ml）で濃く抽出し、たっぷりの氷で急冷することで風味を閉じ込めます。'},
     {id:596,c:'basic',q:'世界のコーヒーの半分以上は小規模生産者によって栽培されていますが、この「小規模」とは一般的にどの程度の農園規模を指すでしょう？',o:['2ヘクタール（約5エーカー）未満','10ヘクタール未満','50ヘクタール未満','100ヘクタール未満'],a:0,n:'およそ東京ドームの半分以下の広さです。多くのコーヒーが小規模農園で家族経営で育てられています。'},
     {id:597,c:'brew',q:'店舗で提供されている「コールドブリュー コーヒー」は、熱を加えずに水でじっくりと抽出して作られますが、その抽出時間として正しいのはどれでしょう？',o:['14時間','8時間','20時間','24時間'],a:0,n:'日本では14時間かけてゆっくりと水で抽出しています。'},
@@ -606,6 +611,8 @@
     {id:599,c:'core',q:'2008年、スターバックスは店舗で毎日提供できる「なめらかでロースト感を抑えた味わい」のブレンドを北米で開発・発売しました。このコーヒーはどれでしょう？',o:['パイクプレイス ロースト（EDB）','ハウス ブレンド（HOU）','ライトノート ブレンド（LNB）','ブレックファースト ブレンド（BRK）'],a:0},
     {id:600,c:'hist',q:'1995年に北米で初めて「フラペチーノ®」が発売された当初、ベースとなるコーヒーとして使用されていたのは次のうちどれでしょう？',o:['イタリアン ロースト','エスプレッソ ロースト','フレンチ ロースト','ハウス ブレンド'],a:0}
   ];
+
+  var playedIntroForQ = -1;
 
   /* ---------------- 出題用シャッフル ---------------- */
   QUESTIONS.forEach(function(q){
@@ -681,6 +688,11 @@
       osc.start();
       osc.stop(audioCtx.currentTime + duration);
     } catch(e) {}
+  }
+
+  function playIntroTone() {
+    playTone(523.25, 'sine', 0.1, 0.1);
+    setTimeout(() => playTone(783.99, 'sine', 0.2, 0.1), 100);
   }
 
   function playBuzzer() { playTone(880, 'square', 0.1, 0.1); }
@@ -837,7 +849,14 @@
   function viewTodaySummary(){ mode = 'daily'; screen = 'summary'; render(); }
   function startPractice(){ mode = 'practice'; practiceIds = pickSet(daily && daily.categoryFilter); practiceAnswers = []; qIndex = 0; answeredThisQ = null; screen = 'question'; render(); }
   function startRepeat(){ var sameIds = currentList().slice(); mode = 'practice'; practiceIds = sameIds; practiceAnswers = []; qIndex = 0; answeredThisQ = null; screen = 'question'; render(); }
-  function goHome(){ mode = 'daily'; screen = 'home'; answeredThisQ = null; if(db && bRoom) { db.ref('rooms/'+bRoom).off(); bRoom = null; bState = null; displayedQIndex = -1; if(typeInterval) clearInterval(typeInterval); } render(); }
+  
+  function goHome(){ 
+    mode = 'daily'; screen = 'home'; answeredThisQ = null; 
+    playedIntroForQ = -1;
+    if(db && bRoom) { db.ref('rooms/'+bRoom).off(); bRoom = null; bState = null; displayedQIndex = -1; if(typeInterval) clearInterval(typeInterval); } 
+    render(); 
+  }
+  
   async function doReset(){ deleteKey('bac-stats'); deleteKey('bac-streak'); listKeysWithPrefix('bac-daily-').forEach(function(k){ deleteKey(k); }); stats = {}; streak = {lastDate:null,count:0}; daily = null; mode='daily'; screen='home'; answeredThisQ=null; pendingResetConfirm=false; pendingMode='all'; render(); }
   function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
@@ -977,6 +996,7 @@
 
   function bindBattleLobby() {
     document.getElementById('btnBattleCancel').onclick = goHome;
+    
     document.getElementById('btnCreateRoom').onclick = function() {
       initAudio();
       var name = document.getElementById('inputNickname').value.trim() || 'ホスト';
@@ -990,10 +1010,15 @@
       var roomId = Math.floor(1000 + Math.random() * 9000).toString();
       var qIds = pickSet(null).slice(0, maxQ); 
       
-      // 今回はバグを防ぐため、ホストが現在のQUESTIONSの配列状態をそのまま保存する（4択）
       var battleQs = qIds.map(function(id) {
         var original = getQ(id);
-        return { id: original.id, o: original.o, a: original.a };
+        var wrongIdxs = [];
+        for(var i=0; i<original.o.length; i++){ if(i !== original.a) wrongIdxs.push(i); }
+        wrongIdxs = shuffleArrayInPlace(wrongIdxs).slice(0, 2);
+        var chosenIdxs = [original.a].concat(wrongIdxs);
+        chosenIdxs = shuffleArrayInPlace(chosenIdxs);
+        var newA = chosenIdxs.indexOf(original.a);
+        return { id: original.id, oIdxs: chosenIdxs, a: newA };
       });
 
       bMe = 'p_' + Math.random().toString(36).substr(2, 9);
@@ -1002,9 +1027,9 @@
       var newRoom = { 
         status: 'waiting', settings: { maxQuestions: maxQ, maxPlayers: maxP }, 
         players: players, questions: battleQs, currentQ: 0, 
-        state: 'reading', buzzer: '', winner: '', lastResult: false, lastAnswerIdx: -1 
+        state: 'intro', buzzer: '', winner: '', lastResult: false, lastAnswerIdx: -1 
       };
-      db.ref('rooms/' + roomId).set(newRoom).then(function(){ bRoom = roomId; listenBattleRoom(); }).catch(function(e){ alert("エラー: " + e.message); });
+      db.ref('rooms/' + roomId).set(newRoom).then(function(){ bRoom = roomId; playedIntroForQ = -1; listenBattleRoom(); }).catch(function(e){ alert("エラー: " + e.message); });
     };
 
     document.getElementById('btnJoinRoom').onclick = function() {
@@ -1026,7 +1051,7 @@
         var updates = {}; updates['players/' + bMe] = { name: name, score: 0 };
         if(pKeys.length + 1 >= r.settings.maxPlayers) { updates['status'] = 'playing'; }
         
-        db.ref('rooms/' + roomId).update(updates).then(function(){ bRoom = roomId; listenBattleRoom(); });
+        db.ref('rooms/' + roomId).update(updates).then(function(){ bRoom = roomId; playedIntroForQ = -1; listenBattleRoom(); });
       });
     };
   }
@@ -1040,6 +1065,19 @@
       var prevStateStr = bState ? bState.state : '';
       bState = newState;
       render();
+
+      var pKeys = Object.keys(bState.players || {});
+      var isHost = pKeys.length > 0 && pKeys[0] === bMe;
+
+      if (bState.status === 'playing' && bState.state === 'intro' && playedIntroForQ !== bState.currentQ) {
+        playedIntroForQ = bState.currentQ;
+        playIntroTone();
+        if (isHost) {
+          setTimeout(function() {
+            db.ref('rooms/' + bRoom).update({ state: 'reading' });
+          }, 2000);
+        }
+      }
 
       if (prevStateStr === 'reading' && bState.state === 'answering') {
         playBuzzer();
@@ -1059,8 +1097,7 @@
         if (answerTimer) { clearTimeout(answerTimer); answerTimer = null; }
         if (bState.lastResult) playCorrect(); else playWrong();
         
-        var pKeys = Object.keys(bState.players || {});
-        if (pKeys.length > 0 && pKeys[0] === bMe) {
+        if (isHost) {
           setTimeout(function() { if(bState.state === 'answered') advanceBattleTurn(); }, 5000);
         }
       }
@@ -1099,7 +1136,7 @@
   function advanceBattleTurn() {
     var nextQ = bState.currentQ + 1;
     if(nextQ >= bState.settings.maxQuestions) { db.ref('rooms/' + bRoom).update({ status: 'finished' }); }
-    else { db.ref('rooms/' + bRoom).update({ currentQ: nextQ, state: 'reading', buzzer: '', lastResult: false, lastAnswerIdx: -1 }); }
+    else { db.ref('rooms/' + bRoom).update({ currentQ: nextQ, state: 'intro', buzzer: '', lastResult: false, lastAnswerIdx: -1 }); }
   }
 
   function updateTyping() {
@@ -1200,7 +1237,7 @@
 
     html += '<div class="qnum" style="text-align:center;font-weight:bold; font-size:14px; margin-bottom:8px;">第 ' + (bState.currentQ + 1) + ' 問 / 全' + bState.settings.maxQuestions + '問</div>';
     
-    var msg = '問題を読んでいます...';
+    var msg = '準備してね！';
     if (bState.state === 'reading') { msg = '早押しスタンバイ！'; }
     if (bState.buzzer !== '') { 
       var buzzerName = bState.players[bState.buzzer] ? bState.players[bState.buzzer].name : '';
@@ -1210,11 +1247,17 @@
 
     html += '<div class="battle-status-msg" id="battleStatusMsg">' + msg + '</div>';
     
-    html += '<div style="min-height:140px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--card); border-radius:14px; padding:16px; margin-bottom:16px; border:2px solid var(--line);">';
-    html += '<p class="qtext" id="battleQuestionText" style="margin:0 0 10px; text-align:left; width:100%; min-height:80px;"></p>';
-    if(original.img){ html += '<img src="'+esc(original.img)+'" style="max-width:100%; border-radius:8px; margin-bottom:10px;">'; }
-    if(original.map){ html += '<div class="question-map" style="margin:0;">'+original.map+'</div>'; }
-    html += '</div>';
+    if (bState.state === 'intro') {
+      html += '<div style="min-height:200px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--card); border-radius:14px; padding:16px; margin-bottom:16px; border:2px solid var(--line);">';
+      html += '<div style="font-family:var(--font-display); font-size:40px; font-weight:800; color:var(--forest-deep); animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">第 ' + (bState.currentQ + 1) + ' 問</div>';
+      html += '</div>';
+    } else {
+      html += '<div style="min-height:140px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--card); border-radius:14px; padding:16px; margin-bottom:16px; border:2px solid var(--line);">';
+      html += '<p class="qtext" id="battleQuestionText" style="margin:0 0 10px; text-align:left; width:100%; min-height:80px;"></p>';
+      if(original.img){ html += '<img src="'+esc(original.img)+'" style="max-width:100%; border-radius:8px; margin-bottom:10px;">'; }
+      if(original.map){ html += '<div class="question-map" style="margin:0;">'+original.map+'</div>'; }
+      html += '</div>';
+    }
 
     if (bState.state === 'reading') {
       html += '<div class="buzzer-area">';
@@ -1226,18 +1269,18 @@
         html += '<div style="width:100%; height:8px; background:var(--line); border-radius:4px; margin-bottom:12px; overflow:hidden;">';
         html += '<div id="answerProgressBar" class="answer-bar"></div></div>';
         html += '<div class="choices">';
-        for(var i=0; i<qMeta.o.length; i++){
-          html += '<button class="choice-btn" data-idx="'+i+'" type="button"><span class="mark"></span><span>'+esc(qMeta.o[i])+'</span></button>';
+        for(var i=0; i<3; i++){
+          html += '<button class="choice-btn" data-idx="'+i+'" type="button"><span class="mark"></span><span>'+esc(original.o[qMeta.oIdxs[i]])+'</span></button>';
         }
         html += '</div>';
       } 
       else if (bState.state === 'answered') {
         html += '<div class="choices">';
-        for(var j=0; j<qMeta.o.length; j++){
+        for(var j=0; j<3; j++){
           var cls = 'choice-btn'; 
           if(j === qMeta.a) { cls += ' correct'; }
           else if(j === bState.lastAnswerIdx) { cls += ' wrong'; }
-          html += '<button class="'+cls+'" disabled type="button"><span class="mark">'+(j===qMeta.a?'✓':(j===bState.lastAnswerIdx?'✕':''))+'</span><span>'+esc(qMeta.o[j])+'</span></button>';
+          html += '<button class="'+cls+'" disabled type="button"><span class="mark">'+(j===qMeta.a?'✓':(j===bState.lastAnswerIdx?'✕':''))+'</span><span>'+esc(original.o[qMeta.oIdxs[j]])+'</span></button>';
         }
         html += '</div>';
         if(original.n) { html += '<div class="note">💡 '+esc(original.n)+'</div>'; }
@@ -1457,7 +1500,6 @@
     var no = document.getElementById('btnResetNo'); if(no) no.onclick = function(){ pendingResetConfirm=false; renderStatsPanel(); };
   }
 
-  /* ---------------- 全問題ブラウズ画面 ---------------- */
   function renderBrowse(){
     var html = '<div><button class="text-link-btn" id="btnBrowseBack" type="button">← ホーム画面に戻る</button>';
     html += '<div class="big-title" style="margin-top:10px;text-align:left;">収録されている全問題の単語帳（'+QUESTIONS.length+'問）</div>';
