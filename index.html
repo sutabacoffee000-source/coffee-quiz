@@ -214,6 +214,11 @@
   .battle-result-row.ng { border-color:#E03B3B; background:rgba(224,59,59,0.07); }
   .battle-result-row .pts { font-family:var(--font-display); font-weight:800; font-size:16px; white-space:nowrap; }
   .battle-result-row.ok .pts { color:var(--forest-deep); } .battle-result-row.ng .pts { color:#E03B3B; }
+  .battle-topbar { display:flex; justify-content:flex-end; margin:-6px 0 8px; }
+  .battle-quit-btn { background:transparent; border:1px solid var(--line); border-radius:14px; padding:4px 10px; font-size:11px; color:var(--ink-soft); cursor:pointer; font-family:var(--font-body); }
+  .battle-next-bar { position:fixed; left:50%; transform:translateX(-50%); bottom:calc(12px + env(safe-area-inset-bottom)); width:calc(100% - 32px); max-width:440px; z-index:50; background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:10px; box-shadow:0 8px 24px rgba(0,0,0,0.18); text-align:center; font-weight:bold; box-sizing:border-box; }
+  .battle-next-bar .btn { width:100%; margin:0; }
+  .battle-next-spacer { height:96px; }
   .battle-mode-note { text-align:center; font-size:11px; color:var(--ink-soft); margin:-4px 0 10px; }
   @keyframes shrinkBar { from { width: 100%; } to { width: 0%; } }
   .answer-bar { height: 100%; background: var(--clay); animation: shrinkBar 5s linear forwards; }
@@ -836,7 +841,7 @@
   var displayedQIndex = -1;
   var resultShowTime = 0;
   var resultTimerInterval = null;
-  var RESULT_SHOW_SEC = 3;      // 答え確認の待ち時間
+  var RESULT_SHOW_SEC = 4;      // 答え確認の待ち時間
   var ANSWER_LIMIT_MS = 5000;   // 押してから答えるまでの制限時間
   var myBuzzQ = -1;             // 自分が押せた問題番号
   var myBuzzTs = 0;
@@ -1569,6 +1574,8 @@
     var iAnswered = !!answers[bMe] || myAnsweredQ === q;
     var slotsOpen = battleBuzzers().length < cap;
 
+    // 退出ボタンは早押しボタンから離れた右上に置く（誤タップ防止）
+    html += '<div class="battle-topbar"><button class="battle-quit-btn" id="btnBattleQuit" type="button">🚪 退出</button></div>';
     html += '<div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px;">';
     pKeys.forEach(function(k){
       var isMe = k === bMe;
@@ -1626,14 +1633,16 @@
       html += '</div>';
       if(qMeta.n) { html += '<div class="note">💡 '+esc(qMeta.n)+'</div>'; }
 
-      // --- 3秒待機中のUI ---
+      // --- 4秒待機中のUI（スクロールしなくても押せるよう画面下に固定） ---
+      html += '<div class="battle-next-spacer"></div><div class="battle-next-bar">';
       if (resultShowTime > 0) {
-        html += '<div style="text-align:center; margin-top:20px; font-weight:bold; color:var(--ink-soft);">答えを確認中... (あと'+resultShowTime+'秒)</div>';
+        html += '<div style="padding:12px 0; color:var(--ink-soft);">答えを確認中... (あと'+resultShowTime+'秒)</div>';
       } else if (bState.players[bMe] && bState.players[bMe].ready) {
-        html += '<div style="text-align:center; margin-top:20px; font-weight:bold; color:var(--forest);">他のプレイヤーを待っています...</div>';
+        html += '<div style="padding:12px 0; color:var(--forest);">他のプレイヤーを待っています...</div>';
       } else {
-        html += '<div style="text-align:center; margin-top:20px;"><button class="btn" id="btnReadyNext" type="button" style="width:100%;">次の問題へ (OK)</button></div>';
+        html += '<button class="btn" id="btnReadyNext" type="button">次の問題へ (OK)</button>';
       }
+      html += '</div>';
     }
     else if (iBuzzed && !iAnswered && bState.state !== 'intro') {
       var elapsed = myBuzzTs ? Math.min((Date.now() - myBuzzTs) / 1000, ANSWER_LIMIT_MS / 1000) : 0;
@@ -1658,8 +1667,6 @@
       html += '<div style="text-align:center; margin-top:16px;"><button class="btn secondary" id="btnForceNext" style="padding:6px 12px; font-size:12px;">強制的に次へ (進行が止まった場合)</button></div>';
     }
 
-    html += '<div style="text-align:center; margin-top:20px;"><button class="text-link-btn" id="btnBattleQuit" type="button">部屋から退出する</button></div>';
-
     return html;
   }
 
@@ -1668,7 +1675,9 @@
     if(cBtn) cBtn.onclick = goHome;
 
     var qBtn = document.getElementById('btnBattleQuit');
-    if(qBtn) qBtn.onclick = goHome;
+    if(qBtn) qBtn.onclick = function(){
+      if(confirm('本当に部屋から退出しますか？\n（退出するとこの対戦には戻れません）')) goHome();
+    };
 
     var sBtn = document.getElementById('btnStartManual');
     if(sBtn) sBtn.onclick = function() {
@@ -1691,7 +1700,9 @@
     };
 
     var fn = document.getElementById('btnForceNext');
-    if(fn) fn.onclick = advanceBattleTurn;
+    if(fn) fn.onclick = function(){
+      if(confirm('次の問題へ強制的に進めますか？')) advanceBattleTurn();
+    };
   }
 
   /* ---------------- 質問と回答表示のロジック (ドリルモード) ---------------- */
