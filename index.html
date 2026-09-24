@@ -195,6 +195,26 @@
   .battle-status-msg { text-align:center; font-weight:700; color:var(--clay); font-size:18px; margin-bottom:16px; min-height:27px;}
   .input-room { font-size:20px; padding:10px; width:140px; text-align:center; border:2px solid var(--line); border-radius:8px; font-family:var(--font-display); letter-spacing:0.2em; }
   
+  .sound-toggle { background:transparent; border:1px solid var(--line); border-radius:14px; padding:4px 10px; font-size:11px; color:var(--ink-soft); cursor:pointer; font-family:var(--font-body); white-space:nowrap; }
+  .nick-card { width:100%; background:#FFF8F2; border:2px solid #A8492E; border-radius:14px; padding:14px 16px; margin:10px 0 4px; text-align:left; box-sizing:border-box; }
+  .nick-card .step { display:inline-block; background:#A8492E; color:#FFF; font-size:11px; font-weight:800; border-radius:10px; padding:2px 8px; margin-right:6px; }
+  .nick-card label { font-size:14px; font-weight:800; color:var(--ink); }
+  .nick-card input { margin-top:8px; font-size:17px; border:2px solid #A8492E !important; }
+  .nick-card input.nick-error { border-color:#E03B3B !important; background:#FFF0F0; animation: nickShake .3s; }
+  .nick-card .hint { font-size:11px; color:var(--ink-soft); margin:6px 0 0; line-height:1.5; }
+  .nick-card .err { font-size:12px; color:#E03B3B; font-weight:bold; margin:6px 0 0; display:none; }
+  @keyframes nickShake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-6px);} 75%{transform:translateX(6px);} }
+  .battle-rules { width:100%; background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:4px 16px; margin:8px 0 0; text-align:left; box-sizing:border-box; }
+  .battle-rules summary { cursor:pointer; font-weight:800; font-size:13px; color:#A8492E; padding:10px 0; }
+  .battle-rules ul { margin:0 0 12px; padding-left:18px; font-size:12.5px; line-height:1.75; color:var(--ink); }
+  .battle-rules b.plus { color:var(--forest); } .battle-rules b.minus { color:#E03B3B; }
+  .battle-result-list { display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
+  .battle-result-row { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px 12px; border-radius:10px; font-size:13px; background:var(--card); border:1px solid var(--line); }
+  .battle-result-row.ok { border-color:var(--forest); background:rgba(28,59,50,0.08); }
+  .battle-result-row.ng { border-color:#E03B3B; background:rgba(224,59,59,0.07); }
+  .battle-result-row .pts { font-family:var(--font-display); font-weight:800; font-size:16px; white-space:nowrap; }
+  .battle-result-row.ok .pts { color:var(--forest-deep); } .battle-result-row.ng .pts { color:#E03B3B; }
+  .battle-mode-note { text-align:center; font-size:11px; color:var(--ink-soft); margin:-4px 0 10px; }
   @keyframes shrinkBar { from { width: 100%; } to { width: 0%; } }
   .answer-bar { height: 100%; background: var(--clay); animation: shrinkBar 5s linear forwards; }
   @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
@@ -712,30 +732,74 @@
     if(audioCtx.state === 'suspended') { audioCtx.resume(); }
   }
 
-  function playTone(freq, type, duration, vol) {
-    if(!audioCtx) return;
+  var soundOn = true;
+  try { soundOn = localStorage.getItem('bac-sound') !== 'off'; } catch(e) {}
+  function setSoundOn(on) {
+    soundOn = on;
+    try { localStorage.setItem('bac-sound', on ? 'on' : 'off'); } catch(e) {}
+  }
+  function soundToggleHtml() {
+    return '<button class="sound-toggle" id="btnSoundToggle" type="button" title="効果音のオン/オフ">' + (soundOn ? '🔊 音あり' : '🔇 音なし') + '</button>';
+  }
+  function bindSoundToggle() {
+    var b = document.getElementById('btnSoundToggle');
+    if(b) b.onclick = function(){
+      setSoundOn(!soundOn);
+      b.textContent = soundOn ? '🔊 音あり' : '🔇 音なし';
+      if(soundOn) { initAudio(); playSoftCorrect(); }
+    };
+  }
+
+  // delay: 何秒後に鳴らすか（setTimeoutより正確にスケジュールできる）
+  function playTone(freq, type, duration, vol, delay) {
+    if(!audioCtx || !soundOn) return;
     try {
+      var t0 = audioCtx.currentTime + (delay || 0);
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = type;
-      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-      gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      osc.frequency.setValueAtTime(freq, t0);
+      gain.gain.setValueAtTime(0.0001, t0);
+      gain.gain.linearRampToValueAtTime(vol, t0 + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, t0 + duration);
       osc.connect(gain);
       gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + duration);
+      osc.start(t0);
+      osc.stop(t0 + duration + 0.02);
     } catch(e) {}
   }
 
+  /* --- BAバトル用（はっきりした音） --- */
+  // 第◯問：テレッテッテーン
   function playIntroTone() {
-    playTone(523.25, 'sine', 0.1, 0.1);
-    setTimeout(() => playTone(783.99, 'sine', 0.2, 0.1), 100);
+    playTone(523.25, 'triangle', 0.12, 0.12, 0);
+    playTone(659.25, 'triangle', 0.12, 0.12, 0.09);
+    playTone(783.99, 'triangle', 0.12, 0.12, 0.18);
+    playTone(1046.5, 'triangle', 0.4, 0.13, 0.27);
   }
+  // 早押し：ピピッ
+  function playBuzzer() { playTone(1046.5, 'square', 0.08, 0.07, 0); playTone(1318.5, 'square', 0.14, 0.07, 0.08); }
+  // 正解：ピンポーン
+  function playCorrect(d) { d = d || 0; playTone(1318.5, 'sine', 0.3, 0.16, d); playTone(1046.5, 'sine', 0.7, 0.16, d + 0.22); }
+  // 連続正解ボーナス：キラキラ
+  function playBonus(d) { d = d || 0; [1568, 2093, 2637, 3136].forEach(function(f, i){ playTone(f, 'triangle', 0.18, 0.06, d + i * 0.07); }); }
+  // 不正解：ブッブー
+  function playWrong(d) { d = d || 0; playTone(185, 'square', 0.16, 0.07, d); playTone(185, 'square', 0.5, 0.07, d + 0.22); }
+  // 誰も押さなかった
+  function playNoAnswer() { playTone(440, 'triangle', 0.2, 0.08, 0); playTone(330, 'triangle', 0.35, 0.08, 0.18); }
+  // 勝利ファンファーレ
+  function playWin() {
+    [[392,0],[523.25,0.12],[659.25,0.24],[783.99,0.36]].forEach(function(n){ playTone(n[0], 'triangle', 0.14, 0.12, n[1]); });
+    playTone(1046.5, 'triangle', 0.9, 0.13, 0.5);
+    playTone(783.99, 'sine', 0.9, 0.06, 0.5);
+  }
+  // 負け：しょんぼり
+  function playLose() { playTone(392, 'triangle', 0.3, 0.09, 0); playTone(329.63, 'triangle', 0.3, 0.09, 0.28); playTone(261.63, 'triangle', 0.7, 0.09, 0.56); }
 
-  function playBuzzer() { playTone(880, 'square', 0.1, 0.1); }
-  function playCorrect() { playTone(523.25, 'sine', 0.1, 0.1); setTimeout(() => playTone(659.25, 'sine', 0.3, 0.1), 100); }
-  function playWrong() { playTone(150, 'sawtooth', 0.3, 0.1); }
+  /* --- 普段のドリル用（控えめな音） --- */
+  function playSoftCorrect() { playTone(880, 'sine', 0.12, 0.05, 0); playTone(1174.66, 'sine', 0.25, 0.05, 0.08); }
+  function playSoftWrong() { playTone(246.94, 'triangle', 0.14, 0.06, 0); playTone(220, 'triangle', 0.24, 0.06, 0.11); }
+  function playSoftFinish() { playTone(523.25, 'sine', 0.15, 0.05, 0); playTone(659.25, 'sine', 0.15, 0.05, 0.12); playTone(783.99, 'sine', 0.4, 0.05, 0.24); }
 
   /* ---------------- 状態 ---------------- */
   var stats = {};          
@@ -770,8 +834,16 @@
   var typeInterval = null;
   var currentTypedLength = 0;
   var displayedQIndex = -1;
-  var resultShowTime = 0; 
-  var resultTimerInterval = null; 
+  var resultShowTime = 0;
+  var resultTimerInterval = null;
+  var RESULT_SHOW_SEC = 3;      // 答え確認の待ち時間
+  var ANSWER_LIMIT_MS = 5000;   // 押してから答えるまでの制限時間
+  var myBuzzQ = -1;             // 自分が押せた問題番号
+  var myBuzzTs = 0;
+  var myAnsweredQ = -1;
+  var buzzPendingQ = -1;
+  var hostTimerQ = { window: -1, noBuzz: -1 };
+  var lastAdvancedQ = -1;
 
   function currentList(){ return mode==='daily' ? daily.ids : practiceIds; }
   function currentAnswers(){ return mode==='daily' ? daily.answers : practiceAnswers; }
@@ -853,6 +925,8 @@
     var q = getQ(list[qi]);
     var correct = (idx === q.a);
     answeredThisQ = {choice:idx, correct:correct};
+    initAudio();
+    if(correct) playSoftCorrect(); else playSoftWrong();
 
     currentAnswers().push({id:q.id, choice:idx, correct:correct});
 
@@ -880,6 +954,7 @@
         else { streak.count = 1; streak.lastDate = t; }
         await saveJSON('bac-streak', streak);
       }
+      playSoftFinish();
       screen = 'summary';
     }
     render();
@@ -896,9 +971,11 @@
     if(db && bRoom) { 
       db.ref('rooms/'+bRoom).off(); 
       bRoom = null; bState = null; displayedQIndex = -1; 
-      if(typeInterval) clearInterval(typeInterval); 
+      if(typeInterval) clearInterval(typeInterval);
       if(resultTimerInterval) { clearInterval(resultTimerInterval); resultTimerInterval = null; }
-    } 
+      if(answerTimer) { clearTimeout(answerTimer); answerTimer = null; }
+    }
+    resetBattleLocal();
     render(); 
   }
   
@@ -1018,13 +1095,62 @@
     } catch(e) { console.error(e); alert("通信設定エラー: Firebaseの接続に失敗しました。"); return false; }
   }
 
+  function resetBattleLocal() {
+    myBuzzQ = -1; myBuzzTs = 0; myAnsweredQ = -1; buzzPendingQ = -1;
+    hostTimerQ = { window: -1, noBuzz: -1 }; lastAdvancedQ = -1;
+  }
+
+  /* --- 早押し枠まわりのヘルパー --- */
+  // 3人以上なら1問につき2人まで、2人以下なら1人だけ答えられる
+  function battleCap(st) {
+    st = st || bState;
+    if(st && st.settings && st.settings.answerCap) return st.settings.answerCap;
+    return Object.keys((st && st.players) || {}).length >= 3 ? 2 : 1;
+  }
+  function toArr(v) {
+    if(!v) return [];
+    if(Array.isArray(v)) return v.filter(function(x){ return x != null; });
+    return Object.keys(v).sort(function(a,b){ return a-b; }).map(function(k){ return v[k]; });
+  }
+  // '#closed' は締め切りで埋めた空き枠
+  function battleBuzzers(st) { st = st || bState; return toArr(st && st.buzzers); }
+  function realBuzzers(st) { return battleBuzzers(st).filter(function(x){ return x && x !== '#closed'; }); }
+  function battleAnswers(st) { st = st || bState; return (st && st.answers) || {}; }
+  function isStreaking(p, st) {
+    st = st || bState;
+    if(!p || typeof p.lastCorrectQ !== 'number') return false;
+    if(st.state === 'answered') return p.lastCorrectQ === st.currentQ;
+    return p.lastCorrectQ === st.currentQ - 1;
+  }
+
+  function battleRulesHtml(openByDefault) {
+    var h = '<details class="battle-rules"' + (openByDefault ? ' open' : '') + '>';
+    h += '<summary>📖 BAバトルのルール（タップで開閉）</summary><ul>';
+    h += '<li>問題文が1文字ずつ出てきます。分かったら<b>早押しボタン</b>！</li>';
+    h += '<li>押した人だけが4択で答えられます（制限時間<b>5秒</b>）</li>';
+    h += '<li>正解で <b class="plus">+10点</b></li>';
+    h += '<li><b>3人以上のとき</b>は1問につき<b>2人まで</b>押せます。<br>1番に押した人の正解は <b class="plus">+15点</b>、2番目の人は <b class="plus">+10点</b></li>';
+    h += '<li>🔥 <b>連続正解ボーナス</b>：前の問題に続けて正解すると<b>得点2倍</b>！<br>（10点→<b class="plus">20点</b>、15点→<b class="plus">30点</b>）</li>';
+    h += '<li>❌ <b>お手つき</b>（間違い・時間切れ）は <b class="minus">-10点</b>。連続記録もリセット</li>';
+    h += '<li>答え発表のあと<b>3秒</b>で「次の問題へ」ボタンが出ます。全員押したら次の問題へ</li>';
+    h += '</ul></details>';
+    return h;
+  }
+
   function renderBattleLobby() {
     var savedName = localStorage.getItem('bac-nickname') || '';
     var html = '<div class="center-col" style="padding-top:10px;">';
     html += '<div class="big-title" style="color:#A8492E;">🥊 BAバトルロビー</div>';
     html += '<p class="desc" style="margin-bottom:4px;">友達とリアルタイムで早押し対決！</p>';
-    html += '<input type="text" id="inputNickname" class="browse-search" placeholder="あなたのニックネーム" value="'+esc(savedName)+'" style="text-align:center; font-weight:bold;">';
-    html += '<div style="background:var(--paper); padding:20px; border-radius:14px; border:1px solid var(--line); width:100%; margin:12px 0;">';
+    html += '<div class="nick-card">';
+    html += '<label for="inputNickname"><span class="step">STEP 1</span>✏️ ニックネームを決めよう</label>';
+    html += '<input type="text" id="inputNickname" class="browse-search" maxlength="12" placeholder="タップして名前を入力" value="'+esc(savedName)+'" style="text-align:center; font-weight:bold;">';
+    html += '<p class="hint">対戦中にみんなの画面に表示される名前です（12文字まで）。<br>一度入れると次回からは自動で入ります。</p>';
+    html += '<p class="err" id="nickError">⚠️ 先にニックネームを入力してね！</p>';
+    html += '</div>';
+    html += battleRulesHtml(!savedName);
+    html += '<div style="background:var(--paper); padding:20px; border-radius:14px; border:1px solid var(--line); width:100%; margin:12px 0; box-sizing:border-box;">';
+    html += '<p style="font-size:13px; font-weight:bold; color:var(--ink); margin:0 0 10px;"><span style="background:#A8492E;color:#FFF;font-size:11px;border-radius:10px;padding:2px 8px;margin-right:6px;">STEP 2</span>ルームを作る or 入る</p>';
     html += '<p style="font-size:13px; font-weight:bold; color:var(--ink); margin:0 0 10px;">👑 新しくルームを作る</p>';
     html += '<div style="display:flex; gap:10px; margin-bottom:12px;">';
     html += '<label style="font-size:11px; flex:1; color:var(--ink-soft); font-weight:bold;">問題数 (3〜30)<br><input type="number" id="inputMaxQuestions" min="3" max="30" value="10" class="browse-search" style="margin-top:6px; padding:10px; text-align:center;"></label>';
@@ -1035,77 +1161,127 @@
     html += '<p style="font-size:13px; font-weight:bold; color:var(--ink); margin:0 0 10px;">💬 友達の部屋に入る</p>';
     html += '<input type="number" id="inputRoomId" class="input-room" placeholder="部屋番号" style="margin-bottom:10px; width:100%;">';
     html += '<button class="btn secondary" id="btnJoinRoom" type="button" style="width:100%; border-color:#A8492E; color:#A8492E;">入室する</button>';
-    html += '</div><button class="text-link-btn" id="btnBattleCancel" type="button">ホーム画面に戻る</button></div>';
+    html += '</div>';
+    html += '<div style="margin-bottom:6px;">' + soundToggleHtml() + '</div>';
+    html += '<button class="text-link-btn" id="btnBattleCancel" type="button">ホーム画面に戻る</button></div>';
     return html;
+  }
+
+  // ニックネーム未入力なら入力欄を目立たせて止める
+  function readNicknameOrWarn() {
+    var input = document.getElementById('inputNickname');
+    var name = input.value.trim().slice(0, 12);
+    var err = document.getElementById('nickError');
+    if(!name) {
+      input.classList.remove('nick-error'); void input.offsetWidth; input.classList.add('nick-error');
+      if(err) err.style.display = 'block';
+      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      input.focus();
+      return null;
+    }
+    localStorage.setItem('bac-nickname', name);
+    return name;
   }
 
   function bindBattleLobby() {
     document.getElementById('btnBattleCancel').onclick = goHome;
-    
+    bindSoundToggle();
+    var nickInput = document.getElementById('inputNickname');
+    nickInput.oninput = function(){
+      nickInput.classList.remove('nick-error');
+      var err = document.getElementById('nickError'); if(err) err.style.display = 'none';
+    };
+
     document.getElementById('btnCreateRoom').onclick = function() {
       initAudio();
-      var name = document.getElementById('inputNickname').value.trim() || 'ホスト';
-      localStorage.setItem('bac-nickname', name);
+      var name = readNicknameOrWarn(); if(!name) return;
       var maxQ = parseInt(document.getElementById('inputMaxQuestions').value, 10) || 10;
       var maxP = parseInt(document.getElementById('inputMaxPlayers').value, 10) || 2;
       if(maxQ < 3 || maxQ > 30) return alert('問題数は3〜30問にしてください');
       if(maxP < 2 || maxP > 8) return alert('参加人数は2〜8人にしてください');
       if(!initFirebase()) return;
-      
+
       var roomId = Math.floor(1000 + Math.random() * 9000).toString();
-      var qIds = pickSet(null).slice(0, maxQ); 
-      
+      var qIds = pickSet(null).slice(0, maxQ);
+
       // 選択肢はそのまま全て使い、テキストベースで正解を保存することでインデックスズレのバグを回避する
       var battleQs = qIds.map(function(id) {
         var original = getQ(id);
         var chosenOpts = original.o.slice(); // 全選択肢をそのままコピー
         var correctText = original.o[original.a];
         chosenOpts = shuffleArrayInPlace(chosenOpts);
-        
-        return { 
-          id: original.id, 
-          q: original.q, 
-          o: chosenOpts, 
-          correctText: correctText, 
-          img: original.img || '', 
-          map: original.map || '', 
-          n: original.n || '' 
+
+        return {
+          id: original.id,
+          q: original.q,
+          o: chosenOpts,
+          correctText: correctText,
+          img: original.img || '',
+          map: original.map || '',
+          n: original.n || ''
         };
       });
 
       bMe = 'p_' + Math.random().toString(36).substr(2, 9);
-      var players = {}; players[bMe] = { name: name, score: 0, ready: false };
-      
-      var newRoom = { 
-        status: 'waiting', settings: { maxQuestions: maxQ, maxPlayers: maxP }, 
-        players: players, questions: battleQs, currentQ: 0, 
-        state: 'intro', buzzer: '', winner: '', lastResult: false, lastAnswerText: '' 
+      var players = {}; players[bMe] = { name: name, score: 0, ready: false, lastCorrectQ: -99 };
+
+      var newRoom = {
+        status: 'waiting', settings: { maxQuestions: maxQ, maxPlayers: maxP },
+        players: players, questions: battleQs, currentQ: 0,
+        state: 'intro'
       };
-      db.ref('rooms/' + roomId).set(newRoom).then(function(){ bRoom = roomId; playedIntroForQ = -1; listenBattleRoom(); }).catch(function(e){ alert("エラー: " + e.message); });
+      db.ref('rooms/' + roomId).set(newRoom).then(function(){ bRoom = roomId; playedIntroForQ = -1; resetBattleLocal(); listenBattleRoom(); }).catch(function(e){ alert("エラー: " + e.message); });
     };
 
     document.getElementById('btnJoinRoom').onclick = function() {
       initAudio();
-      var name = document.getElementById('inputNickname').value.trim() || 'ゲスト';
-      localStorage.setItem('bac-nickname', name);
+      var name = readNicknameOrWarn(); if(!name) return;
       var roomId = document.getElementById('inputRoomId').value.trim();
       if(roomId.length !== 4) return alert("4桁の部屋番号を入力してください");
       if(!initFirebase()) return;
-      
+
       db.ref('rooms/' + roomId).once('value').then(function(snap){
         if(!snap.exists()){ return alert("部屋が見つかりません"); }
         var r = snap.val();
         if(r.status !== 'waiting'){ return alert("すでにゲームが開始されているか、終了しています"); }
         var pKeys = Object.keys(r.players || {});
         if(pKeys.length >= r.settings.maxPlayers){ return alert("この部屋は満員です"); }
-        
+
         bMe = 'p_' + Math.random().toString(36).substr(2, 9);
-        var updates = {}; updates['players/' + bMe] = { name: name, score: 0, ready: false };
-        if(pKeys.length + 1 >= r.settings.maxPlayers) { updates['status'] = 'playing'; }
-        
-        db.ref('rooms/' + roomId).update(updates).then(function(){ bRoom = roomId; playedIntroForQ = -1; listenBattleRoom(); });
+        var updates = {}; updates['players/' + bMe] = { name: name, score: 0, ready: false, lastCorrectQ: -99 };
+        if(pKeys.length + 1 >= r.settings.maxPlayers) {
+          updates['status'] = 'playing';
+          updates['settings/answerCap'] = (pKeys.length + 1) >= 3 ? 2 : 1;
+        }
+
+        db.ref('rooms/' + roomId).update(updates).then(function(){ bRoom = roomId; playedIntroForQ = -1; resetBattleLocal(); listenBattleRoom(); });
       });
     };
+  }
+
+  // 空いている早押し枠を締め切る（onlyIfEmpty: 誰も押していない時だけ）
+  function closeBuzzSlots(q, onlyIfEmpty) {
+    if(!bState || bState.currentQ !== q) return;
+    var cap = battleCap();
+    db.ref('rooms/' + bRoom + '/buzzers').transaction(function(cur){
+      cur = toArr(cur);
+      if(cur.length >= cap) return;
+      if(onlyIfEmpty && cur.some(function(x){ return x && x !== '#closed'; })) return;
+      while(cur.length < cap) cur.push('#closed');
+      return cur;
+    });
+  }
+
+  // 解答した人の結果に合わせて音を順番に鳴らす
+  function playBattleResultSounds() {
+    var real = realBuzzers(), ans = battleAnswers();
+    if(!real.length) { playNoAnswer(); return; }
+    real.forEach(function(pid, i){
+      var a = ans[pid];
+      var d = i * 1.0;
+      if(a && a.correct) { playCorrect(d); if(a.combo) playBonus(d + 0.55); }
+      else { playWrong(d); }
+    });
   }
 
   function listenBattleRoom() {
@@ -1114,44 +1290,73 @@
       var newState = snap.val();
       if(!newState) return goHome();
 
-      var prevStateStr = bState ? bState.state : '';
+      var prev = bState;
+      var prevStateStr = prev ? prev.state : '';
+      var prevStatus = prev ? prev.status : '';
+      var prevBuzzN = (prev && prev.currentQ === newState.currentQ) ? realBuzzers(prev).length : 0;
       bState = newState;
       render();
 
       var pKeys = Object.keys(bState.players || {});
       var isHost = pKeys.length > 0 && pKeys[0] === bMe;
+      var q = bState.currentQ;
 
-      if (bState.status === 'playing' && bState.state === 'intro' && playedIntroForQ !== bState.currentQ) {
-        playedIntroForQ = bState.currentQ;
+      if (prevStatus !== 'finished' && bState.status === 'finished') {
+        if (answerTimer) { clearTimeout(answerTimer); answerTimer = null; }
+        if (resultTimerInterval) { clearInterval(resultTimerInterval); resultTimerInterval = null; }
+        var top = -Infinity;
+        pKeys.forEach(function(k){ top = Math.max(top, bState.players[k].score || 0); });
+        if (bState.players[bMe] && (bState.players[bMe].score || 0) === top) playWin(); else playLose();
+        return;
+      }
+      if (bState.status !== 'playing') return;
+
+      // --- 第◯問 ---
+      if (bState.state === 'intro' && playedIntroForQ !== q) {
+        playedIntroForQ = q;
         playIntroTone();
         if (resultTimerInterval) { clearInterval(resultTimerInterval); resultTimerInterval = null; resultShowTime = 0; }
         if (isHost) {
           setTimeout(function() {
-            db.ref('rooms/' + bRoom).update({ state: 'reading' });
+            if (bState && bState.currentQ === q && bState.state === 'intro') db.ref('rooms/' + bRoom).update({ state: 'reading' });
           }, 2000);
         }
       }
 
-      if (prevStateStr === 'reading' && bState.state === 'answering') {
-        playBuzzer();
-        if (bState.buzzer === bMe) {
-          setTimeout(function() {
-            var bar = document.getElementById('answerProgressBar');
-            if (bar) { bar.getBoundingClientRect(); bar.style.width = '0%'; }
-          }, 50);
-          if (answerTimer) clearTimeout(answerTimer);
-          answerTimer = setTimeout(function() {
-            if (bState.state === 'answering' && bState.buzzer === bMe) { submitBattleAnswer(-1); }
-          }, 5000);
+      // --- 誰かが押した ---
+      if (bState.state !== 'intro' && realBuzzers().length > prevBuzzN) playBuzzer();
+
+      if (isHost) {
+        // 誰も押さないまま問題文を読み終えたら、6秒後に締め切り
+        if (bState.state === 'reading' && hostTimerQ.noBuzz !== q) {
+          hostTimerQ.noBuzz = q;
+          var readMs = (bState.questions[q].q.length * 120) + 6000;
+          setTimeout(function(){
+            if (bState && bState.currentQ === q && bState.state === 'reading') closeBuzzSlots(q, true);
+          }, readMs);
+        }
+        // 3人以上：1人目が押してから5秒たったら2番手の受付を締め切り
+        if (bState.state === 'answering' && hostTimerQ.window !== q && battleCap() >= 2) {
+          hostTimerQ.window = q;
+          setTimeout(function(){
+            if (bState && bState.currentQ === q && bState.state === 'answering') closeBuzzSlots(q, false);
+          }, ANSWER_LIMIT_MS);
+        }
+        // 枠が埋まって、押した全員が答え終わったら正解発表
+        if (bState.state === 'reading' || bState.state === 'answering') {
+          var ans = battleAnswers();
+          if (battleBuzzers().length >= battleCap() && realBuzzers().every(function(p){ return ans[p]; })) {
+            db.ref('rooms/' + bRoom).update({ state: 'answered' });
+          }
         }
       }
-      
+
       if (prevStateStr !== 'answered' && bState.state === 'answered') {
         if (answerTimer) { clearTimeout(answerTimer); answerTimer = null; }
-        if (bState.lastResult) playCorrect(); else playWrong();
-        
-        // --- 5秒間の強制結果表示タイマー開始 ---
-        resultShowTime = 5;
+        playBattleResultSounds();
+
+        // --- 3秒間の強制結果表示タイマー開始 ---
+        resultShowTime = RESULT_SHOW_SEC;
         if(resultTimerInterval) clearInterval(resultTimerInterval);
         resultTimerInterval = setInterval(function(){
           resultShowTime--;
@@ -1161,6 +1366,7 @@
           }
           render();
         }, 1000);
+        render();
       }
 
       if (bState.state === 'answered' && isHost) {
@@ -1177,46 +1383,73 @@
 
   function doBuzz() {
     initAudio();
-    if(bState.state !== 'reading' || bState.buzzer !== '') return;
-    
-    db.ref('rooms/' + bRoom + '/buzzer').transaction(function(current){
-      if (current === '') { return bMe; }
-      return; 
+    if(!bState || (bState.state !== 'reading' && bState.state !== 'answering')) return;
+    var cap = battleCap();
+    var q = bState.currentQ;
+    var cur = battleBuzzers();
+    if(cur.length >= cap || cur.indexOf(bMe) >= 0 || buzzPendingQ === q) return;
+    buzzPendingQ = q;
+    var btn = document.getElementById('btnBuzz'); if(btn) btn.disabled = true;
+
+    db.ref('rooms/' + bRoom + '/buzzers').transaction(function(list){
+      list = toArr(list);
+      if (list.indexOf(bMe) >= 0 || list.length >= cap) return;
+      list.push(bMe);
+      return list;
     }, function(error, committed, snapshot) {
-      if (committed && snapshot.val() === bMe) {
-        db.ref('rooms/' + bRoom).update({ state: 'answering' });
-      }
+      if (!committed || !bState || bState.currentQ !== q) return;
+      if (toArr(snapshot.val()).indexOf(bMe) < 0) return;
+      myBuzzQ = q; myBuzzTs = Date.now();
+      if (bState.state === 'reading') db.ref('rooms/' + bRoom).update({ state: 'answering' });
+      if (answerTimer) clearTimeout(answerTimer);
+      answerTimer = setTimeout(function() {
+        if (bState && bState.currentQ === q && bState.state !== 'answered' && myAnsweredQ !== q) submitBattleAnswer(-1);
+      }, ANSWER_LIMIT_MS);
+      render();
     });
   }
 
   function submitBattleAnswer(idx) {
     initAudio();
     if (answerTimer) { clearTimeout(answerTimer); answerTimer = null; }
-    
-    var qMeta = bState.questions[bState.currentQ];
+    if (!bState) return;
+    var q = bState.currentQ;
+    if (myAnsweredQ === q || battleAnswers()[bMe]) return;
+    var order = realBuzzers().indexOf(bMe);
+    if (order < 0 && myBuzzQ === q) order = realBuzzers().length; // 自分の押下がまだ反映されていない場合
+    if (order < 0) return;
+    myAnsweredQ = q;
+
+    var qMeta = bState.questions[q];
     var ansText = idx >= 0 ? qMeta.o[idx] : ''; // 時間切れの場合は空文字
     var correct = (ansText !== '' && ansText === qMeta.correctText); // テキスト一致で正解判定
-    
-    var updates = { state: 'answered', lastResult: correct, lastAnswerText: ansText };
-    
-    // スコア加算とステート更新を別々に発火させることで、他の人への画面同期（ラグ）を最速にする
-    if(correct) {
-      db.ref('rooms/' + bRoom + '/players/' + bMe + '/score').transaction(function(s){ return (s||0) + 10; });
-    }
+
+    // 得点：1番手15点・2番手10点（2人対戦は10点）、前の問題も正解なら2倍、お手つきは-10点
+    var base = (battleCap() >= 2 && order === 0) ? 15 : 10;
+    var me = bState.players[bMe] || {};
+    var combo = correct && me.lastCorrectQ === q - 1;
+    var pts = correct ? base * (combo ? 2 : 1) : -10;
+
+    var updates = {};
+    updates['answers/' + bMe] = { text: ansText, correct: correct, pts: pts, combo: combo };
+    if (correct) updates['players/' + bMe + '/lastCorrectQ'] = q;
     db.ref('rooms/' + bRoom).update(updates);
+    db.ref('rooms/' + bRoom + '/players/' + bMe + '/score').transaction(function(s){ return (s||0) + pts; });
+    render();
   }
 
   function advanceBattleTurn() {
+    if (!bState || lastAdvancedQ === bState.currentQ) return;
+    lastAdvancedQ = bState.currentQ;
     var nextQ = bState.currentQ + 1;
     var updates = {};
-    if(nextQ >= bState.settings.maxQuestions) { 
+    if(nextQ >= bState.settings.maxQuestions) {
         updates['status'] = 'finished';
-    } else { 
+    } else {
         updates['currentQ'] = nextQ;
         updates['state'] = 'intro';
-        updates['buzzer'] = '';
-        updates['lastResult'] = false;
-        updates['lastAnswerText'] = '';
+        updates['buzzers'] = null;
+        updates['answers'] = null;
         Object.keys(bState.players).forEach(function(k){
             updates['players/' + k + '/ready'] = false;
         });
@@ -1239,13 +1472,34 @@
           var textEl = document.getElementById('battleQuestionText');
           if(textEl) textEl.textContent = fullText.substring(0, currentTypedLength);
           if (currentTypedLength >= fullText.length) { clearInterval(typeInterval); }
-        }, 120); 
+        }, 120);
+      } else {
+        el.textContent = fullText.substring(0, currentTypedLength);
       }
     } else {
       if(typeInterval) clearInterval(typeInterval);
-      if(bState.state === 'answering') { el.textContent = fullText.substring(0, currentTypedLength); } 
+      if(bState.state === 'answering') { el.textContent = fullText.substring(0, currentTypedLength); }
       else { el.textContent = fullText; }
     }
+  }
+
+  function battleResultListHtml() {
+    var real = realBuzzers(), ans = battleAnswers(), cap = battleCap();
+    if(!real.length) return '<div class="battle-result-list"><div class="battle-result-row"><span>😶 誰も押しませんでした</span><span class="pts">±0</span></div></div>';
+    var h = '<div class="battle-result-list">';
+    real.forEach(function(pid, i){
+      var p = bState.players[pid] || { name: '?' };
+      var a = ans[pid];
+      var label = cap >= 2 ? (i === 0 ? '🥇1番手 ' : '🥈2番手 ') : '';
+      var verdict, pts, cls;
+      if(!a) { verdict = '— 未解答'; pts = '±0'; cls = ''; }
+      else if(a.correct) { verdict = '⭕ 正解'; pts = '+' + a.pts; cls = 'ok'; }
+      else { verdict = a.text === '' ? '⏰ 時間切れ' : '❌ お手つき'; pts = String(a.pts); cls = 'ng'; }
+      h += '<div class="battle-result-row ' + cls + '">';
+      h += '<span>' + label + '<b>' + esc(p.name) + (pid === bMe ? '（あなた）' : '') + '</b><br><small>' + verdict + (a && a.combo ? ' ・🔥連続正解×2' : '') + '</small></span>';
+      h += '<span class="pts">' + pts + '</span></div>';
+    });
+    return h + '</div>';
   }
 
   function renderBattleRoom() {
@@ -1258,81 +1512,95 @@
       html += '<div class="center-col" style="padding:40px 0;">';
       html += '<div class="big-title">部屋番号: <span style="color:#A8492E;font-size:42px;">' + bRoom + '</span></div>';
       html += '<p class="desc" style="margin-bottom:24px;">この番号を相手に教えてください</p>';
-      
+
       html += '<p class="desc" style="font-weight:bold;">参加者 (' + pKeys.length + '/' + bState.settings.maxPlayers + '人)</p>';
       html += '<div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:24px;">';
       pKeys.forEach(function(k){
-        html += '<span style="background:var(--card); border:1px solid var(--line); padding:6px 16px; border-radius:20px; font-size:14px; font-weight:bold;">' + esc(bState.players[k].name) + '</span>';
+        html += '<span style="background:var(--card); border:1px solid var(--line); padding:6px 16px; border-radius:20px; font-size:14px; font-weight:bold;">' + esc(bState.players[k].name) + (k === bMe ? '（あなた）' : '') + '</span>';
       });
       html += '</div>';
 
       if(isHost) {
         html += '<button class="btn" id="btnStartManual" type="button" style="background:var(--forest); margin-bottom:12px; width:100%; max-width:300px;">この人数でゲーム開始</button>';
       }
-      
+
       html += '<div class="loader" style="font-size:40px; margin:10px 0; animation:spin 1s linear infinite;">⏳</div>';
       html += '<p class="desc" style="font-size:12px;">全員揃うと自動で始まります...</p>';
+      html += battleRulesHtml(false);
       html += '<button class="text-link-btn" id="btnBattleCancel" type="button" style="margin-top:20px;">やめる</button>';
       html += '</div>';
       return html;
     }
 
     if(bState.status === 'finished') {
-      var maxScore = -1;
+      var maxScore = -Infinity;
       var winners = [];
       pKeys.forEach(function(k){
-        var s = bState.players[k].score;
+        var s = bState.players[k].score || 0;
         if(s > maxScore) { maxScore = s; winners = [bState.players[k].name]; }
         else if(s === maxScore) { winners.push(bState.players[k].name); }
       });
-      var isWin = winners.indexOf(bState.players[bMe].name) !== -1;
-      
+      var isWin = bState.players[bMe] && (bState.players[bMe].score || 0) === maxScore;
+
       html += '<div class="center-col" style="padding:40px 0;">';
       html += '<div class="big-title" style="color:'+(isWin?'var(--forest-deep)':'var(--clay)')+'; font-size:36px;">' + (isWin ? 'WINNER 🎉' : 'LOSE 💦') + '</div>';
       html += '<p class="desc" style="font-weight:bold; margin-bottom:24px;">勝者: ' + esc(winners.join(' & ')) + ' (' + maxScore + 'pt)</p>';
-      
+
       html += '<div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; width:100%; margin-bottom:24px;">';
-      pKeys.forEach(function(k){
+      pKeys.slice().sort(function(a,b){ return (bState.players[b].score||0) - (bState.players[a].score||0); }).forEach(function(k){
         var isMe = k === bMe;
         html += '<div style="flex:1 1 40%; min-width:100px; background:'+(isMe?'rgba(28,59,50,0.1)':'var(--card)')+'; border:1px solid '+(isMe?'var(--forest)':'var(--line)')+'; border-radius:12px; padding:12px; text-align:center;">';
         html += '<div style="font-size:12px; color:var(--ink-soft); font-weight:'+(isMe?'bold':'normal')+'; margin-bottom:4px;">' + esc(bState.players[k].name) + '</div>';
-        html += '<div style="font-size:24px; font-weight:bold; color:var(--forest-deep);">' + bState.players[k].score + '</div>';
+        html += '<div style="font-size:24px; font-weight:bold; color:var(--forest-deep);">' + (bState.players[k].score || 0) + '</div>';
         html += '</div>';
       });
       html += '</div>';
-      
+
       html += '<button class="btn" id="btnBattleCancel" type="button">ホームに戻る</button>';
       html += '</div>';
       return html;
     }
 
+    var cap = battleCap();
+    var real = realBuzzers();
+    var answers = battleAnswers();
+    var q = bState.currentQ;
+    var iBuzzed = real.indexOf(bMe) >= 0 || myBuzzQ === q;
+    var iAnswered = !!answers[bMe] || myAnsweredQ === q;
+    var slotsOpen = battleBuzzers().length < cap;
+
     html += '<div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px;">';
     pKeys.forEach(function(k){
       var isMe = k === bMe;
+      var p = bState.players[k];
       html += '<div style="flex:1; min-width:70px; background:'+(isMe?'rgba(28,59,50,0.1)':'var(--card)')+'; border:1px solid '+(isMe?'var(--forest)':'var(--line)')+'; border-radius:8px; padding:6px; text-align:center;">';
-      html += '<div style="font-size:10px; color:var(--ink-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:'+(isMe?'bold':'normal')+';">' + esc(bState.players[k].name) + '</div>';
-      html += '<div style="font-size:16px; font-weight:bold; color:var(--forest-deep);">' + bState.players[k].score + '</div>';
+      html += '<div style="font-size:10px; color:var(--ink-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:'+(isMe?'bold':'normal')+';">' + esc(p.name) + '</div>';
+      html += '<div style="font-size:16px; font-weight:bold; color:var(--forest-deep);">' + (p.score || 0) + '</div>';
+      if(isStreaking(p)) html += '<div style="font-size:9px; color:#A8492E; font-weight:bold;">🔥次の正解×2</div>';
       html += '</div>';
     });
     html += '</div>';
 
-    var qMeta = bState.questions[bState.currentQ];
+    var qMeta = bState.questions[q];
 
-    html += '<div class="qnum" style="text-align:center;font-weight:bold; font-size:14px; margin-bottom:8px;">第 ' + (bState.currentQ + 1) + ' 問 / 全' + bState.settings.maxQuestions + '問</div>';
-    
+    html += '<div class="qnum" style="text-align:center;font-weight:bold; font-size:14px; margin-bottom:8px;">第 ' + (q + 1) + ' 問 / 全' + bState.settings.maxQuestions + '問</div>';
+    if(cap >= 2) html += '<div class="battle-mode-note">👥 3人以上ルール：2人まで解答OK（1番手15点・2番手10点）</div>';
+
     var msg = '準備してね！';
     if (bState.state === 'reading') { msg = '早押しスタンバイ！'; }
-    if (bState.buzzer !== '') { 
-      var buzzerName = bState.players[bState.buzzer] ? bState.players[bState.buzzer].name : '';
-      msg = (bState.buzzer === bMe) ? 'あなたの解答！' : esc(buzzerName) + ' が解答中...'; 
+    if (bState.state === 'answering' || (bState.state === 'reading' && real.length)) {
+      if (iBuzzed && !iAnswered) msg = 'あなたの解答！' + (cap >= 2 ? '（' + (Math.max(real.indexOf(bMe), 0) + 1) + '番手）' : '');
+      else if (iAnswered) msg = '解答しました！結果を待っています';
+      else if (slotsOpen) msg = 'まだ2番手で押せる！';
+      else msg = real.map(function(p){ return esc((bState.players[p] || {}).name || ''); }).join('・') + ' が解答中...';
     }
     if (bState.state === 'answered') { msg = '正解発表！'; }
 
     html += '<div class="battle-status-msg" id="battleStatusMsg">' + msg + '</div>';
-    
+
     if (bState.state === 'intro') {
       html += '<div style="min-height:200px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--card); border-radius:14px; padding:16px; margin-bottom:16px; border:2px solid var(--line);">';
-      html += '<div style="font-family:var(--font-display); font-size:40px; font-weight:800; color:var(--forest-deep); animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">第 ' + (bState.currentQ + 1) + ' 問</div>';
+      html += '<div style="font-family:var(--font-display); font-size:40px; font-weight:800; color:var(--forest-deep); animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">第 ' + (q + 1) + ' 問</div>';
       html += '</div>';
     } else {
       html += '<div style="min-height:140px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--card); border-radius:14px; padding:16px; margin-bottom:16px; border:2px solid var(--line);">';
@@ -1342,55 +1610,54 @@
       html += '</div>';
     }
 
-    if (bState.state === 'reading') {
-      html += '<div class="buzzer-area">';
-      html += '<button class="buzzer-btn" id="btnBuzz" type="button">押す！</button>';
-      html += '</div>';
-    } 
-    else if (bState.buzzer !== '') {
-      if (bState.buzzer === bMe && bState.state !== 'answered') {
-        html += '<div style="width:100%; height:8px; background:var(--line); border-radius:4px; margin-bottom:12px; overflow:hidden;">';
-        html += '<div id="answerProgressBar" class="answer-bar"></div></div>';
-        html += '<div class="choices">';
-        for(var i=0; i<qMeta.o.length; i++){
-          html += '<button class="choice-btn" data-idx="'+i+'" type="button"><span class="mark"></span><span>'+esc(qMeta.o[i])+'</span></button>';
-        }
-        html += '</div>';
-      } 
-      else if (bState.state === 'answered') {
-        html += '<div class="choices">';
-        for(var j=0; j<qMeta.o.length; j++){
-          var cls = 'choice-btn'; 
-          // テキストベースで正解/不正解を色付け
-          if(qMeta.o[j] === qMeta.correctText) { cls += ' correct'; }
-          else if(qMeta.o[j] === bState.lastAnswerText) { cls += ' wrong'; }
-          
-          var checkMark = (qMeta.o[j] === qMeta.correctText) ? '✓' : ((qMeta.o[j] === bState.lastAnswerText) ? '✕' : '');
-          html += '<button class="'+cls+'" disabled type="button"><span class="mark">'+checkMark+'</span><span>'+esc(qMeta.o[j])+'</span></button>';
-        }
-        html += '</div>';
-        if(qMeta.n) { html += '<div class="note">💡 '+esc(qMeta.n)+'</div>'; }
-        
-        // --- 5秒待機中のUI ---
-        if (resultShowTime > 0) {
-          html += '<div style="text-align:center; margin-top:20px; font-weight:bold; color:var(--ink-soft);">答えを確認中... (あと'+resultShowTime+'秒)</div>';
-        } else {
-          if (bState.players[bMe].ready) {
-            html += '<div style="text-align:center; margin-top:20px; font-weight:bold; color:var(--forest);">他のプレイヤーを待っています...</div>';
-          } else {
-            html += '<div style="text-align:center; margin-top:20px;"><button class="btn" id="btnReadyNext" type="button" style="width:100%;">次の問題へ (OK)</button></div>';
-          }
-        }
-
-        if (isHost) {
-          html += '<div style="text-align:center; margin-top:16px;"><button class="btn secondary" id="btnForceNext" style="padding:6px 12px; font-size:12px;">強制的に次へ (進行が止まった場合)</button></div>';
-        }
+    if (bState.state === 'answered') {
+      html += battleResultListHtml();
+      var wrongTexts = [];
+      Object.keys(answers).forEach(function(k){ if(!answers[k].correct && answers[k].text) wrongTexts.push(answers[k].text); });
+      html += '<div class="choices">';
+      for(var j=0; j<qMeta.o.length; j++){
+        var cls = 'choice-btn';
+        // テキストベースで正解/不正解を色付け
+        var isCorrectOpt = qMeta.o[j] === qMeta.correctText;
+        var isWrongOpt = !isCorrectOpt && wrongTexts.indexOf(qMeta.o[j]) >= 0;
+        if(isCorrectOpt) { cls += ' correct'; } else if(isWrongOpt) { cls += ' wrong'; }
+        html += '<button class="'+cls+'" disabled type="button"><span class="mark">'+(isCorrectOpt ? '✓' : (isWrongOpt ? '✕' : ''))+'</span><span>'+esc(qMeta.o[j])+'</span></button>';
       }
-      else {
-        html += '<div class="center-col" style="padding:40px 0;"><div class="loader" style="font-size:40px; animation:spin 1s linear infinite;">🤔</div></div>';
+      html += '</div>';
+      if(qMeta.n) { html += '<div class="note">💡 '+esc(qMeta.n)+'</div>'; }
+
+      // --- 3秒待機中のUI ---
+      if (resultShowTime > 0) {
+        html += '<div style="text-align:center; margin-top:20px; font-weight:bold; color:var(--ink-soft);">答えを確認中... (あと'+resultShowTime+'秒)</div>';
+      } else if (bState.players[bMe] && bState.players[bMe].ready) {
+        html += '<div style="text-align:center; margin-top:20px; font-weight:bold; color:var(--forest);">他のプレイヤーを待っています...</div>';
+      } else {
+        html += '<div style="text-align:center; margin-top:20px;"><button class="btn" id="btnReadyNext" type="button" style="width:100%;">次の問題へ (OK)</button></div>';
       }
     }
-    
+    else if (iBuzzed && !iAnswered && bState.state !== 'intro') {
+      var elapsed = myBuzzTs ? Math.min((Date.now() - myBuzzTs) / 1000, ANSWER_LIMIT_MS / 1000) : 0;
+      html += '<div style="width:100%; height:8px; background:var(--line); border-radius:4px; margin-bottom:12px; overflow:hidden;">';
+      html += '<div id="answerProgressBar" class="answer-bar" style="animation-delay:-' + elapsed.toFixed(2) + 's;"></div></div>';
+      html += '<div class="choices">';
+      for(var i=0; i<qMeta.o.length; i++){
+        html += '<button class="choice-btn" data-idx="'+i+'" type="button"><span class="mark"></span><span>'+esc(qMeta.o[i])+'</span></button>';
+      }
+      html += '</div>';
+    }
+    else if ((bState.state === 'reading' || bState.state === 'answering') && !iBuzzed && slotsOpen) {
+      html += '<div class="buzzer-area">';
+      html += '<button class="buzzer-btn" id="btnBuzz" type="button"' + (buzzPendingQ === q ? ' disabled' : '') + '>' + (real.length ? '2番手で<br>押す！' : '押す！') + '</button>';
+      html += '</div>';
+    }
+    else if (bState.state !== 'intro') {
+      html += '<div class="center-col" style="padding:40px 0;"><div class="loader" style="font-size:40px; animation:spin 1s linear infinite;">🤔</div></div>';
+    }
+
+    if (isHost && bState.state !== 'intro') {
+      html += '<div style="text-align:center; margin-top:16px;"><button class="btn secondary" id="btnForceNext" style="padding:6px 12px; font-size:12px;">強制的に次へ (進行が止まった場合)</button></div>';
+    }
+
     html += '<div style="text-align:center; margin-top:20px;"><button class="text-link-btn" id="btnBattleQuit" type="button">部屋から退出する</button></div>';
 
     return html;
@@ -1399,13 +1666,15 @@
   function bindBattleRoom() {
     var cBtn = document.getElementById('btnBattleCancel');
     if(cBtn) cBtn.onclick = goHome;
-    
+
     var qBtn = document.getElementById('btnBattleQuit');
     if(qBtn) qBtn.onclick = goHome;
-    
+
     var sBtn = document.getElementById('btnStartManual');
     if(sBtn) sBtn.onclick = function() {
-      db.ref('rooms/' + bRoom).update({ status: 'playing' });
+      initAudio();
+      var n = Object.keys(bState.players || {}).length;
+      db.ref('rooms/' + bRoom).update({ status: 'playing', 'settings/answerCap': n >= 3 ? 2 : 1 });
     };
 
     var buzzBtn = document.getElementById('btnBuzz');
@@ -1415,7 +1684,7 @@
     choiceBtns.forEach(function(b){
       b.onclick = function(){ submitBattleAnswer(parseInt(b.getAttribute('data-idx'),10)); };
     });
-    
+
     var rBtn = document.getElementById('btnReadyNext');
     if(rBtn) rBtn.onclick = function() {
       db.ref('rooms/' + bRoom + '/players/' + bMe).update({ ready: true });
@@ -1434,7 +1703,7 @@
     var bm = isBookmarked(q.id);
     html += '<div class="q-actions">';
     html += '<button class="bookmark-btn'+(bm?' active':'')+'" id="btnBookmark" type="button">'+(bm?'✅ 苦手登録済み':'🔖 苦手登録')+'</button>';
-    html += '<button class="text-link-btn" id="btnQuitToHome" type="button">ホーム画面に戻る</button>';
+    html += '<span style="display:flex;align-items:center;gap:6px;">' + soundToggleHtml() + '<button class="text-link-btn" id="btnQuitToHome" type="button">ホーム画面に戻る</button></span>';
     html += '</div><div class="q-tags"><span class="tag">'+esc(CATS[q.c])+'</span>';
     if(q.hot){ html += '<span class="tag hot">🔥 出題頻度高め！</span>'; }
     html += '</div><div class="qnum">'+(qi+1)+' / '+list.length+' 問目'+(mode==='practice' ? '（復習ラウンド）' : '')+'</div>';
@@ -1462,6 +1731,7 @@
   }
   function bindQuestion(){
     var qb = document.getElementById('btnQuitToHome'); if(qb) qb.onclick = goHome;
+    bindSoundToggle();
     var bm = document.getElementById('btnBookmark');
     if(bm){ bm.onclick = function(){ var list = currentList(); var q = getQ(list[qIndex]); toggleBookmark(q.id); render(); }; }
     var btns = document.querySelectorAll('.choice-btn');
