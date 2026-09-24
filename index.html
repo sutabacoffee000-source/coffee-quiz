@@ -863,14 +863,14 @@
     }
     return q.hot ? base * 1.7 : base;
   }
-  function pickSet(filterCat){
+  function pickSet(filterCat, count){
     var pool;
     if(filterCat === 'bookmark'){ pool = QUESTIONS.filter(function(q){ return bookmarkedIds.indexOf(q.id) !== -1; }); }
     else if(filterCat){ pool = QUESTIONS.filter(function(q){ return q.c===filterCat; }); }
     else { pool = QUESTIONS; }
     var keyed = pool.map(function(q){ return {id:q.id, key: Math.pow(Math.random(), 1/weightFor(q))}; });
     keyed.sort(function(a,b){ return b.key - a.key; });
-    var n = Math.min(DAILY_COUNT, pool.length);
+    var n = Math.min(count || DAILY_COUNT, pool.length);
     return keyed.slice(0, n).map(function(x){ return x.id; });
   }
   function isBookmarked(id){ return bookmarkedIds.indexOf(id) !== -1; }
@@ -1134,10 +1134,10 @@
     h += '<li>問題文が1文字ずつ出てきます。分かったら<b>早押しボタン</b>！</li>';
     h += '<li>押した人だけが4択で答えられます（制限時間<b>5秒</b>）</li>';
     h += '<li>正解で <b class="plus">+10点</b></li>';
-    h += '<li><b>3人以上のとき</b>は1問につき<b>2人まで</b>押せます。<br>1番に押した人の正解は <b class="plus">+15点</b>、2番目の人は <b class="plus">+10点</b></li>';
+    h += '<li><b>3人以上のとき</b>は1問につき<b>2人まで</b>押せます。<br>1番に押した人の正解は <b class="plus">+15点</b>、2番目の人は <b class="plus">+10点</b><br>（1番手が押したあとも問題文は流れ続けます。2番手は問題文が最後まで出てから5秒まで押せます）</li>';
     h += '<li>🔥 <b>連続正解ボーナス</b>：前の問題に続けて正解すると<b>得点2倍</b>！<br>（10点→<b class="plus">20点</b>、15点→<b class="plus">30点</b>）</li>';
     h += '<li>❌ <b>お手つき</b>（間違い・時間切れ）は <b class="minus">-10点</b>。連続記録もリセット</li>';
-    h += '<li>答え発表のあと<b>3秒</b>で「次の問題へ」ボタンが出ます。全員押したら次の問題へ</li>';
+    h += '<li>答え発表のあと<b>4秒</b>で「次の問題へ」ボタンが出ます。全員押したら次の問題へ</li>';
     h += '</ul></details>';
     return h;
   }
@@ -1207,7 +1207,8 @@
       if(!initFirebase()) return;
 
       var roomId = Math.floor(1000 + Math.random() * 9000).toString();
-      var qIds = pickSet(null).slice(0, maxQ);
+      var qIds = pickSet(null, maxQ);
+      maxQ = qIds.length;
 
       // 選択肢はそのまま全て使い、テキストベースで正解を保存することでインデックスズレのバグを回避する
       var battleQs = qIds.map(function(id) {
@@ -1254,10 +1255,6 @@
 
         bMe = 'p_' + Math.random().toString(36).substr(2, 9);
         var updates = {}; updates['players/' + bMe] = { name: name, score: 0, ready: false, lastCorrectQ: -99 };
-        if(pKeys.length + 1 >= r.settings.maxPlayers) {
-          updates['status'] = 'playing';
-          updates['settings/answerCap'] = (pKeys.length + 1) >= 3 ? 2 : 1;
-        }
 
         db.ref('rooms/' + roomId).update(updates).then(function(){ bRoom = roomId; playedIntroForQ = -1; resetBattleLocal(); listenBattleRoom(); });
       });
@@ -1306,6 +1303,13 @@
       var isHost = pKeys.length > 0 && pKeys[0] === bMe;
       var q = bState.currentQ;
 
+      // 待合室：定員がそろい全員が「準備OK」を押したら、ホストがゲーム開始
+      if (bState.status === 'waiting' && isHost && pKeys.length >= 2 && pKeys.length >= bState.settings.maxPlayers &&
+          pKeys.every(function(k){ return bState.players[k].ready; })) {
+        startBattleGame();
+        return;
+      }
+
       if (prevStatus !== 'finished' && bState.status === 'finished') {
         if (answerTimer) { clearTimeout(answerTimer); answerTimer = null; }
         if (resultTimerInterval) { clearInterval(resultTimerInterval); resultTimerInterval = null; }
@@ -1332,20 +1336,14 @@
       if (bState.state !== 'intro' && realBuzzers().length > prevBuzzN) playBuzzer();
 
       if (isHost) {
-        // 誰も押さないまま問題文を読み終えたら、6秒後に締め切り
-        if (bState.state === 'reading' && hostTimerQ.noBuzz !== q) {
+        // 問題文を最後まで表示してから5秒たったら、空いている早押し枠を締め切り
+        // （誰も押していなければ正解発表へ、3人以上なら2番手の受付終了）
+        if ((bState.state === 'reading' || bState.state === 'answering') && hostTimerQ.noBuzz !== q) {
           hostTimerQ.noBuzz = q;
-          var readMs = (bState.questions[q].q.length * 120) + 6000;
+          var readMs = (bState.questions[q].q.length * 120) + 5000;
           setTimeout(function(){
-            if (bState && bState.currentQ === q && bState.state === 'reading') closeBuzzSlots(q, true);
+            if (bState && bState.currentQ === q && (bState.state === 'reading' || bState.state === 'answering')) closeBuzzSlots(q, false);
           }, readMs);
-        }
-        // 3人以上：1人目が押してから5秒たったら2番手の受付を締め切り
-        if (bState.state === 'answering' && hostTimerQ.window !== q && battleCap() >= 2) {
-          hostTimerQ.window = q;
-          setTimeout(function(){
-            if (bState && bState.currentQ === q && bState.state === 'answering') closeBuzzSlots(q, false);
-          }, ANSWER_LIMIT_MS);
         }
         // 枠が埋まって、押した全員が答え終わったら正解発表
         if (bState.state === 'reading' || bState.state === 'answering') {
@@ -1384,6 +1382,13 @@
         }
       }
     });
+  }
+
+  function startBattleGame() {
+    var pKeys = Object.keys(bState.players || {});
+    var updates = { status: 'playing', 'settings/answerCap': pKeys.length >= 3 ? 2 : 1 };
+    pKeys.forEach(function(k){ updates['players/' + k + '/ready'] = false; });
+    db.ref('rooms/' + bRoom).update(updates);
   }
 
   function doBuzz() {
@@ -1468,7 +1473,9 @@
     var qMeta = bState.questions[bState.currentQ];
     var fullText = qMeta.q;
 
-    if(bState.state === 'reading') {
+    // 3人以上で2番手の枠が空いている間は、1番手が押しても問題文を流し続ける
+    var keepTyping = bState.state === 'reading' || (bState.state === 'answering' && battleBuzzers().length < battleCap());
+    if(keepTyping) {
       if (displayedQIndex !== bState.currentQ) {
         displayedQIndex = bState.currentQ; currentTypedLength = 0;
         if(typeInterval) clearInterval(typeInterval);
@@ -1521,16 +1528,24 @@
       html += '<p class="desc" style="font-weight:bold;">参加者 (' + pKeys.length + '/' + bState.settings.maxPlayers + '人)</p>';
       html += '<div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:24px;">';
       pKeys.forEach(function(k){
-        html += '<span style="background:var(--card); border:1px solid var(--line); padding:6px 16px; border-radius:20px; font-size:14px; font-weight:bold;">' + esc(bState.players[k].name) + (k === bMe ? '（あなた）' : '') + '</span>';
+        var rd = bState.players[k].ready;
+        html += '<span style="background:'+(rd?'rgba(28,59,50,0.1)':'var(--card)')+'; border:1px solid '+(rd?'var(--forest)':'var(--line)')+'; padding:6px 16px; border-radius:20px; font-size:14px; font-weight:bold;">' + (rd ? '✅ ' : '⏳ ') + esc(bState.players[k].name) + (k === bMe ? '（あなた）' : '') + '</span>';
       });
       html += '</div>';
 
-      if(isHost) {
-        html += '<button class="btn" id="btnStartManual" type="button" style="background:var(--forest); margin-bottom:12px; width:100%; max-width:300px;">この人数でゲーム開始</button>';
+      var full = pKeys.length >= bState.settings.maxPlayers;
+      var meReady = bState.players[bMe] && bState.players[bMe].ready;
+      if(!meReady) {
+        html += '<button class="btn" id="btnReadyStart" type="button" style="background:#A8492E; margin-bottom:12px; width:100%; max-width:300px; font-size:18px;">🙌 準備OK！始める</button>';
+      } else {
+        html += '<p class="desc" style="font-weight:bold; color:var(--forest);">✅ 準備OK！' + (full ? '他の人の準備を待っています...' : 'メンバーが集まるのを待っています...') + '</p>';
+      }
+      html += '<p class="desc" style="font-size:12px;">' + (full ? '全員そろいました！全員が「準備OK」を押すとスタートします' : '定員がそろって全員が「準備OK」を押すとスタートします') + '</p>';
+      if(isHost && pKeys.length >= 2 && !full) {
+        html += '<button class="btn secondary" id="btnStartManual" type="button" style="margin:8px 0 12px; width:100%; max-width:300px; font-size:13px;">今の' + pKeys.length + '人で始める（ホスト用）</button>';
       }
 
       html += '<div class="loader" style="font-size:40px; margin:10px 0; animation:spin 1s linear infinite;">⏳</div>';
-      html += '<p class="desc" style="font-size:12px;">全員揃うと自動で始まります...</p>';
       html += battleRulesHtml(false);
       html += '<button class="text-link-btn" id="btnBattleCancel" type="button" style="margin-top:20px;">やめる</button>';
       html += '</div>';
@@ -1682,8 +1697,13 @@
     var sBtn = document.getElementById('btnStartManual');
     if(sBtn) sBtn.onclick = function() {
       initAudio();
-      var n = Object.keys(bState.players || {}).length;
-      db.ref('rooms/' + bRoom).update({ status: 'playing', 'settings/answerCap': n >= 3 ? 2 : 1 });
+      if(confirm('今いるメンバーでゲームを始めますか？')) startBattleGame();
+    };
+
+    var rsBtn = document.getElementById('btnReadyStart');
+    if(rsBtn) rsBtn.onclick = function() {
+      initAudio();
+      db.ref('rooms/' + bRoom + '/players/' + bMe).update({ ready: true });
     };
 
     var buzzBtn = document.getElementById('btnBuzz');
