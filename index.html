@@ -219,6 +219,38 @@
   .battle-next-bar { position:fixed; left:50%; transform:translateX(-50%); bottom:calc(12px + env(safe-area-inset-bottom)); width:calc(100% - 32px); max-width:440px; z-index:50; background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:10px; box-shadow:0 8px 24px rgba(0,0,0,0.18); text-align:center; font-weight:bold; box-sizing:border-box; }
   .battle-next-bar .btn { width:100%; margin:0; }
   .battle-next-spacer { height:96px; }
+  .explain-card { background:#FFF8EC; border:2px solid var(--gold); border-radius:16px; padding:16px; margin-bottom:12px; text-align:center; animation: popIn 0.35s ease-out; }
+  .explain-card .ex-label { font-size:12px; color:var(--ink-soft); font-weight:bold; }
+  .explain-card .ex-answer { font-family:var(--font-display); font-size:22px; font-weight:800; color:var(--forest-deep); margin:4px 0 8px; line-height:1.4; }
+  .explain-card .ex-who { font-size:13px; font-weight:bold; color:var(--clay); margin-bottom:4px; }
+  .explain-card .ex-note { text-align:left; background:#FFF; border-radius:12px; padding:12px 14px; margin-top:10px; font-size:15px; line-height:1.7; color:#4A3212; border:1px solid rgba(185,138,62,0.35); }
+  .explain-card .ex-note b { display:block; font-size:13px; color:var(--gold); margin-bottom:4px; }
+  .title-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; width:100%; margin-bottom:20px; }
+  .title-card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:10px 8px; text-align:center; }
+  .title-card .t-icon { font-size:26px; line-height:1.2; }
+  .title-card .t-name { font-size:13px; font-weight:800; color:#A8492E; }
+  .title-card .t-who { font-size:14px; font-weight:bold; color:var(--ink); margin-top:2px; word-break:break-all; }
+  .title-card .t-val { font-size:11px; color:var(--ink-soft); }
+  .kana-intro { margin-top:14px; text-align:center; animation: popIn 0.5s ease-out; }
+  .kana-intro-tag { display:inline-block; background:#A8492E; color:#FFF; font-size:12px; font-weight:800; border-radius:12px; padding:3px 12px; margin-bottom:8px; }
+  .kana-intro-text { font-size:18px; font-weight:800; color:var(--ink); line-height:1.5; }
+  .kana-intro-sub { font-size:12px; color:var(--ink-soft); margin-top:4px; }
+  .kana-badge { align-self:flex-start; background:#FBEFE9; color:#A8492E; border:1px solid #A8492E; font-size:12px; font-weight:800; border-radius:10px; padding:3px 10px; margin-bottom:8px; }
+  .kana-slots { display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin:4px 0 14px; }
+  .kana-slot { width:38px; height:44px; border-bottom:3px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:800; color:var(--forest-deep); font-family:var(--font-display); }
+  .kana-slot.filled { border-color:var(--forest); }
+  .kana-slot.current { border-color:#A8492E; background:#FBEFE9; border-radius:6px 6px 0 0; }
+  .kana-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .kana-btn { height:76px; font-size:36px; font-weight:800; border-radius:14px; border:2px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; font-family:var(--font-display); box-shadow:0 4px 0 var(--line); }
+  .kana-btn:active { transform:translateY(3px); box-shadow:0 1px 0 var(--line); }
+  .read-cd-wrap { min-height:0; }
+  .read-cd { display:flex; align-items:center; justify-content:center; gap:8px; background:var(--paper); border:2px solid var(--gold); border-radius:14px; padding:8px 12px; margin:-4px 0 4px; font-weight:800; color:var(--ink); }
+  .read-cd .lbl { font-size:14px; }
+  .read-cd .num { font-family:var(--font-display); font-size:34px; line-height:1; color:var(--forest-deep); min-width:28px; text-align:center; }
+  .read-cd.hurry { border-color:#E03B3B; background:#FFF0F0; }
+  .read-cd.hurry .num, .read-cd.hurry .lbl { color:#E03B3B; }
+  .read-cd.hurry .num { animation: cdPulse 1s ease-in-out infinite; }
+  @keyframes cdPulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.25); } }
   .battle-mode-note { text-align:center; font-size:11px; color:var(--ink-soft); margin:-4px 0 10px; }
   @keyframes shrinkBar { from { width: 100%; } to { width: 0%; } }
   .answer-bar { height: 100%; background: var(--clay); animation: shrinkBar 5s linear forwards; }
@@ -849,6 +881,11 @@
   var buzzPendingQ = -1;
   var hostTimerQ = { window: -1, noBuzz: -1 };
   var lastAdvancedQ = -1;
+  var explainAnimQ = -1;
+  var explainAnimAt = 0;
+  var kanaTyped = '', kanaTypedQ = -1;          // 文字パネル問題で自分が入力中の文字
+  var READ_GRACE_SEC = 5;                        // 問題文を出し切ってから締め切るまでの秒数
+  var readEndQ = -1, readEndAt = 0, readCdInterval = null, readCdLastSec = -1;
 
   function currentList(){ return mode==='daily' ? daily.ids : practiceIds; }
   function currentAnswers(){ return mode==='daily' ? daily.answers : practiceAnswers; }
@@ -1102,7 +1139,9 @@
 
   function resetBattleLocal() {
     myBuzzQ = -1; myBuzzTs = 0; myAnsweredQ = -1; buzzPendingQ = -1;
-    hostTimerQ = { window: -1, noBuzz: -1 }; lastAdvancedQ = -1;
+    hostTimerQ = { window: -1, noBuzz: -1 }; lastAdvancedQ = -1; explainAnimQ = -1;
+    kanaTyped = ''; kanaTypedQ = -1; readEndQ = -1; readEndAt = 0; readCdLastSec = -1;
+    if(readCdInterval) { clearInterval(readCdInterval); readCdInterval = null; }
   }
 
   /* --- 早押し枠まわりのヘルパー --- */
@@ -1134,12 +1173,167 @@
     h += '<li>問題文が1文字ずつ出てきます。分かったら<b>早押しボタン</b>！</li>';
     h += '<li>押した人だけが4択で答えられます（制限時間<b>5秒</b>）</li>';
     h += '<li>正解で <b class="plus">+10点</b></li>';
+    h += '<li>✏️ <b>文字パネル問題</b>もまざります。押したら<b>ひらがな（またはカタカナ）を1文字ずつ</b>4つのパネルから選んで答えます。1文字でも間違えるとお手つき！</li>';
+    h += '<li>問題文が最後まで出たら、画面に<b>締め切りまでのカウントダウン（5秒）</b>が出ます</li>';
     h += '<li><b>3人以上のとき</b>は1問につき<b>2人まで</b>押せます。<br>1番に押した人の正解は <b class="plus">+15点</b>、2番目の人は <b class="plus">+10点</b><br>（1番手が押したあとも問題文は流れ続けます。2番手は問題文が最後まで出てから5秒まで押せます）</li>';
     h += '<li>🔥 <b>連続正解ボーナス</b>：前の問題に続けて正解すると<b>得点2倍</b>！<br>（10点→<b class="plus">20点</b>、15点→<b class="plus">30点</b>）</li>';
     h += '<li>❌ <b>お手つき</b>（間違い・時間切れ）は <b class="minus">-10点</b>。連続記録もリセット</li>';
+    h += '<li>🏅 最後に<b>⚡最速王・🔥連続王・🎯正確王・😅お手つき王</b>の称号を発表！「続けて遊ぶ」で同じメンバーのままもう一戦できます</li>';
     h += '<li>答え発表のあと<b>4秒</b>で「次の問題へ」ボタンが出ます。全員押したら次の問題へ</li>';
     h += '</ul></details>';
     return h;
+  }
+
+  /* ---------------- BAバトル専用：文字パネル問題（ひらがな・カタカナを1文字ずつ選んで答える） ----------------
+     t: 'word' = 単語で答える / 'fill' = （　）に当てはまる言葉を答える
+     s: 'h' = ひらがなで答える / 'k' = カタカナで答える
+     ※普段のドリル・模擬試験には出題されません */
+  var BATTLE_KANA_QUESTIONS = [
+    {id:1, t:'word', s:'h', q:'「スターバックス」という社名の由来となった、ハーマン・メルヴィルの小説は？', a:'はくげい', n:'小説『白鯨（Moby-Dick）』に登場する一等航海士「スターバック」が社名の由来です。'},
+    {id:2, t:'word', s:'h', q:'コーヒーチェリーの一番外側にある層を、漢字2文字で何という？', a:'かひ', n:'外側から「果皮 → 果肉（パルプ）→ 内果皮（パーチメント）→ シルバースキン → 生豆」の順です。'},
+    {id:3, t:'word', s:'h', q:'果皮のすぐ内側にあり、コーヒーチェリーの総重量のおよそ80%を占める層を、漢字2文字で何という？', a:'かにく', n:'果肉は「パルプ」とも呼ばれ、チェリーの総重量のおよそ80%を占めます。'},
+    {id:4, t:'word', s:'h', q:'コーヒー豆を保護する硬い層「パーチメント」を、漢字3文字で何という？', a:'ないかひ', n:'パーチメント（内果皮）は、豆を守る硬い殻のような層です。'},
+    {id:5, t:'word', s:'h', q:'果肉を除去したあと発酵タンクで寝かせ、水洗いしてから乾燥させる加工法は？', a:'すいせんしき', n:'水洗式は発酵の工程を伴う加工法。「TANGY（はじけるような）」風味につながります。'},
+    {id:6, t:'word', s:'h', q:'コーヒーチェリーの果肉をつけたまま乾燥させる加工法は？', a:'かんそうしき', n:'乾燥式はエチオピア・イエメン・ブラジルで代表的。「WILD」「BERRY」な風味になります。'},
+    {id:7, t:'word', s:'h', q:'インドネシア・スマトラ島で伝統的に採用されている加工法は？', a:'はんすいせんしき', n:'半水洗式は「FULL BODIED」「SMOOTH」な風味につながります。'},
+    {id:8, t:'fill', s:'h', q:'「コーヒーベルト」とは、北回帰線と（　）回帰線に挟まれた地帯のことである。', a:'みなみ', n:'コーヒーは北回帰線と南回帰線に挟まれた「コーヒーベルト」で栽培されています。'},
+    {id:9, t:'fill', s:'h', q:'コーヒーテイスティング4ステップの最初のステップは「（　）をかぐ」。', a:'かおり', n:'テイスティングはまず香りをかぐところから始まります。'},
+    {id:10, t:'fill', s:'h', q:'OUR VALUESの「CRAFT」は、「思いを（　）にする」。', a:'かたち', n:'OUR VALUES：CRAFT「思いをかたちにする」、COURAGE「勇気をもって向き合う」、JOY「楽しむことを力に」。'},
+    {id:11, t:'fill', s:'h', q:'OUR VALUESの「COURAGE」は、「（　）をもって向き合う」。', a:'ゆうき', n:'OUR VALUES：CRAFT「思いをかたちにする」、COURAGE「勇気をもって向き合う」、JOY「楽しむことを力に」。'},
+    {id:12, t:'fill', s:'h', q:'OUR VALUESの「JOY」は、「（　）ことを力に」。', a:'たのしむ', n:'OUR VALUES：CRAFT「思いをかたちにする」、COURAGE「勇気をもって向き合う」、JOY「楽しむことを力に」。'},
+    {id:13, t:'fill', s:'h', q:'OUR VALUESの前文「私たちは（　）を大切にしながら成長し続けます」', a:'にんげんらしさ', n:'OUR VALUESの前文は「人間らしさを大切にしながら成長し続けます」です。'},
+    {id:14, t:'fill', s:'h', q:'OUR FARMER PROMISE「コーヒーの（　）を確かなものに」', a:'みらい', n:'OUR FARMER PROMISEは「コーヒーの未来を確かなものに」です。'},
+    {id:15, t:'fill', s:'h', q:'OUR SHAREHOLDER PROMISE「たゆみなく永きにわたる（　）を」', a:'せいちょう', n:'OUR SHAREHOLDER PROMISEは「たゆみなく永きにわたる成長を」です。'},
+    {id:16, t:'word', s:'h', q:'「エシカル（ethical）」を日本語で言うと？（漢字3文字）', a:'りんりてき', n:'エシカル＝倫理的な。C.A.F.E.プラクティスなど、倫理的な調達につながる言葉です。'},
+    {id:17, t:'fill', s:'h', q:'焙煎中にアミノ酸と還元糖が熱で結びつき、茶色く色づいて香ばしい風味が生まれる化学反応を「メイラード（　）」という。', a:'はんのう', n:'メイラード反応によって、焙煎したコーヒー豆の色と香ばしさが生まれます。'},
+    {id:18, t:'fill', s:'h', q:'太平洋赤道域から南米沿岸にかけて海面水温が平年より高い状態が一年程度続く「エルニーニョ（　）」は、コーヒー生産地にも影響を与えている。', a:'げんしょう', n:'エルニーニョ現象などの気候の変化は、コーヒー生産にも大きく影響します。'},
+    {id:19, t:'fill', s:'h', q:'スイスウォータープロセスは、化学薬剤を使わず、水と（　）フィルターだけでカフェインを除去する。', a:'かっせいたん', n:'スイスウォータープロセスは水と活性炭（カーボン）フィルターでカフェインだけを取り除きます。'},
+    {id:20, t:'fill', s:'h', q:'牛乳を凍らせて解凍し、濃厚な部分だけを取り出す技術を「（　）蒸留ミルク」という。', a:'とうけつ', n:'凍結蒸留ミルクは加熱せずに濃縮でき、コンデンスミルクのような甘みと濃厚さが得られます。'},
+    {id:21, t:'fill', s:'h', q:'シェードツリーとは、コーヒーの木に直射日光を遮る（　）を作るために植えられる背の高い樹木である。', a:'ひかげ', n:'シェードツリーは日陰を作り、チェリーがゆっくり熟して風味が発達します。野鳥のすみかにもなります。'},
+    {id:22, t:'fill', s:'h', q:'スターバックス1号店では「焙煎したての豆・（　）・スパイス」が販売されていた。', a:'こうちゃ', n:'1号店のロゴには「Starbucks Coffee Tea Spices」と入っていました。'},
+    {id:23, t:'fill', s:'h', q:'一杯のコーヒーのおよそ98%は（　）でできている。', a:'みず', n:'コーヒーの約98%は水。だからこそ、おいしい水を使うことが大切です。'},
+    {id:24, t:'fill', s:'h', q:'スプリング シーズン ブレンド（SSB）と相性の良い風味は「（　）、バニラ、チョコレート」。', a:'さくら', n:'SSBはハニーブッシュやココアを思わせる風味。さくら、バニラ、チョコレートと相性抜群です。'},
+    {id:25, t:'fill', s:'h', q:'ハシエンダ アルサシア（HAC）と相性の良い風味は「（　）、アーモンド」。', a:'はちみつ', n:'HACはキャンディードシトラスやミルクチョコレートを思わせる風味です。'},
+    {id:26, t:'fill', s:'h', q:'「カシ シエロ」は、スペイン語で「（　）のような」という意味である。', a:'てんごく', n:'グアテマラ カシ シエロ（GCC）はメイヤーレモンやカカオニブを思わせる風味です。'},
+    {id:27, t:'fill', s:'h', q:'「コペラニ」は、ハワイ語で「（　）のコーヒー」という意味である。', a:'しふく', n:'コペラニ ブレンド（KLB）はアラスカ・ホライズン航空との提携で開発されました。'},
+    {id:28, t:'fill', s:'h', q:'スマトラ マサデパン（SMD）が掲げるテーマは「未来」と「（　）」。', a:'きょうそう', n:'SMDのテーマは「未来」と「共創」。スイカや煎茶を思わせる風味です。'},
+    {id:29, t:'fill', s:'h', q:'「カティカティ」は、スワヒリ語で「〜の（　）」を意味する言葉が由来である。', a:'あいだ', n:'カティカティ ブレンド（EAB）はグレープフルーツや赤いベリーを思わせる風味です。'},
+    {id:30, t:'fill', s:'h', q:'日本上陸30周年アニバーサリー企画第1弾のテーマは「（　）に立ち返り、（　）を超えていく」。', a:'げんてん', n:'テーマは「原点に立ち返り、原点を超えていく」。第1弾は「THE STAR フラペチーノ®」でした。'},
+    {id:31, t:'word', s:'h', q:'1996年、北米以外で初の海外店舗がオープンした東京の街は？', a:'ぎんざ', n:'1996年、東京・銀座に北米以外で初めての店舗がオープンしました。'},
+    {id:32, t:'word', s:'h', q:'STARBUCKS RESERVE ROASTERY TOKYOがある東京の街は？', a:'なかめぐろ', n:'東京・中目黒のロースタリーでは、約15種類の豆が随時焙煎されています。'},
+    {id:33, t:'fill', s:'h', q:'スターバックス初の自社農園「ハシエンダ アルサシア」は、コスタリカのポアス（　）の斜面に広がっている。', a:'かざん', n:'ハシエンダ アルサシアでは、気候変動や病害に強い品種を研究し、生産者と知見を共有しています。'},
+    {id:34, t:'fill', s:'h', q:'コーヒー用語「EARTHY」は、「（　）のような」という意味である。', a:'だいち', n:'EARTHY（大地のような）は、インドネシア産コーヒーによく使われる表現です。'},
+    {id:35, t:'word', s:'h', q:'コーヒー用語「MOUTHFEEL」を日本語で言うと？', a:'くちあたり', n:'MOUTHFEEL（口当たり）は、コーヒーを味わう時に口の中で感じる感覚や重さのことです。'},
+    {id:36, t:'fill', s:'h', q:'コーヒー用語「STALE」は、「（　）の落ちた」という意味である。', a:'せんど', n:'STALEは、酸素に長期間さらされて酸味が失われ、平坦な味になった状態です。'},
+    {id:37, t:'fill', s:'h', q:'コーヒー用語「BRIGHT」は、「（　）な」という意味である。', a:'あざやか', n:'BRIGHT（鮮やかな）は、口の中前方で感じるキリッとした酸味のことです。'},
+    {id:38, t:'fill', s:'h', q:'コーヒー用語「SMOOTH」は、「（　）な」という意味である。', a:'なめらか', n:'SMOOTH（なめらかな）は、尖りのない、丸みのあるバランスの良い口当たりです。'},
+    {id:39, t:'fill', s:'h', q:'コーヒー用語「TANGY」は、「（　）ような」という意味である。', a:'はじける', n:'TANGY（はじけるような）は、はっきりしていて余韻を残す酸味を表します。'},
+    {id:40, t:'fill', s:'h', q:'コーヒー用語「CLEAN」は、「（　）とした」という意味である。', a:'さっぱり', n:'CLEAN（さっぱりとした）は、後味のほとんど残らないコーヒーを指します。'},
+    {id:41, t:'fill', s:'h', q:'かかるとコーヒーの木の葉にオレンジ色の斑点ができる病気を「コーヒー（　）病」という。', a:'さび', n:'コーヒーさび病は生産者にとって大きな脅威。耐性のある品種の研究が進められています。'},
+    {id:42, t:'fill', s:'h', q:'コーヒーの「2050年問題」とは、気候変動により2050年までにアラビカ種の栽培適地が（　）する問題である。', a:'はんげん', n:'平均気温が1℃上がると、コーヒーの収量は約14%低下すると言われています。'},
+    {id:43, t:'word', s:'h', q:'生豆に熱を加えて煎ることを、漢字2文字で何という？', a:'ばいせん', n:'焙煎によってコーヒー豆の色・香り・風味が引き出されます。'},
+    {id:44, t:'word', s:'h', q:'コーヒーの成分をお湯や水で取り出すことを、漢字2文字で何という？', a:'ちゅうしゅつ', n:'スターバックスの推奨は、水180mlに対してコーヒー10gです。'},
+    {id:45, t:'fill', s:'h', q:'コールドブリュー コーヒーは、（　）を加えずに水でじっくりと抽出して作る。', a:'ねつ', n:'店舗のコールドブリューは、約14時間かけてじっくり抽出されます。'},
+    {id:46, t:'fill', s:'h', q:'コーヒー生産者がまとまり、協力して販売と営業を行う組織形態を「（　）組合」という。', a:'きょうどう', n:'フェアトレード認証は、生産者による協同組合の運営を支援することを目的としています。'},
+    {id:47, t:'fill', s:'h', q:'「サードプレイス」とは、自宅でも（　）でもない、心地よい第三の場所のことである。', a:'しょくば', n:'スターバックスは、自宅でも職場でもない「サードプレイス」を目指しています。'},
+    {id:48, t:'word', s:'k', q:'1971年、スターバックス1号店がオープンしたアメリカの都市は？', a:'シアトル', n:'1号店は焙煎したコーヒー豆を量り売りする専門店でした。'},
+    {id:49, t:'word', s:'k', q:'コーヒーチェリーの中に稀に1粒だけ入っている、丸い豆を何と呼ぶ？', a:'ピーベリー', n:'ピーベリーはコーヒーチェリー全体のおよそ5〜10%の割合で存在します。'},
+    {id:50, t:'word', s:'k', q:'生豆を覆う、最後の薄くほとんど透明な保護層を何と呼ぶ？', a:'シルバースキン', n:'外側から「果皮 → 果肉 → パーチメント → シルバースキン → 生豆」の順です。'},
+    {id:51, t:'word', s:'k', q:'アラビカ種コーヒーの発祥の地とされる国は？', a:'エチオピア', n:'エチオピアでは、鉄鍋で焙煎し、粘土製のジャバナでコーヒーをいれる伝統があります。'},
+    {id:52, t:'word', s:'k', q:'3〜5年熟成させる「エイジド コーヒー」の専用倉庫がある国は？', a:'シンガポール', n:'エイジド コーヒーはシンガポールの専用倉庫で3〜5年ほど熟成されます。'},
+    {id:53, t:'word', s:'k', q:'コーヒーチェリーの果皮や果肉を乾燥させて作る、ハーブティーのように飲まれる飲み物は？', a:'カスカラ', n:'カスカラはスペイン語で「殻・皮」という意味です。'},
+    {id:54, t:'word', s:'k', q:'パイクプレイス ロースト（EDB）のパッケージに描かれている、ブタのマスコットの名前は？', a:'レイチェル', n:'EDBのパッケージには、パイクプレイスマーケットがスクープの形で表現されています。'},
+    {id:55, t:'word', s:'k', q:'グアテマラの国鳥で、グアテマラ アンティグア（GUA）のパッケージに描かれている鳥は？', a:'ケツァール', n:'GUAはココアやスパイスを思わせる洗練された風味です。'},
+    {id:56, t:'word', s:'k', q:'1983年、ハワード・シュルツが出張先でエスプレッソバーに感銘を受けた国は？', a:'イタリア', n:'この体験が、1984年の最初のエスプレッソドリンク「スターバックスラテ」につながりました。'},
+    {id:57, t:'word', s:'k', q:'スターバックス初の自社農園「ハシエンダ アルサシア」がある国は？', a:'コスタリカ', n:'2013年に購入。ポアス火山の斜面に広がる農園です。'},
+    {id:58, t:'word', s:'k', q:'コーヒーの花は、どんな花のような香りがすると言われる？', a:'ジャスミン', n:'コーヒーの木は開花から収穫まで、およそ9か月かかります。'},
+    {id:59, t:'word', s:'k', q:'コーヒーの土壌管理と栽培の専門家を何と呼ぶ？', a:'アグロノミスト', n:'ファーマーサポートセンター（FSC）では、アグロノミストが生産者を直接支援しています。'}
+  ];
+
+  var KANA_ROWS = ['あいうえお','かきくけこ','さしすせそ','たちつてと','なにぬねの','はひふへほ','まみむめも','やゆよ','らりるれろ','わをん',
+                   'がぎぐげご','ざじずぜぞ','だぢづでど','ばびぶべぼ','ぱぴぷぺぽ','っゃゅょ'];
+  function hiraToKata(str) { return str.replace(/[ぁ-ゖ]/g, function(c){ return String.fromCharCode(c.charCodeAt(0) + 0x60); }); }
+  function kataToHira(str) { return str.replace(/[ァ-ヶ]/g, function(c){ return String.fromCharCode(c.charCodeAt(0) - 0x60); }); }
+  // 1文字ごとに「正解＋まぎらわしい3文字」のパネルを作る
+  function makeKanaPanels(ans, kata) {
+    var normal = KANA_ROWS.slice(0, 15).join('').split('');
+    return ans.split('').map(function(ch){
+      var picks;
+      if (ch === 'ー') {
+        picks = shuffleArrayInPlace(['ン','ッ','ウ','イ','ル']).slice(0, 3);
+      } else {
+        var h = kata ? kataToHira(ch) : ch;
+        var row = KANA_ROWS.filter(function(r){ return r.indexOf(h) >= 0; })[0] || '';
+        picks = shuffleArrayInPlace(row.split('').filter(function(c){ return c !== h; })).slice(0, 1); // 同じ行から1文字
+        var others = shuffleArrayInPlace(normal.filter(function(c){ return c !== h && picks.indexOf(c) < 0; }));
+        while (picks.length < 3) picks.push(others.pop());
+        if (kata) picks = picks.map(hiraToKata);
+      }
+      return shuffleArrayInPlace(picks.concat([ch]));
+    });
+  }
+  function isKanaQ(qMeta) { return qMeta && qMeta.type === 'kana'; }
+  function kanaPromptText(qMeta) {
+    var script = qMeta.ks === 'k' ? 'カタカナ' : 'ひらがな';
+    return qMeta.kt === 'fill' ? '（　）に当てはまる言葉を' + script + 'で答えよ' : '単語を' + script + 'で答えよ';
+  }
+  function answerLimitMs(qMeta) {
+    return isKanaQ(qMeta) ? Math.min(3000 + 1300 * qMeta.correctText.length, 15000) : ANSWER_LIMIT_MS;
+  }
+
+  // 選択肢はそのまま全て使い、テキストベースで正解を保存することでインデックスズレのバグを回避する
+  // withKana: 文字パネル問題を約3割まぜる
+  function buildBattleQuestions(maxQ, withKana) {
+    var nKana = withKana ? Math.min(Math.max(1, Math.round(maxQ * 0.3)), BATTLE_KANA_QUESTIONS.length) : 0;
+    var kanaQs = shuffleArrayInPlace(BATTLE_KANA_QUESTIONS.slice()).slice(0, nKana).map(function(k){
+      return { id: 'k' + k.id, type: 'kana', kt: k.t, ks: k.s, q: k.q, correctText: k.a, panels: makeKanaPanels(k.a, k.s === 'k'), n: k.n || '' };
+    });
+    var choiceQs = pickSet(null, maxQ - nKana).map(function(id) {
+      var original = getQ(id);
+      var chosenOpts = shuffleArrayInPlace(original.o.slice());
+      return {
+        id: original.id,
+        q: original.q,
+        o: chosenOpts,
+        correctText: original.o[original.a],
+        img: original.img || '',
+        map: original.map || '',
+        n: original.n || ''
+      };
+    });
+    return shuffleArrayInPlace(choiceQs.concat(kanaQs));
+  }
+
+  // 同じ部屋・同じメンバーでもう一戦（新しい問題で待合室に戻る）
+  function rematchBattle() {
+    initAudio();
+    db.ref('rooms/' + bRoom).transaction(function(r){
+      if(!r || r.status !== 'finished') return;
+      var qs = buildBattleQuestions(r.settings.maxQuestions, r.settings.kana !== false);
+      var n = Object.keys(r.players || {}).length;
+      r.questions = qs;
+      r.settings.maxQuestions = qs.length;
+      r.settings.maxPlayers = Math.max(n, 2);
+      r.status = 'waiting'; r.currentQ = 0; r.state = 'intro';
+      r.round = (r.round || 1) + 1;
+      delete r.buzzers; delete r.answers;
+      Object.keys(r.players || {}).forEach(function(k){
+        var p = r.players[k];
+        p.score = 0; p.ready = false; p.lastCorrectQ = -99; delete p.st;
+      });
+      return r;
+    });
+  }
+
+  // 部屋から抜ける：自分を参加者から外す（最後の1人なら部屋ごと削除）
+  function leaveBattleRoom() {
+    var room = bRoom, me = bMe;
+    var n = bState && bState.players ? Object.keys(bState.players).length : 0;
+    goHome();
+    if(db && room && me) {
+      if(n <= 1) db.ref('rooms/' + room).remove();
+      else db.ref('rooms/' + room + '/players/' + me).remove();
+    }
   }
 
   function renderBattleLobby() {
@@ -1161,6 +1355,7 @@
     html += '<label style="font-size:11px; flex:1; color:var(--ink-soft); font-weight:bold;">問題数 (3〜30)<br><input type="number" id="inputMaxQuestions" min="3" max="30" value="10" class="browse-search" style="margin-top:6px; padding:10px; text-align:center;"></label>';
     html += '<label style="font-size:11px; flex:1; color:var(--ink-soft); font-weight:bold;">参加人数 (2〜8)<br><input type="number" id="inputMaxPlayers" min="2" max="8" value="2" class="browse-search" style="margin-top:6px; padding:10px; text-align:center;"></label>';
     html += '</div>';
+    html += '<label style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:bold; color:var(--ink); margin-bottom:12px; cursor:pointer;"><input type="checkbox" id="inputKana" checked style="width:18px; height:18px;">✏️ 文字パネル問題（ひらがな・カタカナで答える）もまぜる</label>';
     html += '<button class="btn" id="btnCreateRoom" type="button" style="background:#A8492E; width:100%; margin-bottom:16px;">ルームを作る</button>';
     html += '<hr style="border:none; border-top:1px dashed var(--line); margin:0 0 16px;">';
     html += '<p style="font-size:13px; font-weight:bold; color:var(--ink); margin:0 0 10px;">💬 友達の部屋に入る</p>';
@@ -1207,32 +1402,15 @@
       if(!initFirebase()) return;
 
       var roomId = Math.floor(1000 + Math.random() * 9000).toString();
-      var qIds = pickSet(null, maxQ);
-      maxQ = qIds.length;
-
-      // 選択肢はそのまま全て使い、テキストベースで正解を保存することでインデックスズレのバグを回避する
-      var battleQs = qIds.map(function(id) {
-        var original = getQ(id);
-        var chosenOpts = original.o.slice(); // 全選択肢をそのままコピー
-        var correctText = original.o[original.a];
-        chosenOpts = shuffleArrayInPlace(chosenOpts);
-
-        return {
-          id: original.id,
-          q: original.q,
-          o: chosenOpts,
-          correctText: correctText,
-          img: original.img || '',
-          map: original.map || '',
-          n: original.n || ''
-        };
-      });
+      var kanaOn = document.getElementById('inputKana').checked;
+      var battleQs = buildBattleQuestions(maxQ, kanaOn);
+      maxQ = battleQs.length;
 
       bMe = 'p_' + Math.random().toString(36).substr(2, 9);
       var players = {}; players[bMe] = { name: name, score: 0, ready: false, lastCorrectQ: -99 };
 
       var newRoom = {
-        status: 'waiting', settings: { maxQuestions: maxQ, maxPlayers: maxP },
+        status: 'waiting', settings: { maxQuestions: maxQ, maxPlayers: maxP, kana: kanaOn },
         players: players, questions: battleQs, currentQ: 0,
         state: 'intro'
       };
@@ -1298,10 +1476,19 @@
       var prevBuzzN = (prev && prev.currentQ === newState.currentQ) ? realBuzzers(prev).length : 0;
       bState = newState;
       render();
+      if (prevStatus !== bState.status) window.scrollTo(0, 0); // 部屋番号などがすぐ見えるように
 
       var pKeys = Object.keys(bState.players || {});
       var isHost = pKeys.length > 0 && pKeys[0] === bMe;
       var q = bState.currentQ;
+
+      // 「続けて遊ぶ」で待合室に戻ったら、前の試合の手元の状態をリセット
+      if (prevStatus === 'finished' && bState.status === 'waiting') {
+        resetBattleLocal(); playedIntroForQ = -1; displayedQIndex = -1; currentTypedLength = 0;
+        if (answerTimer) { clearTimeout(answerTimer); answerTimer = null; }
+        if (resultTimerInterval) { clearInterval(resultTimerInterval); resultTimerInterval = null; }
+        resultShowTime = 0;
+      }
 
       // 待合室：定員がそろい全員が「準備OK」を押したら、ホストがゲーム開始
       if (bState.status === 'waiting' && isHost && pKeys.length >= 2 && pKeys.length >= bState.settings.maxPlayers &&
@@ -1328,7 +1515,7 @@
         if (isHost) {
           setTimeout(function() {
             if (bState && bState.currentQ === q && bState.state === 'intro') db.ref('rooms/' + bRoom).update({ state: 'reading' });
-          }, 2000);
+          }, isKanaQ(bState.questions[q]) ? 3200 : 2000);
         }
       }
 
@@ -1340,7 +1527,7 @@
         // （誰も押していなければ正解発表へ、3人以上なら2番手の受付終了）
         if ((bState.state === 'reading' || bState.state === 'answering') && hostTimerQ.noBuzz !== q) {
           hostTimerQ.noBuzz = q;
-          var readMs = (bState.questions[q].q.length * 120) + 5000;
+          var readMs = (bState.questions[q].q.length * 120) + READ_GRACE_SEC * 1000;
           setTimeout(function(){
             if (bState && bState.currentQ === q && (bState.state === 'reading' || bState.state === 'answering')) closeBuzzSlots(q, false);
           }, readMs);
@@ -1366,8 +1553,12 @@
           if(resultShowTime <= 0) {
             clearInterval(resultTimerInterval);
             resultTimerInterval = null;
+            render(); // 「次の問題へ」ボタンを出す
+          } else {
+            // 解説が点滅しないよう、数字だけ書き換える
+            var cd = document.getElementById('battleCountdown');
+            if(cd) cd.textContent = resultShowTime; else render();
           }
-          render();
         }, 1000);
         render();
       }
@@ -1414,12 +1605,30 @@
       if (answerTimer) clearTimeout(answerTimer);
       answerTimer = setTimeout(function() {
         if (bState && bState.currentQ === q && bState.state !== 'answered' && myAnsweredQ !== q) submitBattleAnswer(-1);
-      }, ANSWER_LIMIT_MS);
+      }, answerLimitMs(bState.questions[q]));
       render();
     });
   }
 
   function submitBattleAnswer(idx) {
+    var qMeta = bState && bState.questions[bState.currentQ];
+    submitBattleAnswerText(idx >= 0 && qMeta && qMeta.o ? qMeta.o[idx] : ''); // 時間切れの場合は空文字
+  }
+
+  // 文字パネル：1文字選ぶごとに判定。間違えたらその場でお手つき
+  function onKanaTap(ch) {
+    if (!bState) return;
+    var q = bState.currentQ, qMeta = bState.questions[q];
+    if (myAnsweredQ === q || !isKanaQ(qMeta)) return;
+    if (kanaTypedQ !== q) { kanaTypedQ = q; kanaTyped = ''; }
+    var expected = qMeta.correctText.charAt(kanaTyped.length);
+    kanaTyped += ch;
+    if (ch !== expected || kanaTyped.length >= qMeta.correctText.length) { submitBattleAnswerText(kanaTyped); return; }
+    initAudio(); playTone(1046.5, 'sine', 0.08, 0.06);
+    render();
+  }
+
+  function submitBattleAnswerText(ansText) {
     initAudio();
     if (answerTimer) { clearTimeout(answerTimer); answerTimer = null; }
     if (!bState) return;
@@ -1431,7 +1640,6 @@
     myAnsweredQ = q;
 
     var qMeta = bState.questions[q];
-    var ansText = idx >= 0 ? qMeta.o[idx] : ''; // 時間切れの場合は空文字
     var correct = (ansText !== '' && ansText === qMeta.correctText); // テキスト一致で正解判定
 
     // 得点：1番手15点・2番手10点（2人対戦は10点）、前の問題も正解なら2倍、お手つきは-10点
@@ -1440,8 +1648,15 @@
     var combo = correct && me.lastCorrectQ === q - 1;
     var pts = correct ? base * (combo ? 2 : 1) : -10;
 
+    // 称号用の記録（正解数・お手つき数・1番手回数・最大連続正解）
+    var st = me.st || { correct: 0, wrong: 0, first: 0, cur: 0, max: 0 };
+    if (order === 0) st.first++;
+    if (correct) { st.correct++; st.cur = combo ? st.cur + 1 : 1; st.max = Math.max(st.max, st.cur); }
+    else { st.wrong++; st.cur = 0; }
+
     var updates = {};
     updates['answers/' + bMe] = { text: ansText, correct: correct, pts: pts, combo: combo };
+    updates['players/' + bMe + '/st'] = st;
     if (correct) updates['players/' + bMe + '/lastCorrectQ'] = q;
     db.ref('rooms/' + bRoom).update(updates);
     db.ref('rooms/' + bRoom + '/players/' + bMe + '/score').transaction(function(s){ return (s||0) + pts; });
@@ -1467,6 +1682,30 @@
     db.ref('rooms/' + bRoom).update(updates);
   }
 
+  // 問題文を最後まで表示したら、早押し締め切りまでのカウントダウンを開始
+  function markReadEnd() {
+    if (!bState || readEndQ === bState.currentQ) return;
+    readEndQ = bState.currentQ; readEndAt = Date.now(); readCdLastSec = -1;
+    if (readCdInterval) clearInterval(readCdInterval);
+    readCdInterval = setInterval(updateReadCountdown, 200);
+    updateReadCountdown();
+  }
+  function updateReadCountdown() {
+    var wrap = document.getElementById('readCdWrap');
+    if (!bState || readEndQ !== bState.currentQ) { if (wrap) wrap.innerHTML = ''; return; }
+    var left = Math.ceil(READ_GRACE_SEC - (Date.now() - readEndAt) / 1000);
+    if (left <= 0 && readCdInterval) { clearInterval(readCdInterval); readCdInterval = null; }
+    if (left !== readCdLastSec) {
+      readCdLastSec = left;
+      if (left > 0 && left <= 3 && wrap) playTone(1318.5, 'sine', 0.06, 0.04); // 残り3秒から小さくチッ
+    }
+    if (!wrap) return;
+    var label = realBuzzers().length ? '2番手の締め切りまで' : '早押し締め切りまで';
+    wrap.innerHTML = left > 0
+      ? '<div class="read-cd' + (left <= 2 ? ' hurry' : '') + '"><span class="lbl">⏱ ' + label + '</span><span class="num">' + left + '</span><span class="lbl">秒</span></div>'
+      : '<div class="read-cd hurry"><span class="lbl">⏰ 締め切り！</span></div>';
+  }
+
   function updateTyping() {
     var el = document.getElementById('battleQuestionText');
     if(!el || !bState || !bState.questions) return;
@@ -1483,7 +1722,7 @@
           currentTypedLength += 1;
           var textEl = document.getElementById('battleQuestionText');
           if(textEl) textEl.textContent = fullText.substring(0, currentTypedLength);
-          if (currentTypedLength >= fullText.length) { clearInterval(typeInterval); }
+          if (currentTypedLength >= fullText.length) { clearInterval(typeInterval); markReadEnd(); }
         }, 120);
       } else {
         el.textContent = fullText.substring(0, currentTypedLength);
@@ -1493,6 +1732,54 @@
       if(bState.state === 'answering') { el.textContent = fullText.substring(0, currentTypedLength); }
       else { el.textContent = fullText; }
     }
+    updateReadCountdown();
+  }
+
+  // 解説タイム：正解・正解者・解説を大きく表示
+  function battleExplainHtml(qMeta) {
+    var ans = battleAnswers();
+    var winners = realBuzzers().filter(function(p){ return ans[p] && ans[p].correct; })
+      .map(function(p){ return esc((bState.players[p] || { name: '?' }).name); });
+    // 登場アニメーションは最初の0.35秒だけ。描き直しても途中から続け、終わった後は動かさない（点滅防止）
+    if(explainAnimQ !== bState.currentQ) { explainAnimQ = bState.currentQ; explainAnimAt = Date.now(); }
+    var animSec = (Date.now() - explainAnimAt) / 1000;
+    var animStyle = animSec < 0.35 ? 'animation-delay:-' + animSec.toFixed(2) + 's;' : 'animation:none;';
+    var h = '<div class="explain-card" style="' + animStyle + '">';
+    h += '<div class="ex-label">✅ 正解は</div>';
+    h += '<div class="ex-answer">' + esc(qMeta.correctText) + '</div>';
+    h += '<div class="ex-who">' + (winners.length ? '🎉 正解：' + winners.join('・') : '😢 正解者なし') + '</div>';
+    if(qMeta.n) h += '<div class="ex-note"><b>💡 解説</b>' + esc(qMeta.n) + '</div>';
+    return h + '</div>';
+  }
+
+  // 最終結果の称号
+  function battleTitlesHtml(pKeys) {
+    var P = pKeys.map(function(k){
+      var p = bState.players[k];
+      return { name: p.name, st: p.st || { correct: 0, wrong: 0, first: 0, cur: 0, max: 0 } };
+    });
+    function best(metric, eligible) {
+      var max = -Infinity, who = [];
+      P.forEach(function(p){
+        if(eligible && !eligible(p)) return;
+        var v = metric(p);
+        if(v > max) { max = v; who = [p.name]; } else if(v === max) { who.push(p.name); }
+      });
+      return { max: max, who: who };
+    }
+    var titles = [
+      { icon: '⚡', name: '最速王', r: best(function(p){ return p.st.first; }), min: 1, fmt: function(v){ return '1番に押した回数 ' + v + '回'; } },
+      { icon: '🔥', name: '連続王', r: best(function(p){ return p.st.max; }), min: 2, fmt: function(v){ return '最大 ' + v + '問連続正解'; } },
+      { icon: '🎯', name: '正確王', r: best(function(p){ return p.st.correct / (p.st.correct + p.st.wrong); }, function(p){ return p.st.correct + p.st.wrong >= 2; }), min: 0.01, fmt: function(v){ return '正解率 ' + Math.round(v * 100) + '%'; } },
+      { icon: '😅', name: 'お手つき王', r: best(function(p){ return p.st.wrong; }), min: 1, fmt: function(v){ return 'お手つき ' + v + '回'; } }
+    ].filter(function(t){ return t.r.who.length && t.r.max >= t.min; });
+    if(!titles.length) return '';
+    var h = '<p class="desc" style="font-weight:bold; margin:0 0 8px;">🏅 称号発表</p><div class="title-grid">';
+    titles.forEach(function(t){
+      h += '<div class="title-card"><div class="t-icon">' + t.icon + '</div><div class="t-name">' + t.name + '</div>';
+      h += '<div class="t-who">' + esc(t.r.who.join('・')) + '</div><div class="t-val">' + t.fmt(t.r.max) + '</div></div>';
+    });
+    return h + '</div>';
   }
 
   function battleResultListHtml() {
@@ -1506,7 +1793,11 @@
       var verdict, pts, cls;
       if(!a) { verdict = '— 未解答'; pts = '±0'; cls = ''; }
       else if(a.correct) { verdict = '⭕ 正解'; pts = '+' + a.pts; cls = 'ok'; }
-      else { verdict = a.text === '' ? '⏰ 時間切れ' : '❌ お手つき'; pts = String(a.pts); cls = 'ng'; }
+      else {
+        verdict = a.text === '' ? '⏰ 時間切れ' : '❌ お手つき';
+        if (a.text && isKanaQ(bState.questions[bState.currentQ])) verdict += '（' + esc(a.text) + '）';
+        pts = String(a.pts); cls = 'ng';
+      }
       h += '<div class="battle-result-row ' + cls + '">';
       h += '<span>' + label + '<b>' + esc(p.name) + (pid === bMe ? '（あなた）' : '') + '</b><br><small>' + verdict + (a && a.combo ? ' ・🔥連続正解×2' : '') + '</small></span>';
       h += '<span class="pts">' + pts + '</span></div>';
@@ -1522,6 +1813,7 @@
 
     if(bState.status === 'waiting') {
       html += '<div class="center-col" style="padding:40px 0;">';
+      if((bState.round || 1) > 1) html += '<p class="desc" style="font-weight:bold; color:#A8492E; margin-bottom:4px;">🔁 ' + bState.round + '戦目の準備中</p>';
       html += '<div class="big-title">部屋番号: <span style="color:#A8492E;font-size:42px;">' + bRoom + '</span></div>';
       html += '<p class="desc" style="margin-bottom:24px;">この番号を相手に教えてください</p>';
 
@@ -1572,11 +1864,17 @@
         html += '<div style="flex:1 1 40%; min-width:100px; background:'+(isMe?'rgba(28,59,50,0.1)':'var(--card)')+'; border:1px solid '+(isMe?'var(--forest)':'var(--line)')+'; border-radius:12px; padding:12px; text-align:center;">';
         html += '<div style="font-size:12px; color:var(--ink-soft); font-weight:'+(isMe?'bold':'normal')+'; margin-bottom:4px;">' + esc(bState.players[k].name) + '</div>';
         html += '<div style="font-size:24px; font-weight:bold; color:var(--forest-deep);">' + (bState.players[k].score || 0) + '</div>';
+        var st = bState.players[k].st || { correct: 0, wrong: 0, max: 0 };
+        html += '<div style="font-size:10px; color:var(--ink-soft); margin-top:2px;">⭕' + st.correct + ' ❌' + st.wrong + ' 🔥最大' + st.max + '連続</div>';
         html += '</div>';
       });
       html += '</div>';
 
-      html += '<button class="btn" id="btnBattleCancel" type="button">ホームに戻る</button>';
+      html += battleTitlesHtml(pKeys);
+
+      html += '<button class="btn" id="btnRematch" type="button" style="background:#A8492E; width:100%; max-width:300px; margin-bottom:10px;">🔁 このメンバーで続けて遊ぶ</button>';
+      html += '<p class="desc" style="font-size:11px; margin:0 0 14px;">部屋はそのまま、新しい問題でもう一戦！</p>';
+      html += '<button class="btn secondary" id="btnBattleCancel" type="button">部屋を出てホームに戻る</button>';
       html += '</div>';
       return html;
     }
@@ -1623,21 +1921,30 @@
     if (bState.state === 'intro') {
       html += '<div style="min-height:200px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--card); border-radius:14px; padding:16px; margin-bottom:16px; border:2px solid var(--line);">';
       html += '<div style="font-family:var(--font-display); font-size:40px; font-weight:800; color:var(--forest-deep); animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">第 ' + (q + 1) + ' 問</div>';
+      if(isKanaQ(qMeta)) {
+        html += '<div class="kana-intro"><div class="kana-intro-tag">✏️ 文字パネル問題</div><div class="kana-intro-text">' + kanaPromptText(qMeta) + '</div><div class="kana-intro-sub">押したら' + (qMeta.ks === 'k' ? 'カタカナ' : 'ひらがな') + 'を1文字ずつ選んで答えよう！</div></div>';
+      }
       html += '</div>';
     } else {
       html += '<div style="min-height:140px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--card); border-radius:14px; padding:16px; margin-bottom:16px; border:2px solid var(--line);">';
+      if(isKanaQ(qMeta)) html += '<div class="kana-badge">✏️ ' + kanaPromptText(qMeta) + '</div>';
       html += '<p class="qtext" id="battleQuestionText" style="margin:0 0 10px; text-align:left; width:100%; min-height:80px;"></p>';
       if(qMeta.img){ html += '<img src="'+esc(qMeta.img)+'" style="max-width:100%; border-radius:8px; margin-bottom:10px;">'; }
       if(qMeta.map){ html += '<div class="question-map" style="margin:0;">'+qMeta.map+'</div>'; }
       html += '</div>';
     }
 
+    if ((bState.state === 'reading' || bState.state === 'answering') && slotsOpen) {
+      html += '<div id="readCdWrap" class="read-cd-wrap"></div>';
+    }
+
     if (bState.state === 'answered') {
+      html += battleExplainHtml(qMeta);
       html += battleResultListHtml();
       var wrongTexts = [];
       Object.keys(answers).forEach(function(k){ if(!answers[k].correct && answers[k].text) wrongTexts.push(answers[k].text); });
       html += '<div class="choices">';
-      for(var j=0; j<qMeta.o.length; j++){
+      for(var j=0; qMeta.o && j<qMeta.o.length; j++){
         var cls = 'choice-btn';
         // テキストベースで正解/不正解を色付け
         var isCorrectOpt = qMeta.o[j] === qMeta.correctText;
@@ -1646,12 +1953,11 @@
         html += '<button class="'+cls+'" disabled type="button"><span class="mark">'+(isCorrectOpt ? '✓' : (isWrongOpt ? '✕' : ''))+'</span><span>'+esc(qMeta.o[j])+'</span></button>';
       }
       html += '</div>';
-      if(qMeta.n) { html += '<div class="note">💡 '+esc(qMeta.n)+'</div>'; }
 
       // --- 4秒待機中のUI（スクロールしなくても押せるよう画面下に固定） ---
       html += '<div class="battle-next-spacer"></div><div class="battle-next-bar">';
       if (resultShowTime > 0) {
-        html += '<div style="padding:12px 0; color:var(--ink-soft);">答えを確認中... (あと'+resultShowTime+'秒)</div>';
+        html += '<div style="padding:12px 0; color:var(--ink-soft);">答えを確認中... (あと<span id="battleCountdown">'+resultShowTime+'</span>秒)</div>';
       } else if (bState.players[bMe] && bState.players[bMe].ready) {
         html += '<div style="padding:12px 0; color:var(--forest);">他のプレイヤーを待っています...</div>';
       } else {
@@ -1660,14 +1966,28 @@
       html += '</div>';
     }
     else if (iBuzzed && !iAnswered && bState.state !== 'intro') {
-      var elapsed = myBuzzTs ? Math.min((Date.now() - myBuzzTs) / 1000, ANSWER_LIMIT_MS / 1000) : 0;
+      var limitSec = answerLimitMs(qMeta) / 1000;
+      var elapsed = myBuzzTs ? Math.min((Date.now() - myBuzzTs) / 1000, limitSec) : 0;
       html += '<div style="width:100%; height:8px; background:var(--line); border-radius:4px; margin-bottom:12px; overflow:hidden;">';
-      html += '<div id="answerProgressBar" class="answer-bar" style="animation-delay:-' + elapsed.toFixed(2) + 's;"></div></div>';
-      html += '<div class="choices">';
-      for(var i=0; i<qMeta.o.length; i++){
-        html += '<button class="choice-btn" data-idx="'+i+'" type="button"><span class="mark"></span><span>'+esc(qMeta.o[i])+'</span></button>';
+      html += '<div id="answerProgressBar" class="answer-bar" style="animation-duration:' + limitSec + 's; animation-delay:-' + elapsed.toFixed(2) + 's;"></div></div>';
+      if(isKanaQ(qMeta)) {
+        var typed = kanaTypedQ === q ? kanaTyped : '';
+        html += '<div class="kana-slots">';
+        for(var si=0; si<qMeta.correctText.length; si++){
+          html += '<span class="kana-slot' + (si < typed.length ? ' filled' : (si === typed.length ? ' current' : '')) + '">' + esc(typed.charAt(si)) + '</span>';
+        }
+        html += '</div><div class="kana-grid">';
+        (qMeta.panels[typed.length] || []).forEach(function(ch){
+          html += '<button class="kana-btn" type="button" data-kana="' + esc(ch) + '">' + esc(ch) + '</button>';
+        });
+        html += '</div>';
+      } else {
+        html += '<div class="choices">';
+        for(var i=0; i<qMeta.o.length; i++){
+          html += '<button class="choice-btn" data-idx="'+i+'" type="button"><span class="mark"></span><span>'+esc(qMeta.o[i])+'</span></button>';
+        }
+        html += '</div>';
       }
-      html += '</div>';
     }
     else if ((bState.state === 'reading' || bState.state === 'answering') && !iBuzzed && slotsOpen) {
       html += '<div class="buzzer-area">';
@@ -1687,11 +2007,14 @@
 
   function bindBattleRoom() {
     var cBtn = document.getElementById('btnBattleCancel');
-    if(cBtn) cBtn.onclick = goHome;
+    if(cBtn) cBtn.onclick = leaveBattleRoom;
+
+    var rmBtn = document.getElementById('btnRematch');
+    if(rmBtn) rmBtn.onclick = rematchBattle;
 
     var qBtn = document.getElementById('btnBattleQuit');
     if(qBtn) qBtn.onclick = function(){
-      if(confirm('本当に部屋から退出しますか？\n（退出するとこの対戦には戻れません）')) goHome();
+      if(confirm('本当に部屋から退出しますか？\n（退出するとこの対戦には戻れません）')) leaveBattleRoom();
     };
 
     var sBtn = document.getElementById('btnStartManual');
@@ -1708,6 +2031,10 @@
 
     var buzzBtn = document.getElementById('btnBuzz');
     if(buzzBtn) buzzBtn.onclick = doBuzz;
+
+    document.querySelectorAll('.kana-btn').forEach(function(b){
+      b.onclick = function(){ onKanaTap(b.getAttribute('data-kana')); };
+    });
 
     var choiceBtns = document.querySelectorAll('.choice-btn:not(:disabled)');
     choiceBtns.forEach(function(b){
