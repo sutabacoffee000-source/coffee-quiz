@@ -251,6 +251,24 @@
   .read-cd.hurry .num, .read-cd.hurry .lbl { color:#E03B3B; }
   .read-cd.hurry .num { animation: cdPulse 1s ease-in-out infinite; }
   @keyframes cdPulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.25); } }
+  .score-board { display:grid; grid-template-columns:repeat(auto-fill, minmax(70px, 1fr)); gap:6px; margin-bottom:16px; }
+  .score-board.compact { grid-template-columns:repeat(auto-fill, minmax(56px, 1fr)); gap:4px; }
+  .score-board.compact > div { padding:3px !important; }
+  .score-board.compact .sb-score { font-size:13px !important; }
+  .owner-panel { width:100%; max-width:300px; background:#FFF8EC; border:1.5px solid var(--gold); border-radius:14px; padding:12px; margin:8px 0 12px; box-sizing:border-box; text-align:center; }
+  .owner-title { font-size:12px; font-weight:800; color:#8A6420; margin-bottom:8px; }
+  .battle-notice { position:fixed; top:20px; left:50%; transform:translateX(-50%); z-index:10000; background:var(--forest-deep); color:#FFF; font-weight:800; padding:14px 22px; border-radius:14px; box-shadow:0 10px 25px rgba(0,0,0,0.3); transition:opacity .6s; white-space:nowrap; }
+  .rank-list { width:100%; display:flex; flex-direction:column; gap:6px; margin-bottom:20px; }
+  .rank-row { display:flex; align-items:center; gap:10px; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:10px 12px; }
+  .rank-row.me { border:2px solid var(--forest); background:rgba(28,59,50,0.08); }
+  .rank-row.top1 { background:#FFF6DA; border-color:#D4A017; }
+  .rank-row.top2 { background:#F4F4F4; }
+  .rank-row.top3 { background:#FBEFE9; }
+  .rank-no { width:40px; text-align:center; font-size:22px; font-weight:800; font-family:var(--font-display); color:var(--ink-soft); }
+  .rank-name { flex:1; font-weight:bold; font-size:14px; text-align:left; word-break:break-all; }
+  .rank-name small { display:block; font-weight:normal; font-size:10px; color:var(--ink-soft); }
+  .rank-pt { font-family:var(--font-display); font-size:22px; font-weight:800; color:var(--forest-deep); white-space:nowrap; }
+  .rank-pt small { font-size:11px; margin-left:2px; }
   .battle-mode-note { text-align:center; font-size:11px; color:var(--ink-soft); margin:-4px 0 10px; }
   @keyframes shrinkBar { from { width: 100%; } to { width: 0%; } }
   .answer-bar { height: 100%; background: var(--clay); animation: shrinkBar 5s linear forwards; }
@@ -901,7 +919,8 @@
   var resultShowTime = 0;
   var resultTimerInterval = null;
   var RESULT_SHOW_SEC = 4;      // 答え確認の待ち時間
-  var ANSWER_LIMIT_MS = 5000;   // 押してから答えるまでの制限時間
+  var ANSWER_LIMIT_MS = 5000;   // 押してから答えるまでの制限時間（文字パネル問題は1文字ごと）
+  var BATTLE_MAX_PLAYERS = 30;  // 1部屋の最大人数
   var myBuzzQ = -1;             // 自分が押せた問題番号
   var myBuzzTs = 0;
   var myAnsweredQ = -1;
@@ -1173,10 +1192,26 @@
 
   /* --- 早押し枠まわりのヘルパー --- */
   // 3人以上なら1問につき2人まで、2人以下なら1人だけ答えられる
+  // 参加人数÷2（小数点切り上げ）の人数まで解答できる。例：8人→4人、13人→7人
+  function answerCapFor(n) { return Math.max(1, Math.ceil(n / 2)); }
+  // 何番手で押したかで得点が変わる：1番手20点、2番手15点、3番手以降10点
+  function basePointsFor(order) { return order === 0 ? 20 : (order === 1 ? 15 : 10); }
+  function orderLabel(i) { return ['🥇1番手','🥈2番手','🥉3番手'][i] || ((i + 1) + '番手'); }
+
+  // オーナー＝部屋を作った人（古い部屋は先頭の参加者）
+  function battleOwnerId(st) {
+    st = st || bState;
+    if (!st) return '';
+    if (st.owner && st.players && st.players[st.owner]) return st.owner;
+    return Object.keys(st.players || {})[0] || '';
+  }
+  function isBattleOwner(st) { return !!bMe && battleOwnerId(st) === bMe; }
+  function ownerMark(k) { return k === battleOwnerId() ? '👑 ' : ''; }
+
   function battleCap(st) {
     st = st || bState;
     if(st && st.settings && st.settings.answerCap) return st.settings.answerCap;
-    return Object.keys((st && st.players) || {}).length >= 3 ? 2 : 1;
+    return answerCapFor(Object.keys((st && st.players) || {}).length);
   }
   function toArr(v) {
     if(!v) return [];
@@ -1199,14 +1234,17 @@
     h += '<summary>📖 BAバトルのルール（タップで開閉）</summary><ul>';
     h += '<li>問題文が1文字ずつ出てきます。分かったら<b>早押しボタン</b>！</li>';
     h += '<li>押した人だけが4択で答えられます（制限時間<b>5秒</b>）</li>';
-    h += '<li>正解で <b class="plus">+10点</b></li>';
-    h += '<li>✏️ <b>文字パネル問題</b>もまざります。押したら<b>ひらがな（またはカタカナ）を1文字ずつ</b>4つのパネルから選んで答えます。1文字でも間違えるとお手つき！</li>';
+    h += '<li>1問につき<b>参加人数÷2（切り上げ）</b>の人数まで押せます（例：2人→1人、8人→4人、13人→7人）</li>';
+    h += '<li>正解の得点は押した順番で決まります：<b>1番手 <span class="plus">+20点</span></b>、<b>2番手 <span class="plus">+15点</span></b>、<b>3番手以降 <span class="plus">+10点</span></b></li>';
+    h += '<li>✏️ <b>文字パネル問題</b>もまざります。押したら<b>ひらがな（またはカタカナ）を1文字ずつ</b>4つのパネルから選んで答えます（<b>1文字ごとに5秒</b>）。1文字でも間違えるとお手つき！</li>';
     h += '<li>問題文が最後まで出たら、画面に<b>締め切りまでのカウントダウン（5秒）</b>が出ます</li>';
-    h += '<li><b>3人以上のとき</b>は1問につき<b>2人まで</b>押せます。<br>1番に押した人の正解は <b class="plus">+15点</b>、2番目の人は <b class="plus">+10点</b><br>（1番手が押したあとも問題文は流れ続けます。2番手は問題文が最後まで出てから5秒まで押せます）</li>';
-    h += '<li>🔥 <b>連続正解ボーナス</b>：前の問題に続けて正解すると<b>得点2倍</b>！<br>（10点→<b class="plus">20点</b>、15点→<b class="plus">30点</b>）</li>';
+    h += '<li>誰かが押したあとも、解答枠が残っている間は問題文が流れ続けます。問題文が最後まで出てから5秒で締め切り</li>';
+    h += '<li>🔥 <b>連続正解ボーナス</b>：前の問題に続けて正解すると<b>得点2倍</b>！<br>（20点→<b class="plus">40点</b>、15点→<b class="plus">30点</b>、10点→<b class="plus">20点</b>）</li>';
     h += '<li>❌ <b>お手つき</b>（間違い・時間切れ）は <b class="minus">-10点</b>。連続記録もリセット</li>';
     h += '<li>🏅 最後に<b>⚡最速王・🔥連続王・🎯正確王・😅お手つき王</b>の称号を発表！「続けて遊ぶ」で同じメンバーのままもう一戦できます</li>';
     h += '<li>答え発表のあと<b>4秒</b>で「次の問題へ」ボタンが出ます。全員押したら次の問題へ</li>';
+    h += '<li>👑 <b>オーナー</b>（部屋を作った人）は、定員前でもスタート・問題を先に進める・ルームの解散ができます</li>';
+    h += '<li>最後に<b>順位</b>を発表！結果はLINEなどにシェアできます</li>';
     h += '</ul></details>';
     return h;
   }
@@ -1232,8 +1270,8 @@
     {id:14, t:'fill', s:'h', q:'OUR FARMER PROMISE「コーヒーの（　）を確かなものに」', a:'みらい', n:'OUR FARMER PROMISEは「コーヒーの未来を確かなものに」です。'},
     {id:15, t:'fill', s:'h', q:'OUR SHAREHOLDER PROMISE「たゆみなく永きにわたる（　）を」', a:'せいちょう', n:'OUR SHAREHOLDER PROMISEは「たゆみなく永きにわたる成長を」です。'},
     {id:16, t:'word', s:'h', q:'「エシカル（ethical）」を日本語で言うと？（漢字3文字）', a:'りんりてき', n:'エシカル＝倫理的な。C.A.F.E.プラクティスなど、倫理的な調達につながる言葉です。'},
-    {id:17, t:'fill', s:'h', q:'焙煎中にアミノ酸と還元糖が熱で結びつき、茶色く色づいて香ばしい風味が生まれる化学反応を「メイラード（　）」という。', a:'はんのう', n:'メイラード反応によって、焙煎したコーヒー豆の色と香ばしさが生まれます。'},
-    {id:18, t:'fill', s:'h', q:'太平洋赤道域から南米沿岸にかけて海面水温が平年より高い状態が一年程度続く「エルニーニョ（　）」は、コーヒー生産地にも影響を与えている。', a:'げんしょう', n:'エルニーニョ現象などの気候の変化は、コーヒー生産にも大きく影響します。'},
+    {id:17, t:'fill', s:'k', q:'焙煎中にアミノ酸と還元糖が熱で結びつき、茶色く色づいて香ばしい風味が生まれる化学反応を「（　）反応」という。', a:'メイラード', n:'メイラード反応によって、焙煎したコーヒー豆の色と香ばしさが生まれます。'},
+    {id:18, t:'fill', s:'k', q:'太平洋赤道域から南米沿岸にかけて海面水温が平年より高い状態が一年程度続き、コーヒー生産地にも影響を与える「（　）現象」。', a:'エルニーニョ', n:'エルニーニョ現象などの気候の変化は、コーヒー生産にも大きく影響します。'},
     {id:19, t:'fill', s:'h', q:'スイスウォータープロセスは、化学薬剤を使わず、水と（　）フィルターだけでカフェインを除去する。', a:'かっせいたん', n:'スイスウォータープロセスは水と活性炭（カーボン）フィルターでカフェインだけを取り除きます。'},
     {id:20, t:'fill', s:'h', q:'牛乳を凍らせて解凍し、濃厚な部分だけを取り出す技術を「（　）蒸留ミルク」という。', a:'とうけつ', n:'凍結蒸留ミルクは加熱せずに濃縮でき、コンデンスミルクのような甘みと濃厚さが得られます。'},
     {id:21, t:'fill', s:'h', q:'シェードツリーとは、コーヒーの木に直射日光を遮る（　）を作るために植えられる背の高い樹木である。', a:'ひかげ', n:'シェードツリーは日陰を作り、チェリーがゆっくり熟して風味が発達します。野鳥のすみかにもなります。'},
@@ -1248,7 +1286,7 @@
     {id:30, t:'fill', s:'h', q:'日本上陸30周年アニバーサリー企画第1弾のテーマは「（　）に立ち返り、（　）を超えていく」。', a:'げんてん', n:'テーマは「原点に立ち返り、原点を超えていく」。第1弾は「THE STAR フラペチーノ®」でした。'},
     {id:31, t:'word', s:'h', q:'1996年、北米以外で初の海外店舗がオープンした東京の街は？', a:'ぎんざ', n:'1996年、東京・銀座に北米以外で初めての店舗がオープンしました。'},
     {id:32, t:'word', s:'h', q:'STARBUCKS RESERVE ROASTERY TOKYOがある東京の街は？', a:'なかめぐろ', n:'東京・中目黒のロースタリーでは、約15種類の豆が随時焙煎されています。'},
-    {id:33, t:'fill', s:'h', q:'スターバックス初の自社農園「ハシエンダ アルサシア」は、コスタリカのポアス（　）の斜面に広がっている。', a:'かざん', n:'ハシエンダ アルサシアでは、気候変動や病害に強い品種を研究し、生産者と知見を共有しています。'},
+    {id:33, t:'fill', s:'k', q:'スターバックス初の自社農園「ハシエンダ アルサシア」は、コスタリカの（　）火山の斜面に広がっている。', a:'ポアス', n:'ハシエンダ アルサシアでは、気候変動や病害に強い品種を研究し、生産者と知見を共有しています。'},
     {id:34, t:'fill', s:'h', q:'コーヒー用語「EARTHY」は、「（　）のような」という意味である。', a:'だいち', n:'EARTHY（大地のような）は、インドネシア産コーヒーによく使われる表現です。'},
     {id:35, t:'word', s:'h', q:'コーヒー用語「MOUTHFEEL」を日本語で言うと？', a:'くちあたり', n:'MOUTHFEEL（口当たり）は、コーヒーを味わう時に口の中で感じる感覚や重さのことです。'},
     {id:36, t:'fill', s:'h', q:'コーヒー用語「STALE」は、「（　）の落ちた」という意味である。', a:'せんど', n:'STALEは、酸素に長期間さらされて酸味が失われ、平坦な味になった状態です。'},
@@ -1287,7 +1325,7 @@
     {id:69, t:'word', s:'k', q:'干ばつ対策として、土壌を藁などで覆う農法を何と呼ぶ？', a:'マルチング', n:'土壌を覆うことで、水分の蒸発を防ぎます。'},
     {id:70, t:'fill', s:'h', q:'干ばつ対策の「マルチング」では、土壌を（　）で覆う。', a:'わら', n:'マルチングは、土壌の乾燥を防ぐための農法です。'},
     {id:71, t:'fill', s:'h', q:'ハシエンダ アルサシアの研究成果や新品種の種子は、世界中の生産者に（　）で提供されている。', a:'むしょう', n:'サプライヤーか否かを問わず、オープンソースとして提供されています。'},
-    {id:72, t:'fill', s:'h', q:'ハシエンダ アルサシアで導入された最新の加工技術は、（　）の使用量を80%削減できる。', a:'みず', n:'2016年に導入されたウェットミル等の技術です。'},
+    {id:72, t:'fill', s:'k', q:'ハシエンダ アルサシアで2016年に導入された、水の使用量を80%削減できる加工設備を「（　）ミル」という。', a:'ウェット', n:'2016年に導入されたウェットミル等の技術です。'},
     {id:73, t:'fill', s:'h', q:'グアテマラの「バレー オブ ボルケーノ農園」は、（　）農家の現実的な課題の解決策を研究している。', a:'しょうきぼ', n:'2024年に開設。コスタリカの「ハイランズ オブ アルサシア農園」はドローン等の先端技術を研究しています。'}
   ];
 
@@ -1318,9 +1356,7 @@
     var script = qMeta.ks === 'k' ? 'カタカナ' : 'ひらがな';
     return qMeta.kt === 'fill' ? '（　）に当てはまる言葉を' + script + 'で答えよ' : '単語を' + script + 'で答えよ';
   }
-  function answerLimitMs(qMeta) {
-    return isKanaQ(qMeta) ? Math.min(3000 + 1300 * qMeta.correctText.length, 15000) : ANSWER_LIMIT_MS;
-  }
+  function answerLimitMs(qMeta) { return ANSWER_LIMIT_MS; } // 4択は5秒、文字パネルは1文字ごとに5秒
 
   // 選択肢はそのまま全て使い、テキストベースで正解を保存することでインデックスズレのバグを回避する
   // withKana: 文字パネル問題を約3割まぜる
@@ -1366,6 +1402,29 @@
     });
   }
 
+  // オーナーがルームを解散：部屋を削除すると、他の参加者には「ルームが解散されました」と表示される
+  function disbandBattleRoom() {
+    var room = bRoom;
+    goHome();
+    if(db && room) db.ref('rooms/' + room).remove();
+  }
+  // オーナーは解散、それ以外は退出
+  function leaveOrDisband(needConfirm) {
+    if (isBattleOwner()) {
+      if (confirm('ルームを解散しますか？\n参加者全員がホーム画面に戻ります')) disbandBattleRoom();
+    } else if (!needConfirm || confirm('本当に部屋から退出しますか？\n（退出するとこの対戦には戻れません）')) {
+      leaveBattleRoom();
+    }
+  }
+  function showBattleNotice(msg) {
+    var el = document.createElement('div');
+    el.className = 'battle-notice';
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(function(){ el.style.opacity = '0'; }, 3500);
+    setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 4200);
+  }
+
   // 部屋から抜ける：自分を参加者から外す（最後の1人なら部屋ごと削除）
   function leaveBattleRoom() {
     var room = bRoom, me = bMe;
@@ -1394,7 +1453,7 @@
     html += '<p style="font-size:13px; font-weight:bold; color:var(--ink); margin:0 0 10px;">👑 新しくルームを作る</p>';
     html += '<div style="display:flex; gap:10px; margin-bottom:12px;">';
     html += '<label style="font-size:11px; flex:1; color:var(--ink-soft); font-weight:bold;">問題数 (3〜30)<br><input type="number" id="inputMaxQuestions" min="3" max="30" value="10" class="browse-search" style="margin-top:6px; padding:10px; text-align:center;"></label>';
-    html += '<label style="font-size:11px; flex:1; color:var(--ink-soft); font-weight:bold;">参加人数 (2〜8)<br><input type="number" id="inputMaxPlayers" min="2" max="8" value="2" class="browse-search" style="margin-top:6px; padding:10px; text-align:center;"></label>';
+    html += '<label style="font-size:11px; flex:1; color:var(--ink-soft); font-weight:bold;">参加人数 (2〜30)<br><input type="number" id="inputMaxPlayers" min="2" max="30" value="2" class="browse-search" style="margin-top:6px; padding:10px; text-align:center;"></label>';
     html += '</div>';
     html += '<label style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:bold; color:var(--ink); margin-bottom:12px; cursor:pointer;"><input type="checkbox" id="inputKana" checked style="width:18px; height:18px;">✏️ 文字パネル問題（ひらがな・カタカナで答える）もまぜる</label>';
     html += '<button class="btn" id="btnCreateRoom" type="button" style="background:#A8492E; width:100%; margin-bottom:16px;">ルームを作る</button>';
@@ -1439,7 +1498,7 @@
       var maxQ = parseInt(document.getElementById('inputMaxQuestions').value, 10) || 10;
       var maxP = parseInt(document.getElementById('inputMaxPlayers').value, 10) || 2;
       if(maxQ < 3 || maxQ > 30) return alert('問題数は3〜30問にしてください');
-      if(maxP < 2 || maxP > 8) return alert('参加人数は2〜8人にしてください');
+      if(maxP < 2 || maxP > BATTLE_MAX_PLAYERS) return alert('参加人数は2〜' + BATTLE_MAX_PLAYERS + '人にしてください');
       if(!initFirebase()) return;
 
       var roomId = Math.floor(1000 + Math.random() * 9000).toString();
@@ -1451,6 +1510,7 @@
       var players = {}; players[bMe] = { name: name, score: 0, ready: false, lastCorrectQ: -99 };
 
       var newRoom = {
+        owner: bMe,
         status: 'waiting', settings: { maxQuestions: maxQ, maxPlayers: maxP, kana: kanaOn },
         players: players, questions: battleQs, currentQ: 0,
         state: 'intro'
@@ -1509,7 +1569,7 @@
     screen = 'battleRoom';
     db.ref('rooms/' + bRoom).on('value', function(snap){
       var newState = snap.val();
-      if(!newState) return goHome();
+      if(!newState) { goHome(); showBattleNotice('🚪 ルームが解散されました'); return; }
 
       var prev = bState;
       var prevStateStr = prev ? prev.state : '';
@@ -1520,7 +1580,7 @@
       if (prevStatus !== bState.status) window.scrollTo(0, 0); // 部屋番号などがすぐ見えるように
 
       var pKeys = Object.keys(bState.players || {});
-      var isHost = pKeys.length > 0 && pKeys[0] === bMe;
+      var isHost = isBattleOwner();
       var q = bState.currentQ;
 
       // 「続けて遊ぶ」で待合室に戻ったら、前の試合の手元の状態をリセット
@@ -1618,7 +1678,7 @@
 
   function startBattleGame() {
     var pKeys = Object.keys(bState.players || {});
-    var updates = { status: 'playing', 'settings/answerCap': pKeys.length >= 3 ? 2 : 1 };
+    var updates = { status: 'playing', 'settings/answerCap': answerCapFor(pKeys.length) };
     pKeys.forEach(function(k){ updates['players/' + k + '/ready'] = false; });
     db.ref('rooms/' + bRoom).update(updates);
   }
@@ -1641,14 +1701,20 @@
     }, function(error, committed, snapshot) {
       if (!committed || !bState || bState.currentQ !== q) return;
       if (toArr(snapshot.val()).indexOf(bMe) < 0) return;
-      myBuzzQ = q; myBuzzTs = Date.now();
+      myBuzzQ = q;
       if (bState.state === 'reading') db.ref('rooms/' + bRoom).update({ state: 'answering' });
-      if (answerTimer) clearTimeout(answerTimer);
-      answerTimer = setTimeout(function() {
-        if (bState && bState.currentQ === q && bState.state !== 'answered' && myAnsweredQ !== q) submitBattleAnswer(-1);
-      }, answerLimitMs(bState.questions[q]));
+      startAnswerTimer(q);
       render();
     });
+  }
+
+  // 解答の制限時間をスタート（文字パネルは1文字選ぶたびにリセット）
+  function startAnswerTimer(q) {
+    myBuzzTs = Date.now();
+    if (answerTimer) clearTimeout(answerTimer);
+    answerTimer = setTimeout(function() {
+      if (bState && bState.currentQ === q && bState.state !== 'answered' && myAnsweredQ !== q) submitBattleAnswerText('');
+    }, answerLimitMs(bState.questions[q]));
   }
 
   function submitBattleAnswer(idx) {
@@ -1666,6 +1732,7 @@
     kanaTyped += ch;
     if (ch !== expected || kanaTyped.length >= qMeta.correctText.length) { submitBattleAnswerText(kanaTyped); return; }
     initAudio(); playTone(1046.5, 'sine', 0.08, 0.06);
+    startAnswerTimer(q); // 次の1文字にまた5秒
     render();
   }
 
@@ -1683,8 +1750,8 @@
     var qMeta = bState.questions[q];
     var correct = (ansText !== '' && ansText === qMeta.correctText); // テキスト一致で正解判定
 
-    // 得点：1番手15点・2番手10点（2人対戦は10点）、前の問題も正解なら2倍、お手つきは-10点
-    var base = (battleCap() >= 2 && order === 0) ? 15 : 10;
+    // 得点：1番手20点・2番手15点・3番手以降10点、前の問題も正解なら2倍、お手つきは-10点
+    var base = basePointsFor(order);
     var me = bState.players[bMe] || {};
     var combo = correct && me.lastCorrectQ === q - 1;
     var pts = correct ? base * (combo ? 2 : 1) : -10;
@@ -1741,7 +1808,7 @@
       if (left > 0 && left <= 3 && wrap) playTone(1318.5, 'sine', 0.06, 0.04); // 残り3秒から小さくチッ
     }
     if (!wrap) return;
-    var label = realBuzzers().length ? '2番手の締め切りまで' : '早押し締め切りまで';
+    var label = realBuzzers().length ? (realBuzzers().length + 1) + '番手の締め切りまで' : '早押し締め切りまで';
     wrap.innerHTML = left > 0
       ? '<div class="read-cd' + (left <= 2 ? ' hurry' : '') + '"><span class="lbl">⏱ ' + label + '</span><span class="num">' + left + '</span><span class="lbl">秒</span></div>'
       : '<div class="read-cd hurry"><span class="lbl">⏰ 締め切り！</span></div>';
@@ -1753,7 +1820,7 @@
     var qMeta = bState.questions[bState.currentQ];
     var fullText = qMeta.q;
 
-    // 3人以上で2番手の枠が空いている間は、1番手が押しても問題文を流し続ける
+    // 解答枠が空いている間は、誰かが押しても問題文を流し続ける
     var keepTyping = bState.state === 'reading' || (bState.state === 'answering' && battleBuzzers().length < battleCap());
     if(keepTyping) {
       if (displayedQIndex !== bState.currentQ) {
@@ -1793,6 +1860,42 @@
     return h + '</div>';
   }
 
+  // 順位（同点は同じ順位）
+  function battleRanking() {
+    var list = Object.keys(bState.players || {}).map(function(k){ return { k: k, p: bState.players[k] }; });
+    list.sort(function(a, b){ return (b.p.score || 0) - (a.p.score || 0); });
+    list.forEach(function(r, i){
+      r.rank = (i > 0 && (r.p.score || 0) === (list[i - 1].p.score || 0)) ? list[i - 1].rank : i + 1;
+    });
+    return list;
+  }
+  function rankBadge(rank) { return ['🥇','🥈','🥉'][rank - 1] || rank + '位'; }
+
+  // 結果をLINEなどにシェア（共有メニューが使えない端末はコピー）
+  function shareBattleResult() {
+    var ranking = battleRanking();
+    var lines = ['🥊 BAバトル 結果発表（全' + bState.settings.maxQuestions + '問・' + ranking.length + '人）', ''];
+    ranking.forEach(function(r){
+      lines.push((r.rank <= 3 ? rankBadge(r.rank) + ' ' : '') + r.rank + '位 ' + r.p.name + '　' + (r.p.score || 0) + 'pt');
+    });
+    var titles = document.querySelectorAll('.title-card');
+    if (titles.length) {
+      lines.push('', '🏅 称号');
+      titles.forEach(function(t){
+        lines.push(t.querySelector('.t-icon').textContent + t.querySelector('.t-name').textContent + '：' + t.querySelector('.t-who').textContent);
+      });
+    }
+    lines.push('', '#BAドリル #BAバトル');
+    var text = lines.join('\n');
+    if (navigator.share) {
+      navigator.share({ text: text }).catch(function(){});
+    } else if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function(){ alert('結果をコピーしました！LINEなどに貼り付けてシェアできます✨'); }).catch(function(){ prompt('この結果をコピーしてください', text); });
+    } else {
+      prompt('この結果をコピーしてください', text);
+    }
+  }
+
   // 最終結果の称号
   function battleTitlesHtml(pKeys) {
     var P = pKeys.map(function(k){
@@ -1830,7 +1933,7 @@
     real.forEach(function(pid, i){
       var p = bState.players[pid] || { name: '?' };
       var a = ans[pid];
-      var label = cap >= 2 ? (i === 0 ? '🥇1番手 ' : '🥈2番手 ') : '';
+      var label = cap >= 2 ? orderLabel(i) + ' ' : '';
       var verdict, pts, cls;
       if(!a) { verdict = '— 未解答'; pts = '±0'; cls = ''; }
       else if(a.correct) { verdict = '⭕ 正解'; pts = '+' + a.pts; cls = 'ok'; }
@@ -1850,7 +1953,7 @@
     if(!bState) return '<div class="center-col">読み込み中...</div>';
     var html = '';
     var pKeys = Object.keys(bState.players || {});
-    var isHost = pKeys.length > 0 && pKeys[0] === bMe;
+    var isHost = isBattleOwner();
 
     if(bState.status === 'waiting') {
       html += '<div class="center-col" style="padding:40px 0;">';
@@ -1862,7 +1965,7 @@
       html += '<div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:24px;">';
       pKeys.forEach(function(k){
         var rd = bState.players[k].ready;
-        html += '<span style="background:'+(rd?'rgba(28,59,50,0.1)':'var(--card)')+'; border:1px solid '+(rd?'var(--forest)':'var(--line)')+'; padding:6px 16px; border-radius:20px; font-size:14px; font-weight:bold;">' + (rd ? '✅ ' : '⏳ ') + esc(bState.players[k].name) + (k === bMe ? '（あなた）' : '') + '</span>';
+        html += '<span style="background:'+(rd?'rgba(28,59,50,0.1)':'var(--card)')+'; border:1px solid '+(rd?'var(--forest)':'var(--line)')+'; padding:6px 14px; border-radius:20px; font-size:14px; font-weight:bold;">' + (rd ? '✅ ' : '⏳ ') + ownerMark(k) + esc(bState.players[k].name) + (k === bMe ? '（あなた）' : '') + '</span>';
       });
       html += '</div>';
 
@@ -1874,48 +1977,50 @@
         html += '<p class="desc" style="font-weight:bold; color:var(--forest);">✅ 準備OK！' + (full ? '他の人の準備を待っています...' : 'メンバーが集まるのを待っています...') + '</p>';
       }
       html += '<p class="desc" style="font-size:12px;">' + (full ? '全員そろいました！全員が「準備OK」を押すとスタートします' : '定員がそろって全員が「準備OK」を押すとスタートします') + '</p>';
-      if(isHost && pKeys.length >= 2 && !full) {
-        html += '<button class="btn secondary" id="btnStartManual" type="button" style="margin:8px 0 12px; width:100%; max-width:300px; font-size:13px;">今の' + pKeys.length + '人で始める（ホスト用）</button>';
+      if(isHost) {
+        html += '<div class="owner-panel"><div class="owner-title">👑 オーナー（あなた）の操作</div>';
+        if(pKeys.length >= 2) {
+          html += '<button class="btn secondary" id="btnStartManual" type="button" style="width:100%; font-size:13px; margin:0 0 8px;">今の' + pKeys.length + '人ですぐに始める</button>';
+        } else {
+          html += '<p class="desc" style="font-size:12px; margin:0 0 8px;">2人以上集まると、定員前でもすぐに始められます</p>';
+        }
+        html += '<button class="text-link-btn" id="btnBattleCancel" type="button" style="color:#E03B3B;">ルームを解散する</button></div>';
+      } else {
+        html += '<p class="desc" style="font-size:12px;">👑 オーナー：' + esc((bState.players[battleOwnerId()] || {}).name || '') + '</p>';
       }
 
       html += '<div class="loader" style="font-size:40px; margin:10px 0; animation:spin 1s linear infinite;">⏳</div>';
       html += battleRulesHtml(false);
-      html += '<button class="text-link-btn" id="btnBattleCancel" type="button" style="margin-top:20px;">やめる</button>';
+      if(!isHost) html += '<button class="text-link-btn" id="btnBattleCancel" type="button" style="margin-top:20px;">やめる</button>';
       html += '</div>';
       return html;
     }
 
     if(bState.status === 'finished') {
-      var maxScore = -Infinity;
-      var winners = [];
-      pKeys.forEach(function(k){
-        var s = bState.players[k].score || 0;
-        if(s > maxScore) { maxScore = s; winners = [bState.players[k].name]; }
-        else if(s === maxScore) { winners.push(bState.players[k].name); }
-      });
-      var isWin = bState.players[bMe] && (bState.players[bMe].score || 0) === maxScore;
+      var ranking = battleRanking();
+      var myRank = (ranking.filter(function(r){ return r.k === bMe; })[0] || {}).rank;
 
-      html += '<div class="center-col" style="padding:40px 0;">';
-      html += '<div class="big-title" style="color:'+(isWin?'var(--forest-deep)':'var(--clay)')+'; font-size:36px;">' + (isWin ? 'WINNER 🎉' : 'LOSE 💦') + '</div>';
-      html += '<p class="desc" style="font-weight:bold; margin-bottom:24px;">勝者: ' + esc(winners.join(' & ')) + ' (' + maxScore + 'pt)</p>';
+      html += '<div class="center-col" style="padding:30px 0;">';
+      if(myRank === 1) html += '<div class="big-title" style="color:var(--forest-deep); font-size:36px;">WINNER 🎉</div>';
+      else html += '<div class="big-title" style="color:var(--clay); font-size:32px;">' + (myRank || '-') + '位 <span style="font-size:16px;">/ ' + ranking.length + '人中</span></div>';
+      html += '<p class="desc" style="font-weight:bold; margin-bottom:16px;">🏆 最終順位</p>';
 
-      html += '<div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; width:100%; margin-bottom:24px;">';
-      pKeys.slice().sort(function(a,b){ return (bState.players[b].score||0) - (bState.players[a].score||0); }).forEach(function(k){
-        var isMe = k === bMe;
-        html += '<div style="flex:1 1 40%; min-width:100px; background:'+(isMe?'rgba(28,59,50,0.1)':'var(--card)')+'; border:1px solid '+(isMe?'var(--forest)':'var(--line)')+'; border-radius:12px; padding:12px; text-align:center;">';
-        html += '<div style="font-size:12px; color:var(--ink-soft); font-weight:'+(isMe?'bold':'normal')+'; margin-bottom:4px;">' + esc(bState.players[k].name) + '</div>';
-        html += '<div style="font-size:24px; font-weight:bold; color:var(--forest-deep);">' + (bState.players[k].score || 0) + '</div>';
-        var st = bState.players[k].st || { correct: 0, wrong: 0, max: 0 };
-        html += '<div style="font-size:10px; color:var(--ink-soft); margin-top:2px;">⭕' + st.correct + ' ❌' + st.wrong + ' 🔥最大' + st.max + '連続</div>';
-        html += '</div>';
+      html += '<div class="rank-list">';
+      ranking.forEach(function(r){
+        var isMe = r.k === bMe, st = r.p.st || { correct: 0, wrong: 0, max: 0 };
+        html += '<div class="rank-row' + (isMe ? ' me' : '') + (r.rank <= 3 ? ' top' + r.rank : '') + '">';
+        html += '<span class="rank-no">' + rankBadge(r.rank) + '</span>';
+        html += '<span class="rank-name">' + ownerMark(r.k) + esc(r.p.name) + (isMe ? '（あなた）' : '') + '<small>⭕' + st.correct + ' ❌' + st.wrong + ' 🔥最大' + st.max + '連続</small></span>';
+        html += '<span class="rank-pt">' + (r.p.score || 0) + '<small>pt</small></span></div>';
       });
       html += '</div>';
 
       html += battleTitlesHtml(pKeys);
 
+      html += '<button class="btn secondary" id="btnShareResult" type="button" style="width:100%; max-width:300px; margin-bottom:10px;">📤 順位とポイントをシェア</button>';
       html += '<button class="btn" id="btnRematch" type="button" style="background:#A8492E; width:100%; max-width:300px; margin-bottom:10px;">🔁 このメンバーで続けて遊ぶ</button>';
       html += '<p class="desc" style="font-size:11px; margin:0 0 14px;">部屋はそのまま、新しい問題でもう一戦！</p>';
-      html += '<button class="btn secondary" id="btnBattleCancel" type="button">部屋を出てホームに戻る</button>';
+      html += '<button class="btn secondary" id="btnBattleCancel" type="button">' + (isHost ? '👑 ルームを解散してホームに戻る' : '部屋を出てホームに戻る') + '</button>';
       html += '</div>';
       return html;
     }
@@ -1929,14 +2034,14 @@
     var slotsOpen = battleBuzzers().length < cap;
 
     // 退出ボタンは早押しボタンから離れた右上に置く（誤タップ防止）
-    html += '<div class="battle-topbar"><button class="battle-quit-btn" id="btnBattleQuit" type="button">🚪 退出</button></div>';
-    html += '<div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px;">';
+    html += '<div class="battle-topbar"><button class="battle-quit-btn" id="btnBattleQuit" type="button">' + (isHost ? '👑 ルームを解散' : '🚪 退出') + '</button></div>';
+    html += '<div class="score-board' + (pKeys.length > 8 ? ' compact' : '') + '">';
     pKeys.forEach(function(k){
       var isMe = k === bMe;
       var p = bState.players[k];
-      html += '<div style="flex:1; min-width:70px; background:'+(isMe?'rgba(28,59,50,0.1)':'var(--card)')+'; border:1px solid '+(isMe?'var(--forest)':'var(--line)')+'; border-radius:8px; padding:6px; text-align:center;">';
-      html += '<div style="font-size:10px; color:var(--ink-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:'+(isMe?'bold':'normal')+';">' + esc(p.name) + '</div>';
-      html += '<div style="font-size:16px; font-weight:bold; color:var(--forest-deep);">' + (p.score || 0) + '</div>';
+      html += '<div style="background:'+(isMe?'rgba(28,59,50,0.1)':'var(--card)')+'; border:1px solid '+(isMe?'var(--forest)':'var(--line)')+'; border-radius:8px; padding:6px; text-align:center;">';
+      html += '<div style="font-size:10px; color:var(--ink-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:'+(isMe?'bold':'normal')+';">' + ownerMark(k) + esc(p.name) + '</div>';
+      html += '<div class="sb-score" style="font-size:16px; font-weight:bold; color:var(--forest-deep);">' + (p.score || 0) + '</div>';
       if(isStreaking(p)) html += '<div style="font-size:9px; color:#A8492E; font-weight:bold;">🔥次の正解×2</div>';
       html += '</div>';
     });
@@ -1945,15 +2050,15 @@
     var qMeta = bState.questions[q];
 
     html += '<div class="qnum" style="text-align:center;font-weight:bold; font-size:14px; margin-bottom:8px;">第 ' + (q + 1) + ' 問 / 全' + bState.settings.maxQuestions + '問</div>';
-    if(cap >= 2) html += '<div class="battle-mode-note">👥 3人以上ルール：2人まで解答OK（1番手15点・2番手10点）</div>';
+    html += '<div class="battle-mode-note">👥 ' + (cap >= 2 ? cap + '人まで解答OK ・ ' : '') + '1番手20点' + (cap >= 2 ? '・2番手15点' : '') + (cap >= 3 ? '・3番手以降10点' : '') + '</div>';
 
     var msg = '準備してね！';
     if (bState.state === 'reading') { msg = '早押しスタンバイ！'; }
     if (bState.state === 'answering' || (bState.state === 'reading' && real.length)) {
-      if (iBuzzed && !iAnswered) msg = 'あなたの解答！' + (cap >= 2 ? '（' + (Math.max(real.indexOf(bMe), 0) + 1) + '番手）' : '');
+      if (iBuzzed && !iAnswered) msg = 'あなたの解答！' + (cap >= 2 ? '（' + (real.indexOf(bMe) >= 0 ? real.indexOf(bMe) + 1 : real.length + 1) + '番手）' : '');
       else if (iAnswered) msg = '解答しました！結果を待っています';
-      else if (slotsOpen) msg = 'まだ2番手で押せる！';
-      else msg = real.map(function(p){ return esc((bState.players[p] || {}).name || ''); }).join('・') + ' が解答中...';
+      else if (slotsOpen) msg = 'まだ' + (real.length + 1) + '番手で押せる！';
+      else msg = real.length > 3 ? real.length + '人が解答中...' : real.map(function(p){ return esc((bState.players[p] || {}).name || ''); }).join('・') + ' が解答中...';
     }
     if (bState.state === 'answered') { msg = '正解発表！'; }
 
@@ -2032,7 +2137,7 @@
     }
     else if ((bState.state === 'reading' || bState.state === 'answering') && !iBuzzed && slotsOpen) {
       html += '<div class="buzzer-area">';
-      html += '<button class="buzzer-btn" id="btnBuzz" type="button"' + (buzzPendingQ === q ? ' disabled' : '') + '>' + (real.length ? '2番手で<br>押す！' : '押す！') + '</button>';
+      html += '<button class="buzzer-btn" id="btnBuzz" type="button"' + (buzzPendingQ === q ? ' disabled' : '') + '>' + (real.length ? (real.length + 1) + '番手で<br>押す！' : '押す！') + '</button>';
       html += '</div>';
     }
     else if (bState.state !== 'intro') {
@@ -2040,7 +2145,8 @@
     }
 
     if (isHost && bState.state !== 'intro') {
-      html += '<div style="text-align:center; margin-top:16px;"><button class="btn secondary" id="btnForceNext" style="padding:6px 12px; font-size:12px;">強制的に次へ (進行が止まった場合)</button></div>';
+      var fLabel = bState.state === 'answered' ? '👑 全員を待たずに次の問題へ' : '👑 この問題を飛ばして次へ';
+      html += '<div style="text-align:center; margin-top:16px;"><button class="btn secondary" id="btnForceNext" style="padding:6px 12px; font-size:12px;">' + fLabel + '</button></div>';
     }
 
     return html;
@@ -2048,20 +2154,21 @@
 
   function bindBattleRoom() {
     var cBtn = document.getElementById('btnBattleCancel');
-    if(cBtn) cBtn.onclick = leaveBattleRoom;
+    if(cBtn) cBtn.onclick = function(){ leaveOrDisband(false); };
+
+    var shBtn = document.getElementById('btnShareResult');
+    if(shBtn) shBtn.onclick = shareBattleResult;
 
     var rmBtn = document.getElementById('btnRematch');
     if(rmBtn) rmBtn.onclick = rematchBattle;
 
     var qBtn = document.getElementById('btnBattleQuit');
-    if(qBtn) qBtn.onclick = function(){
-      if(confirm('本当に部屋から退出しますか？\n（退出するとこの対戦には戻れません）')) leaveBattleRoom();
-    };
+    if(qBtn) qBtn.onclick = function(){ leaveOrDisband(true); };
 
     var sBtn = document.getElementById('btnStartManual');
     if(sBtn) sBtn.onclick = function() {
       initAudio();
-      if(confirm('今いるメンバーでゲームを始めますか？')) startBattleGame();
+      if(confirm('今いる' + Object.keys(bState.players || {}).length + '人でゲームを始めますか？\n（準備OKを押していない人がいても始まります）')) startBattleGame();
     };
 
     var rsBtn = document.getElementById('btnReadyStart');
