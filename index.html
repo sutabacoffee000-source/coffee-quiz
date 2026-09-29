@@ -204,14 +204,27 @@
   .pq-box { display:inline-block; width:14px; }
   .pq-ans { width:100%; border-collapse:collapse; font-size:12px; } .pq-ans td { border-bottom:1px solid #DDD; padding:4px 6px; vertical-align:top; } .pq-ans td.no { width:48px; font-weight:bold; white-space:nowrap; }
   .page-break { height:24px; }
-  #printRoot { display:none; }
+  #printRoot { display:none; color:#111; font-size:7pt; line-height:1.28; font-family:var(--font-body); }
+  #printRoot .cp-head { font-size:7.6pt; border-bottom:0.6pt solid #111; padding-bottom:1.2mm; margin-bottom:2.4mm; }
+  #printRoot .cp-cols { column-count:2; column-gap:5mm; column-rule:0.4pt solid #BBB; }
+  #printRoot .cp-q { break-inside:avoid; page-break-inside:avoid; margin:0 0 1mm; padding-bottom:0.9mm; border-bottom:0.4pt dotted #999; overflow:hidden; }
+  #printRoot .cp-sec { font-weight:bold; margin:1.5mm 0 1.8mm; padding:0.8mm 1.5mm; background:#EEE; break-after:avoid; }
+  #printRoot .cp-o { margin-top:0.5mm; padding-left:2.5mm; }
+  #printRoot .cp-o span { margin-right:4.2mm; display:inline; }
+  #printRoot .cp-o b { font-weight:800; }
+  #printRoot .cp-media { float:right; margin:0 0 0.5mm 2mm; }
+  #printRoot .cp-img { width:13mm; height:auto; }
+  #printRoot .cp-map svg { width:40mm; height:auto; display:block; }
+  #printRoot .cp-pic svg { width:22mm; height:auto; display:block; }
+  #printRoot .cp-map .map-wrapper, #printRoot .cp-pic svg { box-shadow:none; }
+  #printRoot .cp-ans { margin-top:3mm; border-top:0.6pt dashed #111; padding-top:1.6mm; break-inside:avoid; }
+  #printRoot .cp-ans-title { font-weight:bold; margin-bottom:1.2mm; }
+  #printRoot .cp-ans-grid { display:grid; grid-template-columns:repeat(10, 1fr); gap:1mm 2mm; font-size:7.6pt; }
   @media print {
-    @page { margin:12mm; }
+    @page { size:A4; margin:8mm 9mm; }
     body { background:#FFF !important; padding:0 !important; }
     body > *:not(#printRoot) { display:none !important; }
-    #printRoot { display:block !important; color:#111; font-size:12px; line-height:1.6; }
-    #printRoot h1 { font-size:16px; margin:0 0 6px; } #printRoot h2 { font-size:15px; margin:0 0 10px; }
-    #printRoot .page-break { page-break-before:always; break-before:page; height:0; }
+    #printRoot { display:block !important; }
   }
   .map-wrapper {position: relative; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 14px rgba(28,59,50,0.15); background: #A0C4C9; margin: 0 auto;}
 
@@ -2781,7 +2794,7 @@
     var p = getPastExam(printExamKey); if(!p) return '';
     var html = '<div class="print-toolbar"><button class="text-link-btn" id="btnPrintBack" type="button">← 戻る</button>';
     html += '<button class="btn" id="btnPrintNow" type="button" style="width:100%;">🖨 印刷する／PDFで保存する</button>';
-    html += '<p class="desc" style="font-size:12px; margin:6px 0 14px;">印刷画面で「PDFとして保存」（iPhoneは共有 → プリント → 2本指で拡大 → 共有）を選ぶとPDFにできます。問題のあとに、最後のページへ解答をまとめています。</p></div>';
+    html += '<p class="desc" style="font-size:12px; margin:6px 0 14px;">印刷画面で「PDFとして保存」（iPhoneは共有 → プリント → 2本指で拡大 → 共有）を選ぶとPDFにできます。印刷すると2段組みのコンパクトな形（A4 約2枚）になり、最後に解答の一覧表が付きます。下は画面用の見やすいプレビューです。</p></div>';
     html += '<div id="printArea" class="print-area">';
     html += '<h1>' + esc(p.label) + '（' + esc(p.sub) + '）</h1>';
     html += '<p class="print-meta">全' + p.questions.length + '問・制限時間30分・100点満点・合格ライン' + p.pass + '点　／　問41〜50は正しいものを全て選ぶ形式（部分点なし）<br>※問題番号に【採点対象外】とある問題は、昨年のプロモーションコーヒーの問題のため今年の範囲外です（0点扱い）。</p>';
@@ -2801,13 +2814,36 @@
     html += '</tbody></table></div>';
     return html;
   }
+  // 印刷用：2段組み・小さめの文字でA4 2枚程度にまとめる（解答は最後に一覧表）
+  function buildCompactPrintHtml(p){
+    var h = '<div class="cp-head"><b>' + esc(p.label) + '（' + esc(p.sub) + '）</b>　全' + p.questions.length + '問・30分・100点満点・合格ライン' + p.pass + '点／問41〜50は正しいものを全て選ぶ（完答）／<b>【対象外】</b>＝昨年のプロモーション問題（今年は範囲外・0点扱い）</div>';
+    h += '<div class="cp-cols">';
+    p.questions.forEach(function(q){
+      if(q.no === 41) h += '<div class="cp-sec">▼ 問41〜50：複数選択（あてはまるものを全て）</div>';
+      h += '<div class="cp-q"><b>問' + q.no + '</b> ' + (q.void ? '<b>【対象外】</b>' : '') + esc(q.q.replace(/\n/g, ' '));
+      if(q.img) h += '<div class="cp-media"><img src="' + esc(q.img) + '" class="cp-img"></div>';
+      if(q.map) h += '<div class="cp-media cp-map">' + q.map + '</div>';
+      if(q.pic) h += '<div class="cp-media cp-pic">' + q.pic + '</div>';
+      h += '<div class="cp-o">';
+      q.o.forEach(function(opt, i){ h += '<span>' + (q.multi ? '□' : '○') + '<b>' + OPT_LABELS[i] + '.</b> ' + esc(opt) + '</span>'; });
+      h += '</div></div>';
+    });
+    h += '</div>';
+    h += '<div class="cp-ans"><div class="cp-ans-title">✂ 解答（※＝採点対象外）</div><div class="cp-ans-grid">';
+    p.questions.forEach(function(q){
+      var a = (q.a === null || q.a === undefined) ? '—' : (Array.isArray(q.a) ? q.a : [q.a]).map(function(i){ return OPT_LABELS[i]; }).join('');
+      h += '<span><b>' + q.no + '</b> ' + a + (q.void ? '※' : '') + '</span>';
+    });
+    h += '</div></div>';
+    return h;
+  }
   function bindPastPrint(){
     document.getElementById('btnPrintBack').onclick = function(){ screen = 'examIntro'; render(); };
     document.getElementById('btnPrintNow').onclick = function(){
       // 印刷する部分だけをページ直下に置いて、それ以外を隠して印刷する
       var old = document.getElementById('printRoot'); if(old) old.parentNode.removeChild(old);
       var root = document.createElement('div'); root.id = 'printRoot';
-      root.innerHTML = document.getElementById('printArea').innerHTML;
+      root.innerHTML = buildCompactPrintHtml(getPastExam(printExamKey));
       document.body.appendChild(root);
       var cleanup = function(){ var r = document.getElementById('printRoot'); if(r) r.parentNode.removeChild(r); window.removeEventListener('afterprint', cleanup); };
       window.addEventListener('afterprint', cleanup);
