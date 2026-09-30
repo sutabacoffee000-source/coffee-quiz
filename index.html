@@ -307,6 +307,7 @@
   #printRoot .cp-map .map-wrapper, #printRoot .cp-pic svg { box-shadow:none; }
   #printRoot .cp-ans { margin-top:3mm; border-top:0.6pt dashed #111; padding-top:1.6mm; break-inside:avoid; }
   #printRoot .cp-ans-title { font-weight:bold; margin-bottom:1.2mm; }
+  #printRoot .cp-year { font-size:11pt; font-weight:bold; border:0.8pt solid #111; display:inline-block; padding:0.6mm 3mm; margin-bottom:1.5mm; }
   #printRoot .cp-ans-grid { display:grid; grid-template-columns:repeat(10, 1fr); gap:1mm 2mm; font-size:7.6pt; }
   @media print {
     @page { size:A4; margin:8mm 9mm; }
@@ -2922,11 +2923,11 @@
     var tt = tfTotals(); var weakN = tfWeakIds().length;
     var html = '<div class="center-col"><div class="big-title">⭕❌ ○×チャレンジ</div>';
     html += '<p class="desc">文章が「正しい（○）」か「誤り（×）」かを答える練習です。本番の複数選択（問41〜50）の引っかけ対策に。</p>';
-    html += '<div class="tf-meter"><div><b>' + tt.rate + '%</b><span>ひっかかり対策率</span></div><div><b>' + (tt.lv.blue + tt.lv.green) + '</b><span>覚えた文 / ' + TF_ITEMS.length + '</span></div><div><b>' + tt.seen + '</b><span>回答した回数</span></div></div>';
-    html += '<div class="tf-scope"><button type="button" data-tfscope="all" class="' + (tfScope==='all'?'on':'') + '">🎯 全分野</button><button type="button" data-tfscope="weak" class="' + (tfScope==='weak'?'on':'') + '"' + (weakN ? '' : ' disabled') + '>⚠️ 間違えた文だけ（' + weakN + '）</button></div>';
-    html += '<button class="tf-mode" id="btnTfSingle" type="button"><b>⭕❌ 1文ずつ答える（' + TF_COUNT + '問）</b><span>○か×をタップ。すぐに答えと解説が出ます</span></button>';
-    html += '<button class="tf-mode alt" id="btnTfMulti" type="button"><b>📝 本番形式（4文 × ' + TF_MULTI_SETS + 'セット）</b><span>4つの文から正しいものを全部選ぶ。全部合って正解</span></button>';
-    html += '<button class="text-link-btn" id="btnTfBrowse" type="button">📋 ○×の文を一覧で見る（' + TF_ITEMS.length + '文）</button>';
+    html += '<div class="tf-meter"><div><b>' + tt.rate + '%</b><span>ひっかかり対策率</span></div><div><b>' + (tt.lv.blue + tt.lv.green) + '</b><span>覚えた問題 / ' + TF_ITEMS.length + '</span></div><div><b>' + tt.seen + '</b><span>回答した回数</span></div></div>';
+    html += '<div class="tf-scope"><button type="button" data-tfscope="all" class="' + (tfScope==='all'?'on':'') + '">🎯 全分野</button><button type="button" data-tfscope="weak" class="' + (tfScope==='weak'?'on':'') + '"' + (weakN ? '' : ' disabled') + '>⚠️ 間違えた問題だけ（' + weakN + '）</button></div>';
+    html += '<button class="tf-mode" id="btnTfSingle" type="button"><b>⭕❌ 1問ずつ答える（' + TF_COUNT + '問）</b><span>○か×をタップ。すぐに答えと解説が出ます</span></button>';
+    html += '<button class="tf-mode alt" id="btnTfMulti" type="button"><b>📝 本番形式（4問 × ' + TF_MULTI_SETS + 'セット）</b><span>4問のうち正しいものを全部選ぶ。全部合って正解</span></button>';
+    html += '<button class="text-link-btn" id="btnTfBrowse" type="button">📋 ○×問題を一覧で見る（' + TF_ITEMS.length + '問）</button>';
     html += '<button class="text-link-btn" id="btnTfHomeBack" type="button">ホーム画面に戻る</button></div>';
     return html;
   }
@@ -2963,10 +2964,10 @@
       set.forEach(function(id, i){
         var t = getTf(id); var on = r.picked.indexOf(i) !== -1; var cls = 'choice-btn tf-multi' + (on ? ' picked' : ''); var mark = on ? '☑' : '☐';
         if(a){ var ok = (on === t.a); cls += ok ? ' correct' : ' wrong'; mark = t.a ? '⭕' : '❌'; }
-        html += '<button class="' + cls + '" data-mi="' + i + '" type="button"' + (a ? ' disabled' : '') + '><span class="mark">' + mark + '</span><span>' + esc(t.s) + (a ? '<small class="tf-mini-note">' + (on === t.a ? '' : '← ' + (on ? '誤りの文を選んだ' : '正しい文を選ばなかった') + '　') + esc(t.n) + '</small>' : '') + '</span></button>';
+        html += '<button class="' + cls + '" data-mi="' + i + '" type="button"' + (a ? ' disabled' : '') + '><span class="mark">' + mark + '</span><span>' + esc(t.s) + (a ? '<small class="tf-mini-note">' + (on === t.a ? '' : '← ' + (on ? '誤りなのに選んだ' : '正しいのに選ばなかった') + '　') + esc(t.n) + '</small>' : '') + '</span></button>';
       });
       html += '</div>';
-      if(a){ html += '<div class="tf-result ' + (a.ok ? 'ok' : 'ng') + '">' + (a.ok ? '⭕ 正解（完答）' : '❌ 不正解（' + a.miss + '文ちがい）') + '</div>'; html += '<div class="actions"><button class="btn" id="btnTfNext" type="button">' + (r.idx+1 >= r.sets.length ? '結果を見る' : '次のセットへ') + '</button></div>'; }
+      if(a){ html += '<div class="tf-result ' + (a.ok ? 'ok' : 'ng') + '">' + (a.ok ? '⭕ 正解（完答）' : '❌ 不正解（' + a.miss + '問ちがい）') + '</div>'; html += '<div class="actions"><button class="btn" id="btnTfNext" type="button">' + (r.idx+1 >= r.sets.length ? '結果を見る' : '次のセットへ') + '</button></div>'; }
       else { html += '<div class="actions"><button class="btn" id="btnTfJudge" type="button">これで判定する</button></div>'; }
     }
     return html;
@@ -3001,12 +3002,12 @@
   function renderTfSummary(){
     var r = tfRound, n = r.results.length, ok = r.results.filter(function(x){ return x.ok; }).length, miss = n - ok;
     var html = '<div class="center-col"><div class="big-title">○×チャレンジ 結果</div>';
-    html += '<div class="score-big">' + ok + ' / ' + n + '</div><div class="score-sub">正解した文　／　今回のひっかかり対策率 <b>' + (n ? Math.round(ok/n*100) : 0) + '%</b></div>';
+    html += '<div class="score-big">' + ok + ' / ' + n + '</div><div class="score-sub">正解した問題　／　今回のひっかかり対策率 <b>' + (n ? Math.round(ok/n*100) : 0) + '%</b></div>';
     if(r.kind === 'multi'){ var full = (r.setResults || []).filter(Boolean).length; html += '<p class="desc">本番形式の完答：<b>' + full + ' / ' + r.sets.length + 'セット</b>（本番なら ' + (full*2) + ' / ' + (r.sets.length*2) + '点）</p>'; }
     html += '<p class="desc">全体のひっかかり対策率：<b>' + tfTotals().rate + '%</b></p>';
     var wrong = r.results.filter(function(x){ return !x.ok; });
     if(wrong.length){
-      html += '<div class="tf-miss-list"><div class="tf-miss-head">❌ 間違えた文（' + wrong.length + '）</div>';
+      html += '<div class="tf-miss-list"><div class="tf-miss-head">❌ 間違えた問題（' + wrong.length + '）</div>';
       wrong.forEach(function(x){ var t = getTf(x.id); html += '<div class="tf-miss"><div><b>' + (t.a ? '⭕' : '❌') + '</b> ' + esc(t.s) + '</div><small>💡 ' + esc(t.n) + '</small></div>'; });
       html += '</div>';
     } else { html += '<p class="desc">🎉 全問正解です！</p>'; }
@@ -3021,18 +3022,18 @@
   }
   function renderTfBrowse(){
     var html = '<div><button class="text-link-btn" id="btnTfBrowseBack" type="button">← ○×チャレンジに戻る</button>';
-    html += '<div class="big-title" style="margin-top:10px;text-align:left;">○×の文 一覧（' + TF_ITEMS.length + '文）</div>';
-    html += '<p class="desc" style="text-align:left;max-width:none;">分野をタップすると開きます。各文をタップすると、○か×と解説が表示されます。</p>';
+    html += '<div class="big-title" style="margin-top:10px;text-align:left;">○×問題 一覧（' + TF_ITEMS.length + '問）</div>';
+    html += '<p class="desc" style="text-align:left;max-width:none;">分野をタップすると開きます。各問題をタップすると、○か×と解説が表示されます。</p>';
     Object.keys(CATS).forEach(function(k){
       var list = TF_ITEMS.filter(function(t){ return t.c === k; }); if(!list.length) return;
-      html += '<details class="cat-accordion"><summary>' + esc(CATS[k]) + '（' + list.length + '文）</summary><div class="cat-qlist">';
+      html += '<details class="cat-accordion"><summary>' + esc(CATS[k]) + '（' + list.length + '問）</summary><div class="cat-qlist">';
       list.forEach(function(t, i){ html += '<details class="flashcard"><summary>' + (i+1) + '. ' + esc(t.s) + '</summary><div class="flashcard-answer"><div class="browse-answer">' + (t.a ? '⭕ 正しい' : '❌ 誤り') + '</div><div class="browse-note">💡 ' + esc(t.n) + '</div></div></details>'; });
       html += '</div></details>';
     });
     return html + '</div>';
   }
   function bindTfBrowse(){ document.getElementById('btnTfBrowseBack').onclick = function(){ screen = 'tfHome'; render(); window.scrollTo(0,0); }; }
-  function tfLinkHtml(){ return '<button class="tf-link-btn" id="btnTfEntry" type="button"><b>⭕❌ ○×チャレンジ <span class="new-pill">NEW</span></b><span>正しい？誤り？ 本番の引っかけ対策（' + TF_ITEMS.length + '文）</span></button>'; }
+  function tfLinkHtml(){ return '<button class="tf-link-btn" id="btnTfEntry" type="button"><b>⭕❌ ○×チャレンジ <span class="new-pill">NEW</span></b><span>正しい？誤り？ 本番の引っかけ対策（' + TF_ITEMS.length + '問）</span></button>'; }
   function bindTfLink(){ var b = document.getElementById('btnTfEntry'); if(b) b.onclick = function(){ screen = 'tfHome'; render(); window.scrollTo(0,0); }; }
 
   // 学習記録：4択と○×をタブで切り替え（グラフは別、累計回答数は合算）
@@ -3047,11 +3048,11 @@
     var html = statsTabsHtml() + '<h3>○×問題の進捗</h3><div class="stats-overview">';
     html += '<div class="progress-donut" style="background:' + gradient + ';"><div class="donut-inner"><div class="donut-pct">' + tt.rate + '%</div><div class="donut-lbl">ひっかかり<br>対策率</div></div></div>';
     html += '<div class="pie-legend">';
-    html += '<div class="legend-item"><div class="legend-label"><div class="legend-dot blue"></div>完璧 (3回以上正解)</div><div class="legend-count">' + lv.blue + '文</div></div>';
-    html += '<div class="legend-item"><div class="legend-label"><div class="legend-dot green"></div>覚えた (2回連続正解)</div><div class="legend-count">' + lv.green + '文</div></div>';
-    html += '<div class="legend-item"><div class="legend-label"><div class="legend-dot orange"></div>学習中 (1回以上正解)</div><div class="legend-count">' + lv.orange + '文</div></div>';
-    html += '<div class="legend-item"><div class="legend-label"><div class="legend-dot red"></div>苦手 (まだ正解なし)</div><div class="legend-count">' + lv.red + '文</div></div>';
-    html += '<div class="legend-item"><div class="legend-label"><div class="legend-dot gray"></div>未回答</div><div class="legend-count">' + lv.gray + '文</div></div>';
+    html += '<div class="legend-item"><div class="legend-label"><div class="legend-dot blue"></div>完璧 (3回以上正解)</div><div class="legend-count">' + lv.blue + '問</div></div>';
+    html += '<div class="legend-item"><div class="legend-label"><div class="legend-dot green"></div>覚えた (2回連続正解)</div><div class="legend-count">' + lv.green + '問</div></div>';
+    html += '<div class="legend-item"><div class="legend-label"><div class="legend-dot orange"></div>学習中 (1回以上正解)</div><div class="legend-count">' + lv.orange + '問</div></div>';
+    html += '<div class="legend-item"><div class="legend-label"><div class="legend-dot red"></div>苦手 (まだ正解なし)</div><div class="legend-count">' + lv.red + '問</div></div>';
+    html += '<div class="legend-item"><div class="legend-label"><div class="legend-dot gray"></div>未回答</div><div class="legend-count">' + lv.gray + '問</div></div>';
     html += '</div></div>';
     html += '<p class="tf-stats-note">ひっかかり対策率＝これまでの回答のうち、○×を正しく答えられた割合（' + tt.correct + ' / ' + tt.seen + '回）。高いほど引っかけに強い状態です。</p>';
     var rows = Object.keys(CATS).map(function(k){ var seen = 0, ok = 0; TF_ITEMS.forEach(function(t){ if(t.c !== k) return; var s = tfStats[t.id]; if(s){ seen += s.seen; ok += s.correct; } }); return {cat:k, seen:seen, rate: seen ? ok/seen : 0, has: TF_ITEMS.some(function(t){ return t.c === k; })}; }).filter(function(r){ return r.has; });
@@ -3060,8 +3061,8 @@
     rows.forEach(function(r){ var pct = Math.round(r.rate*100); html += '<div class="cat-row"><div class="cat-name">' + esc(CATS[r.cat]) + '</div><div class="cat-bar-track"><div class="cat-bar-fill" style="width:' + (r.seen ? pct : 0) + '%;"></div></div><div class="cat-pct">' + (r.seen ? pct + '%' : '—') + '</div></div>'; });
     var weak = TF_ITEMS.map(function(t){ var s = tfStats[t.id]; return s && s.seen > s.correct ? {t:t, s:s, rate:(s.seen-s.correct)/s.seen} : null; }).filter(Boolean);
     weak.sort(function(a,b){ return b.rate - a.rate || (b.s.seen - b.s.correct) - (a.s.seen - a.s.correct); });
-    html += '<details class="cat-accordion" style="margin-top:20px;border:2px solid rgba(239, 68, 68, 0.3);"><summary style="color:#ef4444;font-size:14.5px;">▶︎ ⚠️ 間違えやすい文トップ10</summary><div class="cat-qlist" style="padding-top:12px;">';
-    if(!weak.length){ html += '<p class="desc" style="text-align:left;">まだ間違えた文はありません。</p>'; }
+    html += '<details class="cat-accordion" style="margin-top:20px;border:2px solid rgba(239, 68, 68, 0.3);"><summary style="color:#ef4444;font-size:14.5px;">▶︎ ⚠️ 間違えやすい問題トップ10</summary><div class="cat-qlist" style="padding-top:12px;">';
+    if(!weak.length){ html += '<p class="desc" style="text-align:left;">まだ間違えた問題はありません。</p>'; }
     weak.slice(0,10).forEach(function(w){ html += '<div class="tf-miss"><div><b>' + (w.t.a ? '⭕' : '❌') + '</b> ' + esc(w.t.s) + '</div><small>💡 ' + esc(w.t.n) + '　（正解 ' + w.s.correct + ' / ' + w.s.seen + '回）</small></div>'; });
     html += '</div></details>';
     var mc = mcTotals();
@@ -3199,6 +3200,8 @@
   function getPastExam(key){ for(var i=0;i<PAST_EXAMS.length;i++){ if(PAST_EXAMS[i].key===key) return PAST_EXAMS[i]; } return null; }
   function examPassLine(kind){ var p = getPastExam(kind || examKind); return p ? p.pass : MOCK_PASS_LINE; }
   function examTitle(kind){ var p = getPastExam(kind || examKind); return p ? p.label : '模擬試験'; }
+  // 「2026年 過去問（FY26）」のように、どの年度の過去問かひと目でわかる名前
+  function pastYearName(p){ return p.label + '（' + p.sub.split(' ')[0] + '）'; }
   function qTextHtml(t){ return esc(t).replace(/\n/g, '<br>'); }
   var OPT_LABELS = ['A','B','C','D','E'];
   function answerText(q){
@@ -3445,7 +3448,8 @@
   }
   function shareExamResult(){
     var r = examLastResult, kind = r.kind || 'mock', passLine = examPassLine(kind);
-    var lines = ['📝 BAドリル「' + examTitle(kind) + '」結果', r.score + '点 / 100点（合格ライン' + (kind === 'mock' ? '目安' : '') + passLine + '点）',
+    var pe = getPastExam(kind);
+    var lines = ['📝 BAドリル「' + (pe ? pastYearName(pe) : examTitle(kind)) + '」結果', '受験日：' + todayStr(), r.score + '点 / 100点（合格ライン' + (kind === 'mock' ? '目安' : '') + passLine + '点）',
                  r.score >= passLine ? '🎉 合格ライン突破！' : '合格ラインまであと' + (passLine - r.score) + '点',
                  '正解 ' + r.correctCount + ' / ' + r.scoredCount + '問', '#BAドリル'];
     var text = lines.join('\n');
@@ -3488,7 +3492,7 @@
   }
   // 印刷用：2段組み・小さめの文字でA4 2枚程度にまとめる（解答は最後に一覧表）
   function buildCompactPrintHtml(p){
-    var h = '<div class="cp-head"><b>' + esc(p.label) + '（' + esc(p.sub) + '）</b>　全' + p.questions.length + '問・30分・100点満点・合格ライン' + p.pass + '点／問41〜50は正しいものを全て選ぶ（完答）／<b>【対象外】</b>＝過去のプロモーション問題（今年は範囲外・0点扱い）</div>';
+    var h = '<div class="cp-year">' + esc(pastYearName(p)) + '</div><div class="cp-head"><b>' + esc(p.label) + '（' + esc(p.sub) + '）</b>　全' + p.questions.length + '問・30分・100点満点・合格ライン' + p.pass + '点／問41〜50は正しいものを全て選ぶ（完答）／<b>【対象外】</b>＝過去のプロモーション問題（今年は範囲外・0点扱い）</div>';
     h += '<div class="cp-cols">';
     p.questions.forEach(function(q){
       if(q.no === 41) h += '<div class="cp-sec">▼ 問41〜50：複数選択（あてはまるものを全て）</div>';
@@ -3501,7 +3505,7 @@
       h += '</div></div>';
     });
     h += '</div>';
-    h += '<div class="cp-ans"><div class="cp-ans-title">✂ 解答（※＝採点対象外）</div><div class="cp-ans-grid">';
+    h += '<div class="cp-ans"><div class="cp-ans-title">✂ 解答｜' + esc(pastYearName(p)) + '（※＝採点対象外）</div><div class="cp-ans-grid">';
     p.questions.forEach(function(q){
       var a = (q.a === null || q.a === undefined) ? '—' : (Array.isArray(q.a) ? q.a : [q.a]).map(function(i){ return OPT_LABELS[i]; }).join('');
       h += '<span><b>' + q.no + '</b> ' + a + (q.void ? '※' : '') + '</span>';
@@ -3517,7 +3521,10 @@
       var root = document.createElement('div'); root.id = 'printRoot';
       root.innerHTML = buildCompactPrintHtml(getPastExam(printExamKey));
       document.body.appendChild(root);
-      var cleanup = function(){ var r = document.getElementById('printRoot'); if(r) r.parentNode.removeChild(r); window.removeEventListener('afterprint', cleanup); };
+      // PDFのファイル名にも年度が入るよう、印刷中だけページのタイトルを変える
+      var p = getPastExam(printExamKey), oldTitle = document.title;
+      document.title = 'BAドリル_' + p.label.replace(/\s/g, '') + '_' + p.sub.split(' ')[0];
+      var cleanup = function(){ var r = document.getElementById('printRoot'); if(r) r.parentNode.removeChild(r); document.title = oldTitle; window.removeEventListener('afterprint', cleanup); };
       window.addEventListener('afterprint', cleanup);
       setTimeout(function(){ window.print(); }, 50);
     };
