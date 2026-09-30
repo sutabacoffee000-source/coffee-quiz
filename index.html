@@ -204,7 +204,19 @@
   .tf-btn.correct{border-color:#10b981;background:rgba(16,185,129,0.12);} .tf-btn.wrong{border-color:#ef4444;background:rgba(239,68,68,0.10);} .tf-btn.dim{opacity:.45;}
   .tf-result{margin-top:14px;padding:10px 12px;border-radius:12px;font-size:14px;font-weight:700;text-align:center;}
   .tf-result.ok{background:rgba(16,185,129,0.12);color:#0f7a57;} .tf-result.ng{background:rgba(239,68,68,0.10);color:#B42318;}
-  .choice-btn.tf-multi.picked{border-color:var(--forest);background:rgba(28,59,50,0.08);}
+  .choice-btn.multi-opt{position:relative;border-width:2px;align-items:center;}
+  .choice-btn.multi-opt .mark.checkbox{flex:0 0 24px;height:24px;border-radius:6px;border-width:2px;font-size:14px;font-weight:700;}
+  .choice-btn.multi-opt .opt-letter{flex:0 0 auto;font-weight:700;font-size:13px;color:var(--ink-soft);}
+  .choice-btn.multi-opt .opt-body{flex:1;}
+  .choice-btn.multi-opt.selected{border-color:var(--forest);background:rgba(28,59,50,0.12);box-shadow:0 0 0 2px rgba(28,59,50,0.15);}
+  .choice-btn.multi-opt.selected .opt-letter{color:var(--forest-deep);}
+  .choice-btn.multi-opt.selected .opt-body{font-weight:700;}
+  .sel-pill{position:absolute;top:-9px;right:10px;background:var(--forest);color:#F6EFDD;font-size:10.5px;font-weight:700;border-radius:999px;padding:3px 8px;white-space:nowrap;}
+  .choice-btn.multi-opt.correct.selected,.choice-btn.multi-opt.correct{box-shadow:none;}
+  .multi-count{margin:10px 0 0;padding:9px 12px;border-radius:12px;background:var(--paper);border:1.5px dashed var(--line);font-size:13px;color:var(--ink-soft);display:flex;flex-direction:column;gap:2px;}
+  .multi-count.has{border-style:solid;border-color:var(--forest);color:var(--forest-deep);background:rgba(28,59,50,0.06);}
+  .multi-count b{font-size:15px;}
+  .multi-count span{font-size:11px;color:var(--ink-soft);font-weight:400;}
   .tf-mini-note{display:block;margin-top:6px;font-size:11.5px;font-weight:400;color:var(--ink-soft);line-height:1.5;}
   .tf-miss-list{width:100%;max-width:380px;text-align:left;margin:8px 0 14px;}
   .tf-miss-head{font-size:13px;font-weight:700;color:#B42318;margin-bottom:6px;}
@@ -2962,11 +2974,15 @@
       html += '<div class="qnum">本番形式 ' + (r.idx+1) + ' / ' + r.sets.length + ' セット</div>';
       html += '<p class="qtext">次の文章のうち、<b>正しいもの</b>を全て選んでください。（全部合って正解）</p><div class="choices">';
       set.forEach(function(id, i){
-        var t = getTf(id); var on = r.picked.indexOf(i) !== -1; var cls = 'choice-btn tf-multi' + (on ? ' picked' : ''); var mark = on ? '☑' : '☐';
-        if(a){ var ok = (on === t.a); cls += ok ? ' correct' : ' wrong'; mark = t.a ? '⭕' : '❌'; }
-        html += '<button class="' + cls + '" data-mi="' + i + '" type="button"' + (a ? ' disabled' : '') + '><span class="mark">' + mark + '</span><span>' + esc(t.s) + (a ? '<small class="tf-mini-note">' + (on === t.a ? '' : '← ' + (on ? '誤りなのに選んだ' : '正しいのに選ばなかった') + '　') + esc(t.n) + '</small>' : '') + '</span></button>';
+        var t = getTf(id); var on = r.picked.indexOf(i) !== -1;
+        if(a){
+          var ok = (on === t.a);
+          var note = '<small class="tf-mini-note">' + (on ? 'あなた：選んだ' : 'あなた：選ばなかった') + '　／　答え：' + (t.a ? '⭕ 正しい' : '❌ 誤り') + (ok ? '' : '　← ここで間違い') + '<br>' + esc(t.n) + '</small>';
+          html += multiOptHtml(i, t.s, on, ok ? ' correct' : ' wrong', 'data-mi="' + i + '"', true, on ? '✓' : '', note);
+        } else { html += multiOptHtml(i, t.s, on, '', 'data-mi="' + i + '"', false); }
       });
       html += '</div>';
+      if(!a){ html += multiCountHtml(r.picked); }
       if(a){ html += '<div class="tf-result ' + (a.ok ? 'ok' : 'ng') + '">' + (a.ok ? '⭕ 正解（完答）' : '❌ 不正解（' + a.miss + '問ちがい）') + '</div>'; html += '<div class="actions"><button class="btn" id="btnTfNext" type="button">' + (r.idx+1 >= r.sets.length ? '結果を見る' : '次のセットへ') + '</button></div>'; }
       else { html += '<div class="actions"><button class="btn" id="btnTfJudge" type="button">これで判定する</button></div>'; }
     }
@@ -3204,6 +3220,14 @@
   function pastYearName(p){ return p.label + '（' + p.sub.split(' ')[0] + '）'; }
   function qTextHtml(t){ return esc(t).replace(/\n/g, '<br>'); }
   var OPT_LABELS = ['A','B','C','D','E'];
+  // 複数選択で「いま何を選んでいるか」をまとめて表示する
+  function multiCountHtml(picked){
+    var list = (picked || []).slice().sort(function(a,b){ return a-b; });
+    return '<div class="multi-count' + (list.length ? ' has' : '') + '">' + '<div>' + (list.length ? '✅ 選択中：<b>' + list.map(function(i){ return OPT_LABELS[i]; }).join('・') + '</b>（' + list.length + 'つ）' : '☐ まだ何も選んでいません') + '</div><span>もう一度タップで選択を外せます</span></div>';
+  }
+  function multiOptHtml(i, text, on, extraCls, attrs, disabled, markTxt, afterHtml){
+    return '<button class="choice-btn multi-opt' + (on ? ' selected' : '') + (extraCls || '') + '" ' + attrs + ' type="button"' + (disabled ? ' disabled' : '') + '><span class="mark checkbox">' + (markTxt !== undefined ? markTxt : (on ? '✓' : '')) + '</span><span class="opt-letter">' + OPT_LABELS[i] + '</span><span class="opt-body">' + esc(text) + (afterHtml || '') + '</span>' + (on && !disabled ? '<span class="sel-pill">選択中</span>' : '') + '</button>';
+  }
   function answerText(q){
     if(q.a === null || q.a === undefined) return '確認中';
     var idxs = Array.isArray(q.a) ? q.a : [q.a];
@@ -3339,10 +3363,11 @@
         return;
       }
       var selected = q.multi ? (ans && ans.indexOf(i)!==-1) : (ans===i);
-      var markCls = q.multi ? 'mark checkbox' : 'mark';
-      html += '<button class="choice-btn'+(selected?' selected':'')+'" data-idx="'+i+'" type="button"><span class="'+markCls+'">'+(selected?'✓':'')+'</span><span>'+esc(opt)+'</span></button>';
+      if(q.multi){ html += multiOptHtml(i, opt, selected, '', 'data-idx="'+i+'"', false); return; }
+      html += '<button class="choice-btn'+(selected?' selected':'')+'" data-idx="'+i+'" type="button"><span class="mark">'+(selected?'✓':'')+'</span><span>'+esc(opt)+'</span></button>';
     });
     html += '</div>';
+    if(q.multi && !q.void){ html += multiCountHtml(ans); }
     if(q.void && !correctSet.length){ html += '<p class="exam-hint">※この問題の正解は現在確認中です。</p>'; }
     html += '<div class="actions" style="justify-content:space-between;">';
     html += examIndex>0 ? '<button class="btn secondary" id="btnExamPrev" type="button">戻る</button>' : '<span></span>';
