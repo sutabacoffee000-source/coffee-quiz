@@ -186,6 +186,36 @@
   .browse-link-btn:hover{background:#e0bd82;}
   .exam-link-btn{background:var(--forest);border:1.5px solid var(--forest-deep);color:#F6EFDD;}
   .exam-link-btn:hover{background:var(--forest-deep);}
+  .tf-link-btn{display:flex;flex-direction:column;align-items:center;gap:3px;width:100%;max-width:340px;border-radius:14px;padding:13px 16px;margin-top:10px;cursor:pointer;font-family:var(--font-body);background:#EEF3F8;border:1.5px solid #6C8EAD;color:#23405C;}
+  .tf-link-btn b{font-size:14.5px;} .tf-link-btn span{font-size:11.5px;opacity:.85;}
+  .tf-meter{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;max-width:340px;margin:4px 0 12px;}
+  .tf-meter div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;}
+  .tf-meter b{font-size:20px;color:var(--forest-deep);} .tf-meter span{font-size:10.5px;color:var(--ink-soft);}
+  .tf-scope{display:flex;gap:6px;width:100%;max-width:340px;margin-bottom:10px;}
+  .tf-scope button{flex:1;background:var(--paper);border:1.5px solid var(--line);border-radius:999px;padding:8px 6px;font-size:12px;font-weight:700;color:var(--ink-soft);cursor:pointer;font-family:var(--font-body);}
+  .tf-scope button.on{background:var(--forest);border-color:var(--forest);color:#F6EFDD;} .tf-scope button[disabled]{opacity:.45;cursor:default;}
+  .tf-mode{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;width:100%;max-width:340px;background:var(--forest);color:#F6EFDD;border:none;border-radius:14px;padding:14px 16px;margin-top:8px;cursor:pointer;font-family:var(--font-body);}
+  .tf-mode b{font-size:15px;} .tf-mode span{font-size:11.5px;opacity:.85;}
+  .tf-mode.alt{background:var(--card);color:var(--forest-deep);border:2px solid var(--forest);}
+  .tf-card{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:18px 16px;font-size:16px;font-weight:600;line-height:1.7;color:var(--ink);margin:6px 0 14px;}
+  .tf-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .tf-btn{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:30px;padding:12px 8px;border-radius:16px;border:2px solid var(--line);background:var(--card);cursor:pointer;font-family:var(--font-body);}
+  .tf-btn span{font-size:12.5px;font-weight:700;color:var(--ink-soft);}
+  .tf-btn.correct{border-color:#10b981;background:rgba(16,185,129,0.12);} .tf-btn.wrong{border-color:#ef4444;background:rgba(239,68,68,0.10);} .tf-btn.dim{opacity:.45;}
+  .tf-result{margin-top:14px;padding:10px 12px;border-radius:12px;font-size:14px;font-weight:700;text-align:center;}
+  .tf-result.ok{background:rgba(16,185,129,0.12);color:#0f7a57;} .tf-result.ng{background:rgba(239,68,68,0.10);color:#B42318;}
+  .choice-btn.tf-multi.picked{border-color:var(--forest);background:rgba(28,59,50,0.08);}
+  .tf-mini-note{display:block;margin-top:6px;font-size:11.5px;font-weight:400;color:var(--ink-soft);line-height:1.5;}
+  .tf-miss-list{width:100%;max-width:380px;text-align:left;margin:8px 0 14px;}
+  .tf-miss-head{font-size:13px;font-weight:700;color:#B42318;margin-bottom:6px;}
+  .tf-miss{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-bottom:6px;font-size:12.5px;line-height:1.55;color:var(--ink);text-align:left;}
+  .tf-miss small{display:block;margin-top:4px;color:var(--ink-soft);font-size:11.5px;}
+  .stats-tabs{display:flex;gap:6px;margin-bottom:14px;}
+  .stats-tabs button{flex:1;background:var(--paper);border:1.5px solid var(--line);border-radius:999px;padding:8px;font-size:12.5px;font-weight:700;color:var(--ink-soft);cursor:pointer;font-family:var(--font-body);}
+  .stats-tabs button.on{background:var(--forest);border-color:var(--forest);color:#F6EFDD;}
+  .tf-stats-note{font-size:11.5px;color:var(--ink-soft);line-height:1.6;margin:10px 0 0;text-align:left;}
+  .legend-count{white-space:nowrap;}
+  .cat-bar-fill.tf{background:linear-gradient(90deg,#f59e0b,#ef4444);}
   .battle-link-btn{background:#A8492E;border:1.5px solid #82341E;color:#FFF;}
   .battle-link-btn:hover{background:#82341E;}
   .browse-link-btn b, .exam-link-btn b, .battle-link-btn b{font-size:14.5px;}
@@ -1148,6 +1178,7 @@
     stats = await loadJSON('bac-stats', {});
     streak = await loadJSON('bac-streak', {lastDate:null,count:0});
     bookmarkedIds = (await loadJSON('bac-bookmarks', [])).filter(function(id){ return !!getQ(id); });
+    tfStats = await loadJSON('bac-tf-stats', {});
     var validKeys = pickGroups().map(function(g){ return g.key; });
     pickAll = !!(await loadJSON('bac-pick-all', false));
     pickedCats = (await loadJSON('bac-pick-cats', validKeys)).filter(function(k){ return validKeys.indexOf(k) !== -1; });
@@ -1264,7 +1295,7 @@
     render(); 
   }
   
-  async function doReset(){ deleteKey('bac-stats'); deleteKey('bac-streak'); listKeysWithPrefix('bac-daily-').forEach(function(k){ deleteKey(k); }); stats = {}; streak = {lastDate:null,count:0}; daily = null; mode='daily'; screen='home'; answeredThisQ=null; pendingResetConfirm=false; pendingMode='all'; render(); }
+  async function doReset(){ deleteKey('bac-stats'); deleteKey('bac-tf-stats'); tfStats = {}; deleteKey('bac-streak'); listKeysWithPrefix('bac-daily-').forEach(function(k){ deleteKey(k); }); stats = {}; streak = {lastDate:null,count:0}; daily = null; mode='daily'; screen='home'; answeredThisQ=null; pendingResetConfirm=false; pendingMode='all'; render(); }
   function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
   function updateHeader(){
@@ -1290,6 +1321,10 @@
     else if(screen==='question'){ stage.innerHTML = renderQuestion(); bindQuestion(); }
     else if(screen==='summary'){ stage.innerHTML = renderSummary(); bindSummary(); }
     else if(screen==='browse'){ stage.innerHTML = renderBrowse(); bindBrowse(); }
+    else if(screen==='tfHome'){ stage.innerHTML = renderTfHome(); bindTfHome(); }
+    else if(screen==='tfQuestion'){ stage.innerHTML = renderTfQuestion(); bindTfQuestion(); }
+    else if(screen==='tfSummary'){ stage.innerHTML = renderTfSummary(); bindTfSummary(); }
+    else if(screen==='tfBrowse'){ stage.innerHTML = renderTfBrowse(); bindTfBrowse(); }
     else if(screen==='examReview'){ if(!pastUnlocked){ screen = 'examLock'; stage.innerHTML = renderExamLock(); bindExamLock(); } else { stage.innerHTML = renderExamReview(); bindExamReview(); } }
     else if(screen==='examLock'){ stage.innerHTML = renderExamLock(); bindExamLock(); }
     else if(screen==='examIntro'){ if(!pastUnlocked){ screen = 'examLock'; stage.innerHTML = renderExamLock(); bindExamLock(); } else { stage.innerHTML = renderExamIntro(); bindExamIntro(); } }
@@ -1311,7 +1346,7 @@
 
   function modeLabel(){ return pendingMode==='pick' ? '🗂 選んだ分野' : pendingMode==='core' ? '☕ コーヒー豆だけ' : (pendingMode==='bookmark' ? '🔖 苦手な問題だけ' : '🎯 全分野ランダム'); }
   function otherLinksHtml(){
-    return '<div class="more-head">ほかの勉強方法</div><p class="more-sub">慣れてきたら、腕試しや確認に使ってください</p>' + browseLinkHtml() + examLinkHtml() + battleLinkHtml();
+    return '<div class="more-head">ほかの勉強方法</div><p class="more-sub">慣れてきたら、腕試しや確認に使ってください</p>' + browseLinkHtml() + tfLinkHtml() + examLinkHtml() + battleLinkHtml();
   }
   function rangePickerHtml(){
     var items = [['all','🎯','全分野','ランダム'],['core','☕','コーヒー豆','だけ'],['pick','🗂','分野を選ぶ',(pickedCats ? pickedCats.length : 0)+'分野を選択中'],['bookmark','🔖','苦手な問題','だけ（'+bookmarkedIds.length+'問）']];
@@ -1396,7 +1431,7 @@
     };
     var vs = document.getElementById('btnViewSummary');
     if(vs) vs.onclick = viewTodaySummary;
-    bindBrowseLink(); bindExamLink(); bindBattleLink();
+    bindBrowseLink(); bindTfLink(); bindExamLink(); bindBattleLink();
   }
 
   /* ---------------- BAバトルモード 実装 ---------------- */
@@ -2555,6 +2590,7 @@
   /* ---------------- 分野別スタッツ & よく間違える問題 ---------------- */
   function renderStatsPanel(){
     var panel = document.getElementById('statsPanel');
+    if(statsTab === 'tf'){ renderTfStats(panel); return; }
     var totalQ = QUESTIONS.length;
     var cBlue = 0, cGreen = 0, cOrange = 0, cRed = 0, cGray = 0;
     var weakQs = []; var totalSeen = 0, totalCorrect = 0;
@@ -2576,7 +2612,7 @@
     var gradient = 'conic-gradient(#3b82f6 0% '+deg1+'%, #10b981 '+deg1+'% '+deg2+'%, #f59e0b '+deg2+'% '+deg3+'%, #ef4444 '+deg3+'% '+deg4+'%, #d1d5db '+deg4+'% 100%)';
     var masteredPct = Math.round(pBlue + pGreen);
 
-    var html = '<h3>全体のマスター進捗</h3><div class="stats-overview">';
+    var html = statsTabsHtml() + '<h3>4択問題のマスター進捗</h3><div class="stats-overview">';
     html += '<div class="progress-donut" style="background:' + gradient + ';">';
     html += '<div class="donut-inner"><div class="donut-pct">' + masteredPct + '%</div><div class="donut-lbl">マスター</div></div></div>';
     html += '<div class="pie-legend">';
@@ -2626,7 +2662,8 @@
       var pct = Math.round(r.rate*100);
       html += '<div class="cat-row"><div class="cat-name">'+esc(CATS[r.cat])+'</div><div class="cat-bar-track"><div class="cat-bar-fill" style="width:'+(r.seen? pct : 0)+'%;"></div></div><div class="cat-pct">'+(r.seen ? pct+'%' : '—')+'</div></div>';
     });
-    html += '<div class="stats-foot"><span>累計回答数：'+totalSeen+'問</span><span>累計正答率：'+(totalSeen? Math.round(totalCorrect/totalSeen*100):0)+'%</span></div>';
+    var tfT = tfTotals();
+    html += '<div class="stats-foot"><span>累計回答数（4択＋○×）：'+(totalSeen + tfT.seen)+'問</span><span>4択の正答率：'+(totalSeen? Math.round(totalCorrect/totalSeen*100):0)+'%</span></div>';
 
     if(!pendingResetConfirm){ html += '<div class="reset-zone"><button class="btn ghost" id="btnResetAsk" type="button">学習記録をリセットする</button></div>'; } 
     else { html += '<div class="confirm-row">本当にすべての記録を削除しますか？<button class="btn ghost" id="btnResetYes" type="button" style="color:var(--forest-deep);">はい、削除する</button><button class="btn ghost" id="btnResetNo" type="button">キャンセル</button></div>'; }
@@ -2635,16 +2672,404 @@
     var shareBtn = document.getElementById('btnShareProgress');
     if(shareBtn){
       shareBtn.onclick = function(){
-        var text = "☕️ BAドリル学習記録\n現在のマスター率: " + masteredPct + "%！\n🔥連続 " + streak.count + " 日学習中！\n(累計回答数: " + totalSeen + "問)\n#BAドリル";
+        var text = "☕️ BAドリル学習記録\n現在のマスター率: " + masteredPct + "%！\n🔥連続 " + streak.count + " 日学習中！\n(累計回答数: " + (totalSeen + tfT.seen) + "問)\n#BAドリル";
         if (navigator.share) { navigator.share({ text: text }).catch(function(){ fallbackCopy(text); }); } else { fallbackCopy(text); }
       };
     }
 
+    bindStatsTabs(panel);
     var bmBtns = panel.querySelectorAll('.weak-bookmark-btn');
     bmBtns.forEach(function(b){
       b.onclick = function(){ var id = parseInt(b.getAttribute('data-id'), 10); toggleBookmark(id); renderStatsPanel(); };
     });
 
+    var ask = document.getElementById('btnResetAsk'); if(ask) ask.onclick = function(){ pendingResetConfirm=true; renderStatsPanel(); };
+    var yes = document.getElementById('btnResetYes'); if(yes) yes.onclick = doReset;
+    var no = document.getElementById('btnResetNo'); if(no) no.onclick = function(){ pendingResetConfirm=false; renderStatsPanel(); };
+  }
+
+  /* ---------------- ○×チャレンジ（4択とは別に記録） ---------------- */
+  var TF_ITEMS = [
+    {"id": "t1", "c": "cafe", "s": "C.A.F.E. プラクティスの「C.A.F.E.」は「Coffee And Farmer Equity（コーヒーと生産者の公平性）」の略である。", "a": true, "n": "Coffee And Farmer Equity＝コーヒーと生産者の公平性。"},
+    {"id": "t2", "c": "cafe", "s": "C.A.F.E. プラクティスは、一度取得すれば永久に有効な認証制度である。", "a": false, "n": "一度限りの認証ではなく、継続的な改善を促す包括的なプログラムです。"},
+    {"id": "t3", "c": "cafe", "s": "C.A.F.E. プラクティスは、国際環境NGOのコンサベーション・インターナショナル（CI）と共同で策定された。", "a": true, "n": "CIと共同で作り上げたガイドラインです。"},
+    {"id": "t4", "c": "cafe", "s": "C.A.F.E. プラクティスの監査は、すべてスターバックスのパートナーが行っている。", "a": false, "n": "監査は第三者機関のSCSが行います。"},
+    {"id": "t5", "c": "cafe", "s": "C.A.F.E. プラクティスの評価はSCTCによって行われている。", "a": false, "n": "評価（監査）は第三者機関のSCS。SCTCは購買を担当する会社です。"},
+    {"id": "t6", "c": "cafe", "s": "C.A.F.E. プラクティスの参加者には、コーヒーチェリーや生豆等の支払証明書の提出が義務付けられている。", "a": true, "n": "生産者に適正に支払われたことを示す証明書（領収書など）の提出が必要です。"},
+    {"id": "t7", "c": "cafe", "s": "C.A.F.E. プラクティスの認証を受けた全ての農園から、スターバックスはコーヒー豆を購買している。", "a": false, "n": "認証を受けた農園すべてから購買しているわけではありません。"},
+    {"id": "t8", "c": "cafe", "s": "児童労働の禁止はC.A.F.E. プラクティスの必須項目で、満たさない場合は是正が確認されるまで参加できない。", "a": true, "n": "14歳未満（または法定就労年齢未満）の雇用はゼロトレランスです。"},
+    {"id": "t9", "c": "cafe", "s": "C.A.F.E. プラクティスでは、天然林を農業地に変えることは禁止されている。", "a": true, "n": "環境面でのリーダーシップの観点から禁止されています。"},
+    {"id": "t10", "c": "cafe", "s": "「賃金と労働」「教育へのアクセス」は、C.A.F.E. プラクティスの「環境面でのリーダーシップ」の指標である。", "a": false, "n": "これらは「社会的責任」の指標です。"},
+    {"id": "t11", "c": "cafe", "s": "「気候変動」「水域の保護」は、C.A.F.E. プラクティスの「環境面でのリーダーシップ」の指標である。", "a": true, "n": "環境面でのリーダーシップの指標です。"},
+    {"id": "t12", "c": "cafe", "s": "C.A.F.E. プラクティスで必須条件とされる2つの柱は「品質基準」と「経済的な透明性」である。", "a": true, "n": "品質基準と経済的な透明性は必須条件です。"},
+    {"id": "t13", "c": "cafe", "s": "雇用の状況や労働環境は、C.A.F.E. プラクティスの「品質基準」で評価される。", "a": false, "n": "雇用や労働環境は「社会的責任」で評価されます。"},
+    {"id": "t14", "c": "cafe", "s": "スコア80%以上かつ全必須項目に適合した農園は「ストラテジックサプライヤー」のステータスを得られる。", "a": true, "n": "ストラテジック（戦略的）サプライヤーの有効期間は4年間です。"},
+    {"id": "t15", "c": "cafe", "s": "ストラテジックサプライヤーのステータスの有効期間は1年間である。", "a": false, "n": "有効期間は4年間です。"},
+    {"id": "t16", "c": "cafe", "s": "スコアが60%未満の農園は、C.A.F.E. プラクティスに一切参加できない。", "a": false, "n": "60%未満でも全必須項目に適合していれば「ベリファイドサプライヤー」になれます。"},
+    {"id": "t17", "c": "cafe", "s": "C.A.F.E. プラクティスが正式にローンチしたのは2004年である。", "a": true, "n": "2004年に正式ローンチ。同じ年に最初のファーマーサポートセンターも開設されました。"},
+    {"id": "t18", "c": "cafe", "s": "スターバックスとコンサベーション・インターナショナルの協業は2010年に始まった。", "a": false, "n": "協業開始は1998年です。"},
+    {"id": "t19", "c": "cafe", "s": "「季節労働者の受け入れ規制」はC.A.F.E. プラクティスの評価項目に含まれる。", "a": false, "n": "季節労働者の受け入れ規制は含まれません。"},
+    {"id": "t20", "c": "cafe", "s": "サステナブル・コーヒー・チャレンジは、コンサベーション・インターナショナルがリードしている。", "a": true, "n": "コーヒーを世界初のサステナブルな農産物にすることを目指す取り組みです。"},
+    {"id": "t21", "c": "cafe", "s": "フェアトレード認証とC.A.F.E. プラクティスは同じ制度である。", "a": false, "n": "別の制度です。C.A.F.E. プラクティスはスターバックス独自のガイドラインです。"},
+    {"id": "t22", "c": "cafe", "s": "「エシカル」とは「倫理的な」という意味である。", "a": true, "n": "エシカルな調達＝倫理的な調達です。"},
+    {"id": "t23", "c": "supply", "s": "スターバックスの生豆の購買を担当するSCTCは、スイス・ローザンヌにある。", "a": true, "n": "SCTC（スターバックス コーヒー トレーディング カンパニー）はスイス・ローザンヌ。"},
+    {"id": "t24", "c": "supply", "s": "スターバックスの生豆の購買を担当しているのはGCQである。", "a": false, "n": "購買はSCTC。GCQは品質管理やブレンドのレシピ作成を担当します。"},
+    {"id": "t25", "c": "supply", "s": "GCQはブレンドのレシピの作成や管理、品質基準の策定を行う。", "a": true, "n": "GCQ（グローバルコーヒークオリティ）の役割です。"},
+    {"id": "t26", "c": "supply", "s": "GCQの拠点はスイス・ローザンヌにある。", "a": false, "n": "GCQはシアトル。ローザンヌにあるのはSCTCです。"},
+    {"id": "t27", "c": "supply", "s": "SCTCは、生産国から焙煎工場までの輸送のコーディネートを行う。", "a": true, "n": "生産者やサプライヤーとの関係強化、取引管理、輸送手配を担います。"},
+    {"id": "t28", "c": "supply", "s": "焙煎工場にコーヒー豆が届いてから店舗に届くまでの品質管理はGCQが行う。", "a": true, "n": "GCQは品質管理のチームです。"},
+    {"id": "t29", "c": "supply", "s": "ファーマーサポートセンター（FSC）は、コーヒー豆の購買の取引を行う。", "a": false, "n": "FSCは生産者を支援する拠点で、購買の取引は行いません（取引はSCTC）。"},
+    {"id": "t30", "c": "supply", "s": "ファーマーサポートセンターは、生産コスト管理のサポートを行う。", "a": true, "n": "品質や収穫量の向上、生産コスト管理、C.A.F.E. プラクティスの実施支援などを行います。"},
+    {"id": "t31", "c": "supply", "s": "ファーマーサポートセンターのアグロノミストは、スターバックスが取引する農園だけを支援する。", "a": false, "n": "取引先かどうかにかかわらず、生産者を支援します。"},
+    {"id": "t32", "c": "supply", "s": "最初のファーマーサポートセンターは、2004年にコスタリカに開設された。", "a": true, "n": "コスタリカ（サンホセ）に2004年開設。"},
+    {"id": "t33", "c": "supply", "s": "アフリカで最初にできたファーマーサポートセンターは、コーヒー発祥の地エチオピアにある。", "a": false, "n": "アフリカ最初のFSCはルワンダです。"},
+    {"id": "t34", "c": "supply", "s": "2021年に10か所目のファーマーサポートセンターが開設されたのはブラジルである。", "a": true, "n": "世界最大のアラビカ種生産国ブラジルに2021年開設。"},
+    {"id": "t35", "c": "supply", "s": "2012年にファーマーサポートセンターが開設されたのはコロンビアである。", "a": true, "n": "国土は日本の約3倍、その4分の3が北半球にあります。"},
+    {"id": "t36", "c": "supply", "s": "生豆を船に積み込む前に、品質チェックのために取るサンプルを「到着サンプル」という。", "a": false, "n": "船積み前は「出荷前サンプル」。焙煎工場に着いたときが「到着サンプル」です。"},
+    {"id": "t37", "c": "supply", "s": "到着サンプルのテイスティングはGCQが行う。", "a": true, "n": "焙煎工場に到着した生豆をGCQがテイスティングします。"},
+    {"id": "t38", "c": "supply", "s": "スターバックスの購買量は、世界のコーヒー豆のおおよそ20%である。", "a": false, "n": "およそ3〜5%（約4%）です。"},
+    {"id": "t39", "c": "supply", "s": "GCQは年間25万カップ以上のテイスティングを行う。", "a": true, "n": "膨大なテイスティングで品質を守っています。"},
+    {"id": "t40", "c": "supply", "s": "ハシエンダ アルサシアは、コスタリカにあるスターバックス初の自社農園である。", "a": true, "n": "ポアス火山の斜面にあり、2013年に購入しました。"},
+    {"id": "t41", "c": "supply", "s": "ハシエンダ アルサシアで開発された品種や研究成果は、有償で提供されている。", "a": false, "n": "サプライヤーかどうかを問わず、無償で提供されています。"},
+    {"id": "t42", "c": "supply", "s": "ハシエンダ アルサシアでは、病気や気候変動に強いコーヒーの品種の開発を行っている。", "a": true, "n": "さび病などに強い品種の研究・開発を行っています。"},
+    {"id": "t43", "c": "supply", "s": "スターバックスは、標高が低い生産地域のコーヒーを好んで購買している。", "a": false, "n": "標高が高いと風味が熟成され複雑になるため、高地の豆を購買します。"},
+    {"id": "t44", "c": "supply", "s": "アグロノミストとは、土壌管理と栽培の専門家のことである。", "a": true, "n": "FSCなどで生産者を直接支援します。"},
+    {"id": "t45", "c": "supply", "s": "コーヒーの小規模農園は、一つひとつが加工施設を完備している。", "a": false, "n": "個別の加工施設を持たないことが多く、協同組合などでまとまって加工・販売します。"},
+    {"id": "t46", "c": "supply", "s": "スターバックスが購買するコーヒーのほとんどは、小規模農園で栽培されている。", "a": true, "n": "世界のコーヒーの多くは小規模生産者が育てています。"},
+    {"id": "t47", "c": "proc", "s": "シルバースキンは、生豆の最後の、薄くほとんど透明な保護層である。", "a": true, "n": "外側から 果皮 → 果肉 → ミューシレージ → パーチメント → シルバースキン → 生豆。"},
+    {"id": "t48", "c": "proc", "s": "果肉とパーチメントの間にある粘液の層を「シルバースキン」という。", "a": false, "n": "その層は「ミューシレージ」です。"},
+    {"id": "t49", "c": "proc", "s": "果肉（パルプ）は、コーヒーチェリーの総重量のおよそ80%を占める。", "a": true, "n": "果肉はチェリーの大部分を占めます。"},
+    {"id": "t50", "c": "proc", "s": "水洗式の加工法は、発酵の工程を伴う。", "a": true, "n": "果肉を除去した後、発酵タンクで寝かせて粘液を取り除きます。"},
+    {"id": "t51", "c": "proc", "s": "水洗式の発酵タンクでの発酵時間は、およそ2〜3時間である。", "a": false, "n": "およそ18〜36時間です。"},
+    {"id": "t52", "c": "proc", "s": "乾燥式は、果肉を取り除いてからコーヒー豆を乾燥させる加工法である。", "a": false, "n": "乾燥式は果肉をつけたまま乾燥させます。"},
+    {"id": "t53", "c": "proc", "s": "半水洗式は、インドネシアのスマトラで代表的な加工法である。", "a": true, "n": "「ウェットハル」とも呼ばれます。"},
+    {"id": "t54", "c": "proc", "s": "ハニープロセスやパルプドナチュラルでは、粘液を残したままパーチメントを乾燥させる。", "a": true, "n": "粘液（ミューシレージ）を残して乾燥させるのが特徴です。"},
+    {"id": "t55", "c": "proc", "s": "「TANGY（はじけるような）」は乾燥式の風味キーワードである。", "a": false, "n": "TANGYは水洗式。乾燥式は「WILD」「BERRY」です。"},
+    {"id": "t56", "c": "proc", "s": "「FULL BODIED」「SMOOTH」は半水洗式の風味キーワードである。", "a": true, "n": "しっかりとしたコクが半水洗式の特徴です。"},
+    {"id": "t57", "c": "proc", "s": "エチオピア・イエメン・ブラジルで代表的な加工法は乾燥式である。", "a": true, "n": "乾燥式はフルーティーでワイルドな風味になります。"},
+    {"id": "t58", "c": "proc", "s": "スターバックスのエイジドコーヒーは、シンガポールの倉庫で3〜5年熟成させる。", "a": true, "n": "インドネシア産の生豆を選んでエイジングします。"},
+    {"id": "t59", "c": "proc", "s": "エイジドコーヒーは、焙煎した後のコーヒー豆を熟成させて作る。", "a": false, "n": "熟成させるのは生豆です。"},
+    {"id": "t60", "c": "proc", "s": "スターバックスは、ラテンアメリカ産のコーヒー豆のみを選んでエイジングしている。", "a": false, "n": "エイジングするのはインドネシア産の豆です。"},
+    {"id": "t61", "c": "proc", "s": "エイジドコーヒーは、スターバックス アニバーサリー ブレンドにブレンドされている。", "a": true, "n": "アニバーサリー ブレンドの特徴的な風味になっています。"},
+    {"id": "t62", "c": "basic", "s": "コーヒーチェリーの中に稀に1粒だけ入っている丸い豆「ピーベリー」は、全体の5〜10%ほどである。", "a": true, "n": "ピーベリーは5〜10%の割合で発生します。"},
+    {"id": "t63", "c": "basic", "s": "コーヒーの花は、ジャスミンのような香りがする。", "a": true, "n": "白く可憐な花で、ジャスミンのような香りです。"},
+    {"id": "t64", "c": "basic", "s": "コーヒーチェリーは、同じ木ならすべて同じタイミングで赤く熟す。", "a": false, "n": "枝や木によって色づくタイミングはまちまちです。"},
+    {"id": "t65", "c": "basic", "s": "全ての品種において、コーヒーチェリーは赤く熟す。", "a": false, "n": "黄色く熟す品種などもあります。"},
+    {"id": "t66", "c": "basic", "s": "コーヒーの木は、開花から収穫まで約9か月かかる。", "a": true, "n": "開花から熟したチェリーを収穫するまで約9か月。"},
+    {"id": "t67", "c": "basic", "s": "1本のコーヒーの木から1年に収穫できるコーヒーは、250g入りのパックで約2袋分である。", "a": true, "n": "生豆で約450〜680g。250gのパックで約2袋分です。"},
+    {"id": "t68", "c": "basic", "s": "健康なコーヒーの木からは、25〜30年ほどチェリーを収穫できる。", "a": true, "n": "剪定などの手入れで生産性を保ちます。"},
+    {"id": "t69", "c": "basic", "s": "アラビカ種は、ロブスタ種に比べて病気や害虫、干ばつに強い。", "a": false, "n": "病気や害虫、干ばつに強いのはロブスタ種です。"},
+    {"id": "t70", "c": "basic", "s": "アラビカ種のカフェイン含有量は、ロブスタ種の約2倍である。", "a": false, "n": "逆です。ロブスタ種が約2%、アラビカ種が約1%です。"},
+    {"id": "t71", "c": "basic", "s": "スターバックスが購買するコーヒー豆は、アラビカ種のみである。", "a": true, "n": "高品質なアラビカ種のみを購買しています。"},
+    {"id": "t72", "c": "basic", "s": "「コーヒーベルト」とは、北回帰線と南回帰線に挟まれた地帯のことである。", "a": true, "n": "赤道をはさんだこの地帯でコーヒーが栽培されます。"},
+    {"id": "t73", "c": "basic", "s": "コーヒーは世界の70か国以上で生産されている。", "a": true, "n": "70以上の国や地域で生産されています。"},
+    {"id": "t74", "c": "basic", "s": "コーヒーで生計を立てている人は、世界に約500万人である。", "a": false, "n": "2,500万人以上です。"},
+    {"id": "t75", "c": "basic", "s": "抽出したコーヒーの約80%は水でできている。", "a": false, "n": "約98%が水です。だから水の質が大切です。"},
+    {"id": "t76", "c": "basic", "s": "ムンドノーボ種は、アラビカ種とロブスタ種のハイブリッド種である。", "a": false, "n": "ムンドノーボはアラビカ種どうしの自然交配種です。"},
+    {"id": "t77", "c": "basic", "s": "標高の高い地域で育ったコーヒーは、様々な風味が熟成され、味わいが複雑になる。", "a": true, "n": "スターバックスが高地の豆を購買する理由です。"},
+    {"id": "t78", "c": "basic", "s": "コーヒーの「2050年問題」とは、2050年までにアラビカ種の栽培適地が半減すると予測されている問題である。", "a": true, "n": "気候変動の影響による問題です。"},
+    {"id": "t79", "c": "basic", "s": "エチオピアでは、生産されるコーヒーの約半分が国内で消費される。", "a": true, "n": "日常的なコーヒーセレモニーの文化があり、森の中にはコーヒーの木が自生しています。"},
+    {"id": "t80", "c": "basic", "s": "エチオピアで発見されたものの世界に広まらなかった何千もの品種を総称して「エアルーム」という。", "a": true, "n": "エアルーム（在来種）と呼ばれます。"},
+    {"id": "t81", "c": "brew", "s": "コーヒーの抽出に適したお湯の温度は90〜96℃である。", "a": true, "n": "沸騰したてのお湯より少し冷ました温度が適温です。"},
+    {"id": "t82", "c": "brew", "s": "コーヒーの抽出には、沸騰直後の98℃以上のお湯が最も適している。", "a": false, "n": "適温は90〜96℃です。"},
+    {"id": "t83", "c": "brew", "s": "スターバックスがおすすめする基本の分量は、水180mlに対してコーヒー豆10gである。", "a": true, "n": "10g：180mlが基本です。"},
+    {"id": "t84", "c": "brew", "s": "ハンドドリップで20gのコーヒー豆を使った場合、おすすめの出来高は300mlである。", "a": true, "n": "20gで300mlがおすすめです。"},
+    {"id": "t85", "c": "brew", "s": "ハンドドリップのペーパーフィルターは、側面と底を同じ向きに折る。", "a": false, "n": "互い違いに折って、ドリッパーに密着させます。"},
+    {"id": "t86", "c": "brew", "s": "ハンドドリップは、蒸らしを行った後、複数回に分けてお湯を注ぐ。", "a": true, "n": "少量のお湯で蒸らしてから、数回に分けて注ぎます。"},
+    {"id": "t87", "c": "brew", "s": "挽き具合が粗すぎると、過抽出になり苦みが強くなる。", "a": false, "n": "粗すぎると未抽出で味が弱くなります。苦くなるのは細かすぎるときです。"},
+    {"id": "t88", "c": "brew", "s": "挽き具合が細かすぎると、過抽出になり苦みが出やすい。", "a": true, "n": "細かいほど成分が出やすくなります。"},
+    {"id": "t89", "c": "brew", "s": "ハンドドリップのコーヒーが薄いときは、使用するお湯の量を増やすとよい。", "a": false, "n": "薄いときは挽き具合を細かくすると、しっかり抽出できます。"},
+    {"id": "t90", "c": "brew", "s": "ハンドドリップのコーヒーが濃すぎるときは、抽出した後にお湯を加えて調整する。", "a": true, "n": "4つの基本は変えず、抽出後にお湯や水で濃さを調整します。"},
+    {"id": "t91", "c": "brew", "s": "コーヒーの鮮度を損なう4つの敵は「熱・湿気・酸素・光」である。", "a": true, "n": "この4つを避けて保存しましょう。"},
+    {"id": "t92", "c": "brew", "s": "一度冷めたコーヒーも、電子レンジで温め直せば風味は変わらない。", "a": false, "n": "温め直すと風味は損なわれます。"},
+    {"id": "t93", "c": "brew", "s": "開封後のコーヒー豆は、1〜2週間以内を目安に使いきる。", "a": true, "n": "できるだけいれる直前に挽くのもポイントです。"},
+    {"id": "t94", "c": "brew", "s": "コーヒー豆を挽くときは、挽き具合だけでなく均一なサイズで挽けることも重要である。", "a": true, "n": "粒がそろっていないと抽出にムラが出ます。"},
+    {"id": "t95", "c": "brew", "s": "コーヒープレスでいれたコーヒーのおいしさが保たれるのは約20分である。", "a": true, "n": "コーヒープレスは約20分です。"},
+    {"id": "t96", "c": "brew", "s": "コーヒーメーカーで抽出したコーヒーのおいしさが保たれるのは約60分である。", "a": false, "n": "約30分です。"},
+    {"id": "t97", "c": "brew", "s": "プレスサービスをアイスで抽出するときの分量は、コーヒー豆28g：お湯250mlである。", "a": true, "n": "濃いめに抽出して氷で急冷します。"},
+    {"id": "t98", "c": "brew", "s": "プレスサービスの抽出時間は2分である。", "a": false, "n": "プレスサービスの抽出時間は4分です。"},
+    {"id": "t99", "c": "brew", "s": "店舗のコールドブリューの抽出時間は約14時間である。", "a": true, "n": "熱を加えず、水でじっくり14時間かけて抽出します。"},
+    {"id": "t100", "c": "brew", "s": "スターバックス オリガミ®の出来上がり量の目安は約180mlである。", "a": false, "n": "オリガミは約140ml。180mlはスターバックス ヴィア®です。"},
+    {"id": "t101", "c": "brew", "s": "スターバックス ヴィア®（レギュラー）1本に必要なお湯の量は180mlである。", "a": true, "n": "ヴィアは180mlです。"},
+    {"id": "t102", "c": "brew", "s": "コーヒーテイスティングの4ステップの最初は「香りをかぐ」である。", "a": true, "n": "香りをかぐ → すする → 口の中全体に広げる → 自分の言葉で表現する。"},
+    {"id": "t103", "c": "brew", "s": "コーヒーテイスティングの4ステップの最後は「すする」である。", "a": false, "n": "最後は「自分の言葉で表現する」です。"},
+    {"id": "t104", "c": "brew", "s": "リストレットショットは、通常と同じ豆の量でお湯の量を少なくして抽出する。", "a": true, "n": "凝縮した甘みのある味わいになります。"},
+    {"id": "t105", "c": "brew", "s": "ロングショットは、コクが強く、力強い風味が増す。", "a": false, "n": "ロングショットはお湯を増やすので、コクが軽く力強い風味がやわらぎます。"},
+    {"id": "t106", "c": "brew", "s": "エスプレッソの抽出が遅いときは、過抽出により苦い風味になっている。", "a": true, "n": "挽き具合が細かすぎる可能性があるので、粗くする方向で調整します。"},
+    {"id": "t107", "c": "brew", "s": "ダブルショットのエスプレッソの理想的な抽出時間は18〜23秒である。", "a": true, "n": "抽出時間は品質チェックのポイントです。"},
+    {"id": "t108", "c": "brew", "s": "エスプレッソ抽出に最適な圧力は、およそ9気圧である。", "a": true, "n": "約9気圧で抽出します。"},
+    {"id": "t109", "c": "equip", "s": "カリタ式ドリッパーは、台形で底に3つの穴がある。", "a": true, "n": "台形・3つ穴＝カリタ。"},
+    {"id": "t110", "c": "equip", "s": "ハリオ式ドリッパーは、台形で底に3つの穴がある。", "a": false, "n": "ハリオは円すい形で大きな1つ穴です。"},
+    {"id": "t111", "c": "equip", "s": "メリタ式ドリッパーを考案したのはドイツの人である。", "a": true, "n": "メリタはドイツ生まれ。台形で1つ穴です。"},
+    {"id": "t112", "c": "equip", "s": "グラスドリップコーヒーメーカーは、日本オリジナルの商品である。", "a": true, "n": "日本オリジナルの抽出器具です。"},
+    {"id": "t113", "c": "equip", "s": "グラスドリップコーヒーメーカーは、アイス専用の商品である。", "a": false, "n": "ホットもアイスも楽しめます。"},
+    {"id": "t114", "c": "equip", "s": "グラスドリップコーヒーメーカーで★★★まで抽出するときのコーヒー豆の量は30gである。", "a": true, "n": "★★★は30g（★★は20g）です。"},
+    {"id": "t115", "c": "equip", "s": "グラスドリップコーヒーメーカーのふたは、ドリッパー置きとしても使える。", "a": true, "n": "ふたのみの購入も可能です。"},
+    {"id": "t116", "c": "equip", "s": "グラスドリップコーヒーメーカーは、コールドブリューストレーナーの抽出用容器としても使える。", "a": true, "n": "コールドブリュー用の容器としても使えます。"},
+    {"id": "t117", "c": "equip", "s": "スターバックス ソロフィルターを使うときは、ペーパーフィルターが必要である。", "a": false, "n": "ソロフィルターはペーパーフィルター不要です。"},
+    {"id": "t118", "c": "equip", "s": "スターバックス ソロフィルターは、一度に1杯分をいれることを目的とした器具である。", "a": true, "n": "コーヒー粉10gにお湯180ml（ホット）が目安です。"},
+    {"id": "t119", "c": "equip", "s": "オリジナルセラミックドリッパーは、つまりを防ぐために穴が大きめに作られている。", "a": true, "n": "穴が大きめなのが特徴です。"},
+    {"id": "t120", "c": "equip", "s": "オリジナル ステンレスコーンフィルターは、グラスドリップコーヒーメーカー専用の付属品である。", "a": true, "n": "ステンレス製で、紙を使わずに風味を抽出できます。"},
+    {"id": "t121", "c": "equip", "s": "コーヒープレスの推奨挽き具合は、マルコニックグラインダーで3番である。", "a": false, "n": "コーヒープレスは13番（粗挽き）。3番はカッピング用です。"},
+    {"id": "t122", "c": "equip", "s": "エスプレッソ抽出前にコーヒー粉を均一に分布させるテクニック（道具）を「WDT」という。", "a": true, "n": "粉の塊をほぐして均一にします。"},
+    {"id": "t123", "c": "equip", "s": "コーヒーの濃度を示す指標「総溶解固形物量」の略称は「TDS」である。", "a": true, "n": "Total Dissolved Solidsの略です。"},
+    {"id": "t124", "c": "equip", "s": "エスプレッソの「4つのM」のうち「マノ」は、イタリア語で「豆」を意味する。", "a": false, "n": "「マノ」は「手（バリスタの技術）」です。"},
+    {"id": "t125", "c": "core", "s": "HOU（ハウス ブレンド）は、1971年の創業当時から販売されているスターバックス初のブレンドである。", "a": true, "n": "HOUはスターバックス初のブレンドです。"},
+    {"id": "t126", "c": "core", "s": "1971年にスターバックス初のブレンドとして開発されたのはKDRである。", "a": false, "n": "初のブレンドはHOU（ハウス ブレンド）です。"},
+    {"id": "t127", "c": "core", "s": "VER（カフェ ベロナ）は、生豆を個別にローストしてからブレンドする「ポストロースト」のブレンドである。", "a": true, "n": "VERはポストローストのブレンドです。"},
+    {"id": "t128", "c": "core", "s": "VERは、もともとレストランの濃厚なチョコレートケーキに合うように作られたコーヒーである。", "a": true, "n": "当初は「80/20ブレンド」と呼ばれていました。"},
+    {"id": "t129", "c": "core", "s": "VERの元となった「80/20ブレンド」は、ハウス ブレンド80%とフレンチ ロースト20%である。", "a": false, "n": "ユーコン ブレンド80%とイタリアン ロースト20%です。"},
+    {"id": "t130", "c": "core", "s": "VERのパッケージには、象徴的な赤いバラが描かれている。", "a": true, "n": "ロミオとジュリエットをモチーフにしています。"},
+    {"id": "t131", "c": "core", "s": "パイクプレイス ロースト（EDB）は、2008年に毎日楽しめるコーヒーとして北米で発売された。", "a": true, "n": "なめらかでロースト感を抑えた味わいのブレンドです。"},
+    {"id": "t132", "c": "core", "s": "スターバックス ブロンド ローストのコーヒーは、創業当初から発売されていた。", "a": false, "n": "ブロンド ローストの発売は2011年です。"},
+    {"id": "t133", "c": "core", "s": "BRK（ブレックファースト ブレンド）は、1998年の発売当初、スターバックスが初めて探求した軽めのローストの商品の1つだった。", "a": true, "n": "BRKはミディアム ロースト。"},
+    {"id": "t134", "c": "core", "s": "スターバックス ラテは、1971年にシアトルで開業したときからの商品である。", "a": false, "n": "最初のエスプレッソドリンク（ラテ）の提供は1984年です。"},
+    {"id": "t135", "c": "core", "s": "フレーバーロックの導入で、ローストしたコーヒーの鮮度を守れるようになり、シアトル以外のマーケットにも進出できた。", "a": true, "n": "鮮度を保てる包装で全国展開が可能になりました。"},
+    {"id": "t136", "c": "core", "s": "FRE（フレンチ ロースト）は、スターバックスで最も深煎りのコーヒーである。", "a": true, "n": "最も深煎りですが、コクは「ライト」と表現されます。"},
+    {"id": "t137", "c": "core", "s": "FRE（フレンチ ロースト）のコク（BODY）は「FULL」と表現されている。", "a": false, "n": "極限までローストするため、コクは「LIGHT」です。"},
+    {"id": "t138", "c": "core", "s": "ITA（イタリアン ロースト）のコク（BODY）は「MEDIUM」と表現されている。", "a": true, "n": "深煎りですがコクはミディアムです。"},
+    {"id": "t139", "c": "core", "s": "最初のフラペチーノ®のベースに使われていたコーヒーは、イタリアン ローストである。", "a": true, "n": "1995年の発売当初はイタリアン ローストでした。"},
+    {"id": "t140", "c": "core", "s": "SRN（サイレン ブレンド）は、3月8日の国際女性デーにフォーカスして開発されたコーヒーである。", "a": true, "n": "コーヒー業界で活躍する女性たちへの敬意が込められています。"},
+    {"id": "t141", "c": "core", "s": "LNB（ライトノート ブレンド）のパッケージには、ハチドリが描かれている。", "a": true, "n": "ラテンアメリカの農園でよく見られる鳥です。"},
+    {"id": "t142", "c": "core", "s": "GUA（グアテマラ アンティグア）のパッケージには、ハチドリが描かれている。", "a": false, "n": "GUAはグアテマラの国鳥ケツァールです。"},
+    {"id": "t143", "c": "core", "s": "KEN（ケニア）のパッケージには、アフリカゾウが描かれている。", "a": true, "n": "ケニアのパッケージはアフリカゾウです。"},
+    {"id": "t144", "c": "core", "s": "TYO（TOKYO ロースト）の相性のよい風味は、シナモン、レーズン、オートミール、チョコレートである。", "a": true, "n": "カスタマーコーヒーパスポートに基づく組み合わせです。"},
+    {"id": "t145", "c": "core", "s": "EDB（パイクプレイス ロースト）の相性のよい風味は、レモンとオレンジである。", "a": false, "n": "EDBはナッツ、チョコレート、シナモンです。"},
+    {"id": "t146", "c": "core", "s": "SUM（スマトラ）は、半水洗式で加工されたダーク ローストのコーヒーである。", "a": true, "n": "大地を思わせる風味としっかりとしたコクが特徴です。"},
+    {"id": "t147", "c": "core", "s": "SUM（スマトラ）はブロンド ローストに分類される。", "a": false, "n": "SUMはダーク ローストです。"},
+    {"id": "t148", "c": "core", "s": "BEB（ブロンド エスプレッソ ロースト）は、アイスコーヒーとして提供できる。", "a": true, "n": "BEBはアイスコーヒーとしても提供できます。"},
+    {"id": "t149", "c": "core", "s": "ESP（エスプレッソ ロースト）の風味キーワードは「豊かな風味とキャラメルのような甘み」である。", "a": true, "n": "エスプレッソ ローストは長めのローストで甘みを引き出します。"},
+    {"id": "t150", "c": "core", "s": "ローストが深くなるほど、酸味は減少する。", "a": true, "n": "ローストが深いほど酸味は穏やかになります。"},
+    {"id": "t151", "c": "core", "s": "ロースト時間が長いほど、コクは強くなり続ける。", "a": false, "n": "コクはある一定のロースト時間を過ぎると減少します。"},
+    {"id": "t152", "c": "core", "s": "AUB（オータム ブレンド）は、秋の味覚との相性を考えて作られたブレンドである。", "a": true, "n": "AUBは秋の味覚に合うブレンドです。"},
+    {"id": "t153", "c": "core", "s": "TYO（TOKYO ロースト）の加工法は、水洗式と半水洗式である。", "a": true, "n": "TYOは水洗式＋半水洗式です。"},
+    {"id": "t154", "c": "hist", "s": "スターバックス1号店は、1971年にシアトルでオープンした。", "a": true, "n": "パイクプレイスマーケットの近くにオープンしました。"},
+    {"id": "t155", "c": "hist", "s": "スターバックス1号店は、焙煎したコーヒー豆を量り売りする専門店だった。", "a": true, "n": "当初は抽出したコーヒーの提供はありませんでした。"},
+    {"id": "t156", "c": "hist", "s": "「スターバックス」の名前は、小説『白鯨』に登場する一等航海士の名にちなんでいる。", "a": true, "n": "一等航海士スターバックにちなんでいます。"},
+    {"id": "t157", "c": "hist", "s": "北米以外で初めてのスターバックスの店舗は、1996年に東京・銀座にオープンした。", "a": true, "n": "1996年8月2日、銀座松屋通り店がオープンしました。"},
+    {"id": "t158", "c": "hist", "s": "ハワード・シュルツがエスプレッソバーに感銘を受けたのは、フランス出張でのことである。", "a": false, "n": "1983年のイタリア出張です。"},
+    {"id": "t159", "c": "hist", "s": "初のスターバックス リザーブ ロースタリーは、2014年にシアトルでオープンした。", "a": true, "n": "シアトルが1号店です。"},
+    {"id": "t160", "c": "hist", "s": "2023年9月、焙煎所を併設した「イノベーションパーク」が中国に開設された。", "a": true, "n": "Bean to Cupを体現した総合的な施設です。"},
+    {"id": "t161", "c": "hist", "s": "スターバックスが自社農園ハシエンダ アルサシアを購入したのは2008年である。", "a": false, "n": "購入したのは2013年です。"},
+    {"id": "t162", "c": "ops", "s": "ドリップコーヒーは、抽出時間を含めて35分間で期限管理を行う。", "a": true, "n": "抽出時間を含めて35分です。"},
+    {"id": "t163", "c": "ops", "s": "アイスコーヒーは、豆の開封後の期限内であれば、グラインド後24時間の期限で管理する。", "a": true, "n": "グラインド後24時間です。"},
+    {"id": "t164", "c": "ops", "s": "ドリップコーヒーの品質確認のテイスティングは、CSポジションに入って初めてコーヒーを抽出したタイミングで行う。", "a": true, "n": "最初の抽出のタイミングで品質を確認します。"},
+    {"id": "t165", "c": "ops", "s": "One More Coffeeでは、有料カスタマイズは一切できない。", "a": false, "n": "カフェミストへの変更など、有料カスタマイズが可能です。"},
+    {"id": "t166", "c": "ops", "s": "ポットサービスは、DHO（ディカフェ ハウス ブレンド）で提供できる。", "a": true, "n": "ポットサービスはDHOで提供可能です。"},
+    {"id": "t167", "c": "ops", "s": "DES（ディカフェ エスプレッソ ロースト）は量り売りに対応できない。", "a": false, "n": "BEB・DESとも量り売り対応が可能です。"},
+    {"id": "t168", "c": "ops", "s": "GUA 50gとSUM 50gをブレンドして購入したいお客様には対応できる。", "a": true, "n": "ブレンドしての購入に対応できます。"},
+    {"id": "t169", "c": "ops", "s": "デリバリーでコーヒー豆を販売するときは、価格シールを切り取る。", "a": true, "n": "デリバリー対応時は価格シールを切り取ります。"},
+    {"id": "t170", "c": "ops", "s": "アイスのコーヒートラベラーの提供量は、ショートで約12杯分である。", "a": true, "n": "約12杯分です。"},
+    {"id": "t171", "c": "ops", "s": "日本のスターバックスでは、塩化メチレンを使うディカフェ工程を経たコーヒーを取り扱っている。", "a": false, "n": "塩化メチレンを使う工程を経たコーヒーは取り扱っていません。"},
+    {"id": "t172", "c": "ops", "s": "ディカフェの「ダイレクトコンタクト法」では、塩化メチレンを使ってカフェインを除去する。", "a": true, "n": "だから日本では取り扱っていません。"},
+    {"id": "t173", "c": "ops", "s": "スイスウォータープロセスは、化学薬剤を使わず、水と活性炭フィルターでカフェインを除去する方法である。", "a": true, "n": "薬剤を使わない方法です。"},
+    {"id": "t174", "c": "ops", "s": "ペーパーカップやTogoバッグについている「FSC認証」は、ファーマーサポートセンターが認めたマークである。", "a": false, "n": "森林の「FSC認証（Forest Stewardship Council）」で、適切な森林管理の証です。略称が同じなので注意。"},
+    {"id": "t175", "c": "ops", "s": "スターバックス コーヒー ジャパンで通年開催しているコーヒーセミナーは「コーヒーをはじめよう編」である。", "a": true, "n": "通年開催は「コーヒーをはじめよう編」です。"}
+  ];
+  var TF_COUNT = 15, TF_MULTI_SETS = 5;
+  var tfStats = {};          // {id:{seen, correct, streak}}
+  var tfScope = 'all';       // 'all'＝全分野 / 'weak'＝間違えた文だけ
+  var tfRound = null;        // {kind:'tf'|'multi', ids:[...]|sets:[[...]], idx, results:[...], answered}
+  var statsTab = 'mc';       // 学習記録のタブ：'mc'＝4択 / 'tf'＝○×
+  function getTf(id){ for(var i=0;i<TF_ITEMS.length;i++){ if(TF_ITEMS[i].id===id) return TF_ITEMS[i]; } return null; }
+  function tfLevel(s){ // 4択と同じ基準：完璧＝3回以上正解／覚えた＝2回連続正解／学習中＝1回以上正解／苦手＝正解なし
+    if(!s || !s.seen) return 'gray';
+    if(s.correct >= 3) return 'blue';
+    if((s.streak || 0) >= 2) return 'green';
+    if(s.correct > 0) return 'orange';
+    return 'red';
+  }
+  function tfWeakIds(){ return TF_ITEMS.filter(function(t){ var s = tfStats[t.id]; return s && s.seen > s.correct && tfLevel(s) !== 'blue'; }).map(function(t){ return t.id; }); }
+  function tfWeight(t){ var s = tfStats[t.id]; if(!s || !s.seen) return 4 + Math.random()*2; return Math.max(0.4, (1 - s.correct/s.seen)*3) + Math.random()*1.5; }
+  function tfPool(){ if(tfScope === 'weak'){ var w = tfWeakIds(); if(w.length) return TF_ITEMS.filter(function(t){ return w.indexOf(t.id) !== -1; }); } return TF_ITEMS; }
+  function tfPick(pool, n){
+    var keyed = pool.map(function(t){ return {id:t.id, key:Math.pow(Math.random(), 1/tfWeight(t))}; });
+    keyed.sort(function(a,b){ return b.key - a.key; });
+    return keyed.slice(0, Math.min(n, pool.length)).map(function(x){ return x.id; });
+  }
+  function tfRecord(id, ok){
+    var s = tfStats[id] || {seen:0, correct:0, streak:0};
+    s.seen++; if(ok){ s.correct++; s.streak = (s.streak||0) + 1; } else { s.streak = 0; }
+    tfStats[id] = s; saveJSON('bac-tf-stats', tfStats);
+  }
+  function tfTotals(){
+    var seen = 0, correct = 0, lv = {blue:0, green:0, orange:0, red:0, gray:0};
+    TF_ITEMS.forEach(function(t){ var s = tfStats[t.id]; lv[tfLevel(s)]++; if(s){ seen += s.seen; correct += s.correct; } });
+    return {seen:seen, correct:correct, miss:seen-correct, rate: seen ? Math.round(correct/seen*100) : 0, lv:lv};
+  }
+  function startTfRound(kind){
+    var pool = tfPool();
+    if(kind === 'multi'){
+      var ids = tfPick(pool, TF_MULTI_SETS*4);
+      if(ids.length < 4){ ids = tfPick(TF_ITEMS, TF_MULTI_SETS*4); }
+      var sets = [];
+      for(var i=0; i+4<=ids.length && sets.length<TF_MULTI_SETS; i+=4){
+        var set = ids.slice(i, i+4);
+        if(!set.some(function(id){ return getTf(id).a; })){ // 本番と同じく、正しい文が最低1つは入るようにする
+          var trues = TF_ITEMS.filter(function(t){ return t.a && ids.indexOf(t.id) === -1; });
+          set[Math.floor(Math.random()*4)] = trues[Math.floor(Math.random()*trues.length)].id;
+        }
+        sets.push(set);
+      }
+      tfRound = {kind:'multi', sets:sets, idx:0, results:[], answered:null, picked:[]};
+    } else {
+      tfRound = {kind:'tf', ids:tfPick(pool, TF_COUNT), idx:0, results:[], answered:null};
+    }
+    screen = 'tfQuestion'; render(); window.scrollTo(0,0);
+  }
+  function tfTagHtml(t){ return '<span class="tag">'+esc(CATS[t.c] || '')+'</span>'; }
+  function renderTfHome(){
+    var tt = tfTotals(); var weakN = tfWeakIds().length;
+    var html = '<div class="center-col"><div class="big-title">⭕❌ ○×チャレンジ</div>';
+    html += '<p class="desc">文章が「正しい（○）」か「誤り（×）」かを答える練習です。本番の複数選択（問41〜50）の引っかけ対策に。</p>';
+    html += '<div class="tf-meter"><div><b>' + tt.rate + '%</b><span>ひっかかり対策率</span></div><div><b>' + (tt.lv.blue + tt.lv.green) + '</b><span>覚えた文 / ' + TF_ITEMS.length + '</span></div><div><b>' + tt.seen + '</b><span>回答した回数</span></div></div>';
+    html += '<div class="tf-scope"><button type="button" data-tfscope="all" class="' + (tfScope==='all'?'on':'') + '">🎯 全分野</button><button type="button" data-tfscope="weak" class="' + (tfScope==='weak'?'on':'') + '"' + (weakN ? '' : ' disabled') + '>⚠️ 間違えた文だけ（' + weakN + '）</button></div>';
+    html += '<button class="tf-mode" id="btnTfSingle" type="button"><b>⭕❌ 1文ずつ答える（' + TF_COUNT + '問）</b><span>○か×をタップ。すぐに答えと解説が出ます</span></button>';
+    html += '<button class="tf-mode alt" id="btnTfMulti" type="button"><b>📝 本番形式（4文 × ' + TF_MULTI_SETS + 'セット）</b><span>4つの文から正しいものを全部選ぶ。全部合って正解</span></button>';
+    html += '<button class="text-link-btn" id="btnTfBrowse" type="button">📋 ○×の文を一覧で見る（' + TF_ITEMS.length + '文）</button>';
+    html += '<button class="text-link-btn" id="btnTfHomeBack" type="button">ホーム画面に戻る</button></div>';
+    return html;
+  }
+  function bindTfHome(){
+    document.querySelectorAll('[data-tfscope]').forEach(function(b){ b.onclick = function(){ tfScope = b.getAttribute('data-tfscope'); render(); }; });
+    document.getElementById('btnTfSingle').onclick = function(){ startTfRound('tf'); };
+    document.getElementById('btnTfMulti').onclick = function(){ startTfRound('multi'); };
+    document.getElementById('btnTfBrowse').onclick = function(){ screen = 'tfBrowse'; render(); window.scrollTo(0,0); };
+    document.getElementById('btnTfHomeBack').onclick = goHome;
+  }
+  function renderTfQuestion(){
+    var r = tfRound, html = '';
+    html += '<div class="q-actions"><span></span><span style="display:flex;align-items:center;gap:6px;">' + soundToggleHtml() + '<button class="text-link-btn" id="btnTfQuit" type="button">○×チャレンジに戻る</button></span></div>';
+    if(r.kind === 'tf'){
+      var t = getTf(r.ids[r.idx]); var ans = r.answered;
+      html += '<div class="q-tags">' + tfTagHtml(t) + '</div><div class="qnum">' + (r.idx+1) + ' / ' + r.ids.length + ' 問目</div>';
+      html += '<div class="tf-card">' + esc(t.s) + '</div>';
+      html += '<div class="tf-btns">';
+      [true,false].forEach(function(v){
+        var cls = 'tf-btn ' + (v ? 'o' : 'x');
+        if(ans){ if(v === t.a) cls += ' correct'; else if(v === ans.choice) cls += ' wrong'; else cls += ' dim'; }
+        html += '<button class="' + cls + '" data-tf="' + (v?1:0) + '" type="button"' + (ans ? ' disabled' : '') + '>' + (v ? '⭕' : '❌') + '<span>' + (v ? '正しい' : '誤り') + '</span></button>';
+      });
+      html += '</div>';
+      if(ans){
+        html += '<div class="tf-result ' + (ans.ok ? 'ok' : 'ng') + '">' + (ans.ok ? '⭕ 正解' : '❌ 不正解') + '　答えは <b>' + (t.a ? '⭕ 正しい' : '❌ 誤り') + '</b></div>';
+        html += '<div class="note">💡 ' + esc(t.n) + '</div>';
+        html += '<div class="actions"><button class="btn" id="btnTfNext" type="button">' + (r.idx+1 >= r.ids.length ? '結果を見る' : '次の問題へ') + '</button></div>';
+      }
+    } else {
+      var set = r.sets[r.idx]; var a = r.answered;
+      html += '<div class="qnum">本番形式 ' + (r.idx+1) + ' / ' + r.sets.length + ' セット</div>';
+      html += '<p class="qtext">次の文章のうち、<b>正しいもの</b>を全て選んでください。（全部合って正解）</p><div class="choices">';
+      set.forEach(function(id, i){
+        var t = getTf(id); var on = r.picked.indexOf(i) !== -1; var cls = 'choice-btn tf-multi' + (on ? ' picked' : ''); var mark = on ? '☑' : '☐';
+        if(a){ var ok = (on === t.a); cls += ok ? ' correct' : ' wrong'; mark = t.a ? '⭕' : '❌'; }
+        html += '<button class="' + cls + '" data-mi="' + i + '" type="button"' + (a ? ' disabled' : '') + '><span class="mark">' + mark + '</span><span>' + esc(t.s) + (a ? '<small class="tf-mini-note">' + (on === t.a ? '' : '← ' + (on ? '誤りの文を選んだ' : '正しい文を選ばなかった') + '　') + esc(t.n) + '</small>' : '') + '</span></button>';
+      });
+      html += '</div>';
+      if(a){ html += '<div class="tf-result ' + (a.ok ? 'ok' : 'ng') + '">' + (a.ok ? '⭕ 正解（完答）' : '❌ 不正解（' + a.miss + '文ちがい）') + '</div>'; html += '<div class="actions"><button class="btn" id="btnTfNext" type="button">' + (r.idx+1 >= r.sets.length ? '結果を見る' : '次のセットへ') + '</button></div>'; }
+      else { html += '<div class="actions"><button class="btn" id="btnTfJudge" type="button">これで判定する</button></div>'; }
+    }
+    return html;
+  }
+  function bindTfQuestion(){
+    var r = tfRound;
+    document.getElementById('btnTfQuit').onclick = function(){ screen = 'tfHome'; render(); window.scrollTo(0,0); };
+    bindSoundToggle();
+    document.querySelectorAll('[data-tf]').forEach(function(b){ b.onclick = function(){
+      if(r.answered) return; var t = getTf(r.ids[r.idx]); var v = b.getAttribute('data-tf') === '1'; var ok = (v === t.a);
+      r.answered = {choice:v, ok:ok}; r.results.push({id:t.id, ok:ok}); tfRecord(t.id, ok);
+      if(soundOn){ initAudio(); if(ok) playSoftCorrect(); else playSoftWrong(); }
+      render();
+    }; });
+    document.querySelectorAll('[data-mi]').forEach(function(b){ b.onclick = function(){ if(r.answered) return; var i = +b.getAttribute('data-mi'); var k = r.picked.indexOf(i); if(k === -1) r.picked.push(i); else r.picked.splice(k,1); render(); }; });
+    var jd = document.getElementById('btnTfJudge');
+    if(jd) jd.onclick = function(){
+      var set = r.sets[r.idx], miss = 0;
+      set.forEach(function(id, i){ var t = getTf(id); var ok = (r.picked.indexOf(i) !== -1) === t.a; if(!ok) miss++; r.results.push({id:id, ok:ok}); tfRecord(id, ok); });
+      r.answered = {ok: miss === 0, miss: miss}; (r.setResults = r.setResults || []).push(miss === 0);
+      if(soundOn){ initAudio(); if(miss === 0) playSoftCorrect(); else playSoftWrong(); }
+      render();
+    };
+    var nx = document.getElementById('btnTfNext');
+    if(nx) nx.onclick = function(){
+      var total = r.kind === 'tf' ? r.ids.length : r.sets.length;
+      r.idx++; r.answered = null; r.picked = [];
+      if(r.idx >= total){ if(soundOn){ initAudio(); playSoftFinish(); } screen = 'tfSummary'; }
+      render(); window.scrollTo(0,0);
+    };
+  }
+  function renderTfSummary(){
+    var r = tfRound, n = r.results.length, ok = r.results.filter(function(x){ return x.ok; }).length, miss = n - ok;
+    var html = '<div class="center-col"><div class="big-title">○×チャレンジ 結果</div>';
+    html += '<div class="score-big">' + ok + ' / ' + n + '</div><div class="score-sub">正解した文　／　今回のひっかかり対策率 <b>' + (n ? Math.round(ok/n*100) : 0) + '%</b></div>';
+    if(r.kind === 'multi'){ var full = (r.setResults || []).filter(Boolean).length; html += '<p class="desc">本番形式の完答：<b>' + full + ' / ' + r.sets.length + 'セット</b>（本番なら ' + (full*2) + ' / ' + (r.sets.length*2) + '点）</p>'; }
+    html += '<p class="desc">全体のひっかかり対策率：<b>' + tfTotals().rate + '%</b></p>';
+    var wrong = r.results.filter(function(x){ return !x.ok; });
+    if(wrong.length){
+      html += '<div class="tf-miss-list"><div class="tf-miss-head">❌ 間違えた文（' + wrong.length + '）</div>';
+      wrong.forEach(function(x){ var t = getTf(x.id); html += '<div class="tf-miss"><div><b>' + (t.a ? '⭕' : '❌') + '</b> ' + esc(t.s) + '</div><small>💡 ' + esc(t.n) + '</small></div>'; });
+      html += '</div>';
+    } else { html += '<p class="desc">🎉 全問正解です！</p>'; }
+    html += '<button class="btn" id="btnTfAgain" type="button" style="width:100%;max-width:340px;">▶ ' + (r.kind === 'multi' ? 'もう一度 本番形式' : '次の' + TF_COUNT + '問へ') + '</button>';
+    html += '<button class="btn secondary" id="btnTfToTop" type="button">○×チャレンジのトップへ</button><button class="text-link-btn" id="btnTfSumHome" type="button">ホーム画面に戻る</button></div>';
+    return html;
+  }
+  function bindTfSummary(){
+    document.getElementById('btnTfAgain').onclick = function(){ startTfRound(tfRound.kind); };
+    document.getElementById('btnTfToTop').onclick = function(){ screen = 'tfHome'; render(); window.scrollTo(0,0); };
+    document.getElementById('btnTfSumHome').onclick = goHome;
+  }
+  function renderTfBrowse(){
+    var html = '<div><button class="text-link-btn" id="btnTfBrowseBack" type="button">← ○×チャレンジに戻る</button>';
+    html += '<div class="big-title" style="margin-top:10px;text-align:left;">○×の文 一覧（' + TF_ITEMS.length + '文）</div>';
+    html += '<p class="desc" style="text-align:left;max-width:none;">分野をタップすると開きます。各文をタップすると、○か×と解説が表示されます。</p>';
+    Object.keys(CATS).forEach(function(k){
+      var list = TF_ITEMS.filter(function(t){ return t.c === k; }); if(!list.length) return;
+      html += '<details class="cat-accordion"><summary>' + esc(CATS[k]) + '（' + list.length + '文）</summary><div class="cat-qlist">';
+      list.forEach(function(t, i){ html += '<details class="flashcard"><summary>' + (i+1) + '. ' + esc(t.s) + '</summary><div class="flashcard-answer"><div class="browse-answer">' + (t.a ? '⭕ 正しい' : '❌ 誤り') + '</div><div class="browse-note">💡 ' + esc(t.n) + '</div></div></details>'; });
+      html += '</div></details>';
+    });
+    return html + '</div>';
+  }
+  function bindTfBrowse(){ document.getElementById('btnTfBrowseBack').onclick = function(){ screen = 'tfHome'; render(); window.scrollTo(0,0); }; }
+  function tfLinkHtml(){ return '<button class="tf-link-btn" id="btnTfEntry" type="button"><b>⭕❌ ○×チャレンジ <span class="new-pill">NEW</span></b><span>正しい？誤り？ 本番の引っかけ対策（' + TF_ITEMS.length + '文）</span></button>'; }
+  function bindTfLink(){ var b = document.getElementById('btnTfEntry'); if(b) b.onclick = function(){ screen = 'tfHome'; render(); window.scrollTo(0,0); }; }
+
+  // 学習記録：4択と○×をタブで切り替え（グラフは別、累計回答数は合算）
+  function statsTabsHtml(){ return '<div class="stats-tabs"><button type="button" data-stab="mc" class="' + (statsTab==='mc'?'on':'') + '">📘 4択問題</button><button type="button" data-stab="tf" class="' + (statsTab==='tf'?'on':'') + '">⭕❌ ○×問題</button></div>'; }
+  function bindStatsTabs(panel){ panel.querySelectorAll('[data-stab]').forEach(function(b){ b.onclick = function(){ statsTab = b.getAttribute('data-stab'); renderStatsPanel(); }; }); }
+  function mcTotals(){ var seen = 0, correct = 0; QUESTIONS.forEach(function(q){ var s = stats[q.id]; if(s){ seen += s.seen; correct += s.correct; } }); return {seen:seen, correct:correct}; }
+  function renderTfStats(panel){
+    var tt = tfTotals(), N = TF_ITEMS.length, lv = tt.lv;
+    var p = function(x){ return x / N * 100; };
+    var d1 = p(lv.blue), d2 = d1 + p(lv.green), d3 = d2 + p(lv.orange), d4 = d3 + p(lv.red);
+    var gradient = 'conic-gradient(#3b82f6 0% '+d1+'%, #10b981 '+d1+'% '+d2+'%, #f59e0b '+d2+'% '+d3+'%, #ef4444 '+d3+'% '+d4+'%, #d1d5db '+d4+'% 100%)';
+    var html = statsTabsHtml() + '<h3>○×問題の進捗</h3><div class="stats-overview">';
+    html += '<div class="progress-donut" style="background:' + gradient + ';"><div class="donut-inner"><div class="donut-pct">' + tt.rate + '%</div><div class="donut-lbl">ひっかかり<br>対策率</div></div></div>';
+    html += '<div class="pie-legend">';
+    html += '<div class="legend-item"><div class="legend-label"><div class="legend-dot blue"></div>完璧 (3回以上正解)</div><div class="legend-count">' + lv.blue + '文</div></div>';
+    html += '<div class="legend-item"><div class="legend-label"><div class="legend-dot green"></div>覚えた (2回連続正解)</div><div class="legend-count">' + lv.green + '文</div></div>';
+    html += '<div class="legend-item"><div class="legend-label"><div class="legend-dot orange"></div>学習中 (1回以上正解)</div><div class="legend-count">' + lv.orange + '文</div></div>';
+    html += '<div class="legend-item"><div class="legend-label"><div class="legend-dot red"></div>苦手 (まだ正解なし)</div><div class="legend-count">' + lv.red + '文</div></div>';
+    html += '<div class="legend-item"><div class="legend-label"><div class="legend-dot gray"></div>未回答</div><div class="legend-count">' + lv.gray + '文</div></div>';
+    html += '</div></div>';
+    html += '<p class="tf-stats-note">ひっかかり対策率＝これまでの回答のうち、○×を正しく答えられた割合（' + tt.correct + ' / ' + tt.seen + '回）。高いほど引っかけに強い状態です。</p>';
+    var rows = Object.keys(CATS).map(function(k){ var seen = 0, ok = 0; TF_ITEMS.forEach(function(t){ if(t.c !== k) return; var s = tfStats[t.id]; if(s){ seen += s.seen; ok += s.correct; } }); return {cat:k, seen:seen, rate: seen ? ok/seen : 0, has: TF_ITEMS.some(function(t){ return t.c === k; })}; }).filter(function(r){ return r.has; });
+    rows.sort(function(a,b){ if(!a.seen !== !b.seen) return a.seen ? -1 : 1; return a.rate - b.rate; });
+    html += '<h3 style="margin-top:20px;">分野別 ひっかかり対策率</h3>';
+    rows.forEach(function(r){ var pct = Math.round(r.rate*100); html += '<div class="cat-row"><div class="cat-name">' + esc(CATS[r.cat]) + '</div><div class="cat-bar-track"><div class="cat-bar-fill" style="width:' + (r.seen ? pct : 0) + '%;"></div></div><div class="cat-pct">' + (r.seen ? pct + '%' : '—') + '</div></div>'; });
+    var weak = TF_ITEMS.map(function(t){ var s = tfStats[t.id]; return s && s.seen > s.correct ? {t:t, s:s, rate:(s.seen-s.correct)/s.seen} : null; }).filter(Boolean);
+    weak.sort(function(a,b){ return b.rate - a.rate || (b.s.seen - b.s.correct) - (a.s.seen - a.s.correct); });
+    html += '<details class="cat-accordion" style="margin-top:20px;border:2px solid rgba(239, 68, 68, 0.3);"><summary style="color:#ef4444;font-size:14.5px;">▶︎ ⚠️ 間違えやすい文トップ10</summary><div class="cat-qlist" style="padding-top:12px;">';
+    if(!weak.length){ html += '<p class="desc" style="text-align:left;">まだ間違えた文はありません。</p>'; }
+    weak.slice(0,10).forEach(function(w){ html += '<div class="tf-miss"><div><b>' + (w.t.a ? '⭕' : '❌') + '</b> ' + esc(w.t.s) + '</div><small>💡 ' + esc(w.t.n) + '　（正解 ' + w.s.correct + ' / ' + w.s.seen + '回）</small></div>'; });
+    html += '</div></details>';
+    var mc = mcTotals();
+    html += '<div class="stats-foot"><span>累計回答数（4択＋○×）：' + (mc.seen + tt.seen) + '問</span><span>○×のひっかかり対策率：' + tt.rate + '%</span></div>';
+    if(!pendingResetConfirm){ html += '<div class="reset-zone"><button class="btn ghost" id="btnResetAsk" type="button">学習記録をリセットする</button></div>'; }
+    else { html += '<div class="confirm-row">本当にすべての記録を削除しますか？<button class="btn ghost" id="btnResetYes" type="button" style="color:var(--forest-deep);">はい、削除する</button><button class="btn ghost" id="btnResetNo" type="button">キャンセル</button></div>'; }
+    panel.innerHTML = html;
+    bindStatsTabs(panel);
     var ask = document.getElementById('btnResetAsk'); if(ask) ask.onclick = function(){ pendingResetConfirm=true; renderStatsPanel(); };
     var yes = document.getElementById('btnResetYes'); if(yes) yes.onclick = doReset;
     var no = document.getElementById('btnResetNo'); if(no) no.onclick = function(){ pendingResetConfirm=false; renderStatsPanel(); };
