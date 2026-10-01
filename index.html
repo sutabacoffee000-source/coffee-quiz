@@ -201,6 +201,12 @@
   .tf-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   .tf-btn{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:30px;padding:12px 8px;border-radius:16px;border:2px solid var(--line);background:var(--card);cursor:pointer;font-family:var(--font-body);}
   .tf-btn span{font-size:12.5px;font-weight:700;color:var(--ink-soft);}
+  .org-red{color:#D32F2F;font-weight:700;}
+  .tfb-cd{display:flex;align-items:baseline;justify-content:center;gap:6px;color:var(--ink-soft);font-size:13px;font-weight:700;margin-bottom:6px;}
+  .tfb-cd b{font-size:28px;color:#A8492E;}
+  .tfb-track{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-bottom:12px;}
+  .tfb-bar{height:100%;background:linear-gradient(90deg,#f59e0b,#A8492E);transition:width .2s linear;}
+  .tf-btn.picked{border-color:var(--forest);background:rgba(28,59,50,0.14);box-shadow:0 0 0 2px rgba(28,59,50,0.15);}
   .tf-btn.correct{border-color:#10b981;background:rgba(16,185,129,0.12);} .tf-btn.wrong{border-color:#ef4444;background:rgba(239,68,68,0.10);} .tf-btn.dim{opacity:.45;}
   .tf-result{margin-top:14px;padding:10px 12px;border-radius:12px;font-size:14px;font-weight:700;text-align:center;}
   .tf-result.ok{background:rgba(16,185,129,0.12);color:#0f7a57;} .tf-result.ng{background:rgba(239,68,68,0.10);color:#B42318;}
@@ -1153,6 +1159,8 @@
   var explainAnimAt = 0;
   var kanaTyped = '', kanaTypedQ = -1;          // 文字パネル問題で自分が入力中の文字
   var READ_GRACE_SEC = 5;                        // 問題文を出し切ってから締め切るまでの秒数
+  var TF_BATTLE_SEC = 5, TF_BATTLE_PTS = 10;      // まるBAつ問題：全員が6秒以内に○×で答える・正解は一律10点
+  var tfBattleQ = -1, tfBattleAt = 0, tfBattleIv = null;
   var readEndQ = -1, readEndAt = 0, readCdInterval = null, readCdLastSec = -1;
 
   function currentList(){ return mode==='daily' ? daily.ids : practiceIds; }
@@ -1472,6 +1480,7 @@
     myBuzzQ = -1; myBuzzTs = 0; myAnsweredQ = -1; buzzPendingQ = -1;
     hostTimerQ = { window: -1, noBuzz: -1 }; lastAdvancedQ = -1; explainAnimQ = -1;
     kanaTyped = ''; kanaTypedQ = -1; readEndQ = -1; readEndAt = 0; readCdLastSec = -1;
+    tfBattleQ = -1; tfBattleAt = 0; if(tfBattleIv){ clearInterval(tfBattleIv); tfBattleIv = null; }
     if(readCdInterval) { clearInterval(readCdInterval); readCdInterval = null; }
   }
 
@@ -1522,6 +1531,7 @@
     h += '<li>1問につき<b>参加人数÷2（切り上げ）</b>の人数まで押せます（例：2人→1人、8人→4人、13人→7人）</li>';
     h += '<li>正解の得点は押した順番で決まります：<b>1番手 <span class="plus">+20点</span></b>、<b>2番手 <span class="plus">+15点</span></b>、<b>3番手以降 <span class="plus">+10点</span></b></li>';
     h += '<li>✏️ <b>文字パネル問題</b>もまざります。押したら<b>ひらがな（またはカタカナ）を1文字ずつ</b>4つのパネルから選んで答えます（<b>1文字ごとに5秒</b>）。1文字でも間違えるとお手つき！</li>';
+    h += '<li>⭕❌ <b>まるBAつ問題</b>もまざります。問題文は最初から全部表示され、<b>全員</b>が<b>5秒以内</b>に⭕か❌で答えます。正解は一律 <span class="plus">+10点</span>（間違い・時間切れは0点）</li>';
     h += '<li>問題文が最後まで出たら、画面に<b>締め切りまでのカウントダウン（5秒）</b>が出ます</li>';
     h += '<li>誰かが押したあとも、解答枠が残っている間は問題文が流れ続けます。問題文が最後まで出てから5秒で締め切り</li>';
     h += '<li>🔥 <b>連続正解ボーナス</b>：前の問題に続けて正解すると<b>得点2倍</b>！<br>（20点→<b class="plus">40点</b>、15点→<b class="plus">30点</b>、10点→<b class="plus">20点</b>）</li>';
@@ -1641,6 +1651,7 @@
     });
   }
   function isKanaQ(qMeta) { return qMeta && qMeta.type === 'kana'; }
+  function isTfQ(qMeta) { return qMeta && qMeta.type === 'tf'; }
   function kanaPromptText(qMeta) {
     var script = qMeta.ks === 'k' ? 'カタカナ' : 'ひらがな';
     return qMeta.kt === 'fill' ? '（　）に当てはまる言葉を' + script + 'で答えよ' : '単語を' + script + 'で答えよ';
@@ -1648,13 +1659,18 @@
   function answerLimitMs(qMeta) { return ANSWER_LIMIT_MS; } // 4択は5秒、文字パネルは1文字ごとに5秒
 
   // 選択肢はそのまま全て使い、テキストベースで正解を保存することでインデックスズレのバグを回避する
-  // withKana: 文字パネル問題を約3割まぜる
-  function buildBattleQuestions(maxQ, withKana) {
-    var nKana = withKana ? Math.min(Math.max(1, Math.round(maxQ * 0.3)), BATTLE_KANA_QUESTIONS.length) : 0;
+  // withKana: 文字パネル問題、withTf: まるBAつ問題をまぜる（片方だけなら約3割、両方なら各約2.5割）
+  function buildBattleQuestions(maxQ, withKana, withTf) {
+    var share = (withKana && withTf) ? 0.25 : 0.3;
+    var nKana = withKana ? Math.min(Math.max(1, Math.round(maxQ * share)), BATTLE_KANA_QUESTIONS.length) : 0;
+    var nTf = withTf ? Math.min(Math.max(1, Math.round(maxQ * share)), TF_ITEMS.length) : 0;
+    var tfQs = shuffleArrayInPlace(TF_ITEMS.slice()).slice(0, nTf).map(function(t){
+      return { id: t.id, type: 'tf', q: t.s, correctText: t.a ? '○' : '×', n: t.n || '' };
+    });
     var kanaQs = shuffleArrayInPlace(BATTLE_KANA_QUESTIONS.slice()).slice(0, nKana).map(function(k){
       return { id: 'k' + k.id, type: 'kana', kt: k.t, ks: k.s, q: k.q, correctText: k.a, panels: makeKanaPanels(k.a, k.s === 'k'), n: k.n || '' };
     });
-    var choiceQs = pickSet(null, maxQ - nKana).map(function(id) {
+    var choiceQs = pickSet(null, maxQ - nKana - nTf).map(function(id) {
       var original = getQ(id);
       var chosenOpts = shuffleArrayInPlace(original.o.slice());
       return {
@@ -1668,7 +1684,7 @@
         n: original.n || ''
       };
     });
-    return shuffleArrayInPlace(choiceQs.concat(kanaQs));
+    return shuffleArrayInPlace(choiceQs.concat(kanaQs, tfQs));
   }
 
   // 同じ部屋・同じメンバーでもう一戦（新しい問題で待合室に戻る）
@@ -1676,7 +1692,7 @@
     initAudio();
     db.ref('rooms/' + bRoom).transaction(function(r){
       if(!r || r.status !== 'finished') return;
-      var qs = buildBattleQuestions(r.settings.maxQuestions, r.settings.kana !== false);
+      var qs = buildBattleQuestions(r.settings.maxQuestions, r.settings.kana !== false, r.settings.tf !== false);
       var n = Object.keys(r.players || {}).length;
       r.questions = qs;
       r.settings.maxQuestions = qs.length;
@@ -1746,6 +1762,7 @@
     html += '<label style="font-size:11px; flex:1; color:var(--ink-soft); font-weight:bold;">参加人数 (2〜30)<br><input type="number" id="inputMaxPlayers" min="2" max="30" value="2" class="browse-search" style="margin-top:6px; padding:10px; text-align:center;"></label>';
     html += '</div>';
     html += '<label style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:bold; color:var(--ink); margin-bottom:12px; cursor:pointer;"><input type="checkbox" id="inputKana" checked style="width:18px; height:18px;">✏️ 文字パネル問題（ひらがな・カタカナで答える）もまぜる</label>';
+    html += '<label style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:bold; color:var(--ink); margin:-4px 0 12px; cursor:pointer;"><input type="checkbox" id="inputTf" checked style="width:18px; height:18px;">⭕❌ まるBAつ問題（全員で○×を答える）もまぜる</label>';
     html += '<button class="btn" id="btnCreateRoom" type="button" style="background:#A8492E; width:100%; margin-bottom:16px;">ルームを作る</button>';
     html += '<hr style="border:none; border-top:1px dashed var(--line); margin:0 0 16px;">';
     html += '<p style="font-size:13px; font-weight:bold; color:var(--ink); margin:0 0 10px;">💬 友達の部屋に入る</p>';
@@ -1793,7 +1810,8 @@
 
       var roomId = Math.floor(1000 + Math.random() * 9000).toString();
       var kanaOn = document.getElementById('inputKana').checked;
-      var battleQs = buildBattleQuestions(maxQ, kanaOn);
+      var tfOn = document.getElementById('inputTf').checked;
+      var battleQs = buildBattleQuestions(maxQ, kanaOn, tfOn);
       maxQ = battleQs.length;
 
       bMe = 'p_' + Math.random().toString(36).substr(2, 9);
@@ -1801,7 +1819,7 @@
 
       var newRoom = {
         owner: bMe,
-        status: 'waiting', settings: { maxQuestions: maxQ, maxPlayers: maxP, kana: kanaOn },
+        status: 'waiting', settings: { maxQuestions: maxQ, maxPlayers: maxP, kana: kanaOn, tf: tfOn },
         players: players, questions: battleQs, currentQ: 0,
         state: 'intro'
       };
@@ -1846,6 +1864,7 @@
   // 解答した人の結果に合わせて音を順番に鳴らす
   function playBattleResultSounds() {
     var real = realBuzzers(), ans = battleAnswers();
+    if (isTfQ(bState.questions[bState.currentQ])) { var mine = ans[bMe]; if (mine && mine.correct) playCorrect(); else if (mine) playWrong(); else playNoAnswer(); return; }
     if(!real.length) { playNoAnswer(); return; }
     real.forEach(function(pid, i){
       var a = ans[pid];
@@ -1913,14 +1932,26 @@
         if (isHost) {
           setTimeout(function() {
             if (bState && bState.currentQ === q && bState.state === 'intro') db.ref('rooms/' + bRoom).update({ state: 'reading' });
-          }, isKanaQ(bState.questions[q]) ? 3200 : 2000);
+          }, (isKanaQ(bState.questions[q]) || isTfQ(bState.questions[q])) ? 3200 : 2000);
         }
       }
 
       // --- 誰かが押した ---
       if (bState.state !== 'intro' && realBuzzers().length > prevBuzzN) playBuzzer();
 
-      if (isHost) {
+      if (isHost && isTfQ(bState.questions[q])) {
+        // まるBAつ問題：6秒たつか、全員が答えたら正解発表
+        if (bState.state === 'reading' && hostTimerQ.noBuzz !== q) {
+          hostTimerQ.noBuzz = q;
+          setTimeout(function(){
+            if (bState && bState.currentQ === q && bState.state === 'reading') db.ref('rooms/' + bRoom).update({ state: 'answered' });
+          }, TF_BATTLE_SEC * 1000 + 800);
+        }
+        if (bState.state === 'reading') {
+          var tfAns = battleAnswers();
+          if (pKeys.every(function(k){ return tfAns[k]; })) db.ref('rooms/' + bRoom).update({ state: 'answered' });
+        }
+      } else if (isHost) {
         // 問題文を最後まで表示してから5秒たったら、空いている早押し枠を締め切り
         // （誰も押していなければ正解発表へ、3人以上なら2番手の受付終了）
         if ((bState.state === 'reading' || bState.state === 'answering') && hostTimerQ.noBuzz !== q) {
@@ -2018,6 +2049,54 @@
   function submitBattleAnswer(idx) {
     var qMeta = bState && bState.questions[bState.currentQ];
     submitBattleAnswerText(idx >= 0 && qMeta && qMeta.o ? qMeta.o[idx] : ''); // 時間切れの場合は空文字
+  }
+
+  // まるBAつ問題：全員が○か×で答える（正解は一律10点、間違い・時間切れは0点）
+  function submitTfBattleAnswer(mark) {
+    initAudio();
+    if (!bState) return;
+    var q = bState.currentQ, qMeta = bState.questions[q];
+    if (!isTfQ(qMeta) || bState.state !== 'reading' || myAnsweredQ === q || battleAnswers()[bMe]) return;
+    if (tfBattleQ === q && Date.now() - tfBattleAt > TF_BATTLE_SEC * 1000) return;
+    myAnsweredQ = q;
+    var correct = mark === qMeta.correctText, pts = correct ? TF_BATTLE_PTS : 0;
+    var me = bState.players[bMe] || {};
+    var st = me.st || { correct: 0, wrong: 0, first: 0, cur: 0, max: 0 };
+    if (correct) st.correct++;
+    var updates = {};
+    updates['answers/' + bMe] = { text: mark, correct: correct, pts: pts, combo: false };
+    updates['players/' + bMe + '/st'] = st;
+    db.ref('rooms/' + bRoom).update(updates);
+    if (pts) db.ref('rooms/' + bRoom + '/players/' + bMe + '/score').transaction(function(s){ return (s||0) + pts; });
+    playTone(1046.5, 'sine', 0.08, 0.06);
+    render();
+  }
+  // まるBAつ問題の6秒カウントダウン（各端末で表示）
+  function tickTfBattle() {
+    if (!bState || bState.status !== 'playing') { if (tfBattleIv) { clearInterval(tfBattleIv); tfBattleIv = null; } return; }
+    var q = bState.currentQ, left = TF_BATTLE_SEC - (Date.now() - tfBattleAt) / 1000;
+    if (bState.state !== 'reading' || tfBattleQ !== q) { clearInterval(tfBattleIv); tfBattleIv = null; return; }
+    var num = document.getElementById('tfBattleNum'), bar = document.getElementById('tfBattleBar');
+    if (num) num.textContent = Math.max(0, Math.ceil(left));
+    if (bar) bar.style.width = Math.max(0, left / TF_BATTLE_SEC * 100) + '%';
+    if (left <= 0) { clearInterval(tfBattleIv); tfBattleIv = null; render(); }
+  }
+  function tfBattleInputHtml(q) {
+    var mine = battleAnswers()[bMe], answered = !!mine || myAnsweredQ === q;
+    var timeUp = tfBattleQ === q && Date.now() - tfBattleAt >= TF_BATTLE_SEC * 1000;
+    var left = tfBattleQ === q ? Math.max(0, TF_BATTLE_SEC - (Date.now() - tfBattleAt) / 1000) : TF_BATTLE_SEC;
+    var h = '<div class="tfb-cd"><span>⏱ のこり</span><b id="tfBattleNum">' + Math.ceil(left) + '</b><span>秒</span></div>';
+    h += '<div class="tfb-track"><div class="tfb-bar" id="tfBattleBar" style="width:' + (left / TF_BATTLE_SEC * 100) + '%;"></div></div>';
+    var myMark = mine ? mine.text : '';
+    h += '<div class="tf-btns">';
+    ['○','×'].forEach(function(m){
+      var cls = 'tf-btn ' + (m === '○' ? 'o' : 'x') + (answered && myMark === m ? ' picked' : (answered || timeUp ? ' dim' : ''));
+      h += '<button class="' + cls + '" data-tfb="' + m + '" type="button"' + (answered || timeUp ? ' disabled' : '') + '>' + (m === '○' ? '⭕' : '❌') + '<span>' + (m === '○' ? '正しい' : '誤り') + '</span></button>';
+    });
+    h += '</div>';
+    if (answered) h += '<p class="desc" style="margin-top:10px; font-weight:bold; color:var(--forest);">解答しました！みんなの解答を待っています</p>';
+    else if (timeUp) h += '<p class="desc" style="margin-top:10px; font-weight:bold; color:#E03B3B;">⏰ 時間切れ</p>';
+    return h;
   }
 
   // 文字パネル：1文字選ぶごとに判定。間違えたらその場でお手つき
@@ -2132,6 +2211,16 @@
     if(!el || !bState || !bState.questions) return;
     var qMeta = bState.questions[bState.currentQ];
     var fullText = qMeta.q;
+    if (isTfQ(qMeta)) {
+      if (typeInterval) { clearInterval(typeInterval); typeInterval = null; }
+      el.textContent = fullText;
+      if (bState.state === 'reading' && tfBattleQ !== bState.currentQ) {
+        tfBattleQ = bState.currentQ; tfBattleAt = Date.now();
+        if (tfBattleIv) clearInterval(tfBattleIv);
+        tfBattleIv = setInterval(tickTfBattle, 200);
+      }
+      return;
+    }
 
     // 解答枠が空いている間は、誰かが押しても問題文を流し続ける
     var keepTyping = (bState.state === 'reading' || (bState.state === 'answering' && battleBuzzers().length < battleCap())) &&
@@ -2161,7 +2250,7 @@
   // 解説タイム：正解・正解者・解説を大きく表示
   function battleExplainHtml(qMeta) {
     var ans = battleAnswers();
-    var winners = realBuzzers().filter(function(p){ return ans[p] && ans[p].correct; })
+    var winners = (isTfQ(qMeta) ? Object.keys(ans) : realBuzzers()).filter(function(p){ return ans[p] && ans[p].correct; })
       .map(function(p){ return esc((bState.players[p] || { name: '?' }).name); });
     // 登場アニメーションは最初の0.35秒だけ。描き直しても途中から続け、終わった後は動かさない（点滅防止）
     if(explainAnimQ !== bState.currentQ) { explainAnimQ = bState.currentQ; explainAnimAt = Date.now(); }
@@ -2169,9 +2258,9 @@
     var animStyle = animSec < 0.35 ? 'animation-delay:-' + animSec.toFixed(2) + 's;' : 'animation:none;';
     var h = '<div class="explain-card" style="' + animStyle + '">';
     h += '<div class="ex-label">✅ 正解は</div>';
-    h += '<div class="ex-answer">' + esc(qMeta.correctText) + '</div>';
+    h += '<div class="ex-answer">' + (isTfQ(qMeta) ? (qMeta.correctText === '○' ? '⭕ 正しい' : '❌ 誤り') : esc(qMeta.correctText)) + '</div>';
     h += '<div class="ex-who">' + (winners.length ? '🎉 正解：' + winners.join('・') : '😢 正解者なし') + '</div>';
-    if(qMeta.n) h += '<div class="ex-note"><b>💡 解説</b>' + esc(qMeta.n) + '</div>';
+    if(qMeta.n) h += '<div class="ex-note"><b>💡 解説</b>' + (isTfQ(qMeta) ? tfNote(qMeta.n) : esc(qMeta.n)) + '</div>';
     return h + '</div>';
   }
 
@@ -2243,6 +2332,15 @@
 
   function battleResultListHtml() {
     var real = realBuzzers(), ans = battleAnswers(), cap = battleCap();
+    if (isTfQ(bState.questions[bState.currentQ])) {
+      var th = '<div class="battle-result-list">';
+      Object.keys(bState.players || {}).forEach(function(pid){
+        var p = bState.players[pid], a = ans[pid];
+        var v = !a ? '⏰ 時間切れ' : (a.correct ? '⭕ 正解' : '❌ 不正解') + '（' + (a.text === '○' ? '⭕' : '❌') + 'と解答）';
+        th += '<div class="battle-result-row ' + (a && a.correct ? 'ok' : (a ? 'ng' : '')) + '"><span><b>' + esc(p.name) + (pid === bMe ? '（あなた）' : '') + '</b><br><small>' + v + '</small></span><span class="pts">' + (a && a.correct ? '+' + a.pts : '±0') + '</span></div>';
+      });
+      return th + '</div>';
+    }
     if(!real.length) return '<div class="battle-result-list"><div class="battle-result-row"><span>😶 誰も押しませんでした</span><span class="pts">±0</span></div></div>';
     var h = '<div class="battle-result-list">';
     real.forEach(function(pid, i){
@@ -2365,7 +2463,8 @@
     var qMeta = bState.questions[q];
 
     html += '<div class="qnum" style="text-align:center;font-weight:bold; font-size:14px; margin-bottom:8px;">第 ' + (q + 1) + ' 問 / 全' + bState.settings.maxQuestions + '問</div>';
-    html += '<div class="battle-mode-note">👥 ' + (cap >= 2 ? cap + '人まで解答OK ・ ' : '') + '1番手20点' + (cap >= 2 ? '・2番手15点' : '') + (cap >= 3 ? '・3番手以降10点' : '') + '</div>';
+    if (isTfQ(qMeta)) html += '<div class="battle-mode-note">⭕❌ まるBAつ問題 ・ 全員が解答 ・ 正解で一律10点（' + TF_BATTLE_SEC + '秒以内）</div>';
+    else html += '<div class="battle-mode-note">👥 ' + (cap >= 2 ? cap + '人まで解答OK ・ ' : '') + '1番手20点' + (cap >= 2 ? '・2番手15点' : '') + (cap >= 3 ? '・3番手以降10点' : '') + '</div>';
 
     var msg = '準備してね！';
     if (bState.state === 'reading') { msg = '早押しスタンバイ！'; }
@@ -2375,6 +2474,7 @@
       else if (slotsOpen) msg = 'まだ' + (real.length + 1) + '番手で押せる！';
       else msg = real.length > 3 ? real.length + '人が解答中...' : real.map(function(p){ return esc((bState.players[p] || {}).name || ''); }).join('・') + ' が解答中...';
     }
+    if (isTfQ(qMeta) && bState.state === 'reading') msg = iAnswered ? '解答しました！' : '⭕か❌で答えよう！（全員参加）';
     if (bState.state === 'answered') { msg = '正解発表！'; }
 
     html += '<div class="battle-status-msg" id="battleStatusMsg">' + msg + '</div>';
@@ -2385,10 +2485,14 @@
       if(isKanaQ(qMeta)) {
         html += '<div class="kana-intro"><div class="kana-intro-tag">✏️ 文字パネル問題</div><div class="kana-intro-text">' + kanaPromptText(qMeta) + '</div><div class="kana-intro-sub">押したら' + (qMeta.ks === 'k' ? 'カタカナ' : 'ひらがな') + 'を1文字ずつ選んで答えよう！</div></div>';
       }
+      if(isTfQ(qMeta)) {
+        html += '<div class="kana-intro"><div class="kana-intro-tag" style="background:#23405C;">⭕❌ まるBAつ問題</div><div class="kana-intro-text">全員で答えよう！</div><div class="kana-intro-sub">問題文が全部表示されたら、' + TF_BATTLE_SEC + '秒以内に⭕か❌をタップ。正解で10点！</div></div>';
+      }
       html += '</div>';
     } else {
       html += '<div style="min-height:140px; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--card); border-radius:14px; padding:16px; margin-bottom:16px; border:2px solid var(--line);">';
       if(isKanaQ(qMeta)) html += '<div class="kana-badge">✏️ ' + kanaPromptText(qMeta) + '</div>';
+      if(isTfQ(qMeta)) html += '<div class="kana-badge" style="background:#EEF3F8;color:#23405C;border-color:#6C8EAD;">⭕❌ 正しい？誤り？</div>';
       html += '<div class="qtext-box"><p class="qtext qtext-ghost" aria-hidden="true">' + esc(qMeta.q) + '</p><p class="qtext" id="battleQuestionText"></p></div>';
       if(qMeta.img){ html += '<img src="'+esc(qMeta.img)+'" style="max-width:100%; border-radius:8px; margin-bottom:10px;">'; }
       if(qMeta.map){ html += '<div class="question-map" style="margin:0;">'+qMeta.map+'</div>'; }
@@ -2396,7 +2500,7 @@
       html += '</div>';
     }
 
-    if ((bState.state === 'reading' || bState.state === 'answering') && slotsOpen && !(iBuzzed && !iAnswered)) {
+    if ((bState.state === 'reading' || bState.state === 'answering') && slotsOpen && !(iBuzzed && !iAnswered) && !isTfQ(qMeta)) {
       html += '<div id="readCdWrap" class="read-cd-wrap"></div>';
     }
 
@@ -2428,6 +2532,9 @@
         html += '<button class="btn" id="btnReadyNext" type="button">次の問題へ (OK)</button>';
       }
       html += '</div>';
+    }
+    else if (isTfQ(qMeta) && bState.state === 'reading') {
+      html += tfBattleInputHtml(q);
     }
     else if (iBuzzed && !iAnswered && bState.state !== 'intro') {
       var limitSec = answerLimitMs(qMeta) / 1000;
@@ -2497,6 +2604,10 @@
 
     var buzzBtn = document.getElementById('btnBuzz');
     if(buzzBtn) buzzBtn.onclick = doBuzz;
+
+    document.querySelectorAll('[data-tfb]').forEach(function(b){
+      b.onclick = function(){ submitTfBattleAnswer(b.getAttribute('data-tfb')); };
+    });
 
     document.querySelectorAll('.kana-btn').forEach(function(b){
       b.onclick = function(){ onKanaTap(b.getAttribute('data-kana')); };
@@ -2676,7 +2787,7 @@
       html += '<div class="cat-row"><div class="cat-name">'+esc(CATS[r.cat])+'</div><div class="cat-bar-track"><div class="cat-bar-fill" style="width:'+(r.seen? pct : 0)+'%;"></div></div><div class="cat-pct">'+(r.seen ? pct+'%' : '—')+'</div></div>';
     });
     var tfT = tfTotals();
-    html += '<div class="stats-foot"><span>累計回答数（4択＋○×）：'+(totalSeen + tfT.seen)+'問</span><span>4択の正答率：'+(totalSeen? Math.round(totalCorrect/totalSeen*100):0)+'%</span></div>';
+    html += '<div class="stats-foot"><span>累計回答数（4択＋まるBAつ）：'+(totalSeen + tfT.seen)+'問</span><span>4択の正答率：'+(totalSeen? Math.round(totalCorrect/totalSeen*100):0)+'%</span></div>';
 
     if(!pendingResetConfirm){ html += '<div class="reset-zone"><button class="btn ghost" id="btnResetAsk" type="button">学習記録をリセットする</button></div>'; } 
     else { html += '<div class="confirm-row">本当にすべての記録を削除しますか？<button class="btn ghost" id="btnResetYes" type="button" style="color:var(--forest-deep);">はい、削除する</button><button class="btn ghost" id="btnResetNo" type="button">キャンセル</button></div>'; }
@@ -2701,7 +2812,7 @@
     var no = document.getElementById('btnResetNo'); if(no) no.onclick = function(){ pendingResetConfirm=false; renderStatsPanel(); };
   }
 
-  /* ---------------- ○×チャレンジ（4択とは別に記録） ---------------- */
+  /* ---------------- まるBAつ問題（4択とは別に記録） ---------------- */
   var TF_ITEMS = [
     {"id": "t1", "c": "cafe", "s": "C.A.F.E. プラクティスの「C.A.F.E.」は「Coffee And Farmer Equity（コーヒーと生産者の公平性）」の略である。", "a": true, "n": "Coffee And Farmer Equity＝コーヒーと生産者の公平性。"},
     {"id": "t2", "c": "cafe", "s": "C.A.F.E. プラクティスは、一度取得すれば永久に有効な認証制度である。", "a": false, "n": "一度限りの認証ではなく、継続的な改善を促す包括的なプログラムです。"},
@@ -2877,13 +2988,30 @@
     {"id": "t172", "c": "ops", "s": "ディカフェの「ダイレクトコンタクト法」では、塩化メチレンを使ってカフェインを除去する。", "a": true, "n": "だから日本では取り扱っていません。"},
     {"id": "t173", "c": "ops", "s": "スイスウォータープロセスは、化学薬剤を使わず、水と活性炭フィルターでカフェインを除去する方法である。", "a": true, "n": "薬剤を使わない方法です。"},
     {"id": "t174", "c": "ops", "s": "ペーパーカップやTogoバッグについている「FSC認証」は、ファーマーサポートセンターが認めたマークである。", "a": false, "n": "森林の「FSC認証（Forest Stewardship Council）」で、適切な森林管理の証です。略称が同じなので注意。"},
-    {"id": "t175", "c": "ops", "s": "スターバックス コーヒー ジャパンで通年開催しているコーヒーセミナーは「コーヒーをはじめよう編」である。", "a": true, "n": "通年開催は「コーヒーをはじめよう編」です。"}
+    {"id": "t175", "c": "ops", "s": "スターバックス コーヒー ジャパンで通年開催しているコーヒーセミナーは「コーヒーをはじめよう編」である。", "a": true, "n": "通年開催は「コーヒーをはじめよう編」です。"},
+    {"id": "t176", "c": "supply", "s": "SCTCは、アメリカ・シアトルにある。", "a": false, "n": "SCTCはスイス・ローザンヌ。シアトルにあるのはGCQです。"},
+    {"id": "t177", "c": "supply", "s": "SCTCは、ブレンドのレシピの作成や管理を行う。", "a": false, "n": "レシピの作成・管理はGCQの役割です。SCTCは購買を担当します。"},
+    {"id": "t178", "c": "supply", "s": "SCTCは、コーヒー生産者やサプライヤーとの関係強化を行う。", "a": true, "n": "SCTCの役割の一つです。"},
+    {"id": "t179", "c": "supply", "s": "SCTCは、全サプライヤーとの取引関係の管理を行う。", "a": true, "n": "取引関係の管理はSCTCの役割です。"},
+    {"id": "t180", "c": "supply", "s": "SCTCは、コーヒー栽培におけるコスト管理を行う。", "a": false, "n": "栽培や生産コストのサポートはファーマーサポートセンター（FSC）の役割です。"},
+    {"id": "t181", "c": "supply", "s": "SCTCは、生豆の需要予測を担当している。", "a": false, "n": "需要予測はSCTCの役割ではありません。SCTCはオファーサンプルのテイスティング、輸送手配、全購買量の管理などを担います。"},
+    {"id": "t182", "c": "supply", "s": "SCTCは、オファーサンプルのテイスティングを行う。", "a": true, "n": "購買を決める前に、オファーサンプルを評価します。"},
+    {"id": "t183", "c": "supply", "s": "SCTCは、生豆の全購買量の管理を行う。", "a": true, "n": "購買を担当するSCTCの役割です。"},
+    {"id": "t184", "c": "supply", "s": "SCTCは、C.A.F.E. プラクティスの監査を行う第三者機関である。", "a": false, "n": "監査を行う第三者機関はSCSです。SCTCはスターバックスの購買会社です。"},
+    {"id": "t185", "c": "supply", "s": "GCQは、生産者と生豆の購買契約を結ぶ。", "a": false, "n": "購買契約はSCTCの役割です。GCQは品質管理とブレンドのレシピを担当します。"},
+    {"id": "t186", "c": "supply", "s": "GCQは、ファーマーサポートセンターで生産者に栽培の指導を行う。", "a": false, "n": "栽培の指導はFSCのアグロノミストの役割です。"},
+    {"id": "t187", "c": "supply", "s": "スターバックスが購買を決定する前に評価するのは「到着サンプル」である。", "a": false, "n": "購買前に評価するのは「オファーサンプル」。到着サンプルは焙煎工場に着いたときにGCQが確認します。"},
+    {"id": "t188", "c": "supply", "s": "購買契約が結ばれると、輸送前の品質チェックのために「出荷前サンプル」のテイスティングを行う。", "a": true, "n": "オファーサンプル → 出荷前サンプル → 到着サンプル の順です。"},
+    {"id": "t189", "c": "supply", "s": "サプライヤーからオファーされたコーヒーが基準に満たない場合は、その理由を伝えたうえで却下する。", "a": true, "n": "基準に満たない理由を伝えることで、生産者の品質向上につなげます。"}
   ];
   var TF_COUNT = 15, TF_MULTI_SETS = 5;
   var tfStats = {};          // {id:{seen, correct, streak}}
   var tfScope = 'all';       // 'all'＝全分野 / 'weak'＝間違えた文だけ
   var tfRound = null;        // {kind:'tf'|'multi', ids:[...]|sets:[[...]], idx, results:[...], answered}
   var statsTab = 'mc';       // 学習記録のタブ：'mc'＝4択 / 'tf'＝○×
+  // 解説の中の団体名（役割を取り違えやすいもの）を赤字で強調する
+  var TF_ORG_RE = /(ファーマーサポートセンター|コンサベーション・インターナショナル|アグロノミスト|SCTC|GCQ|FSC|SCS|CI)/g;
+  function tfNote(n){ return esc(n || '').replace(TF_ORG_RE, '<span class="org-red">$1</span>'); }
   function getTf(id){ for(var i=0;i<TF_ITEMS.length;i++){ if(TF_ITEMS[i].id===id) return TF_ITEMS[i]; } return null; }
   function tfLevel(s){ // 4択と同じ基準：完璧＝3回以上正解／覚えた＝2回連続正解／学習中＝1回以上正解／苦手＝正解なし
     if(!s || !s.seen) return 'gray';
@@ -2933,13 +3061,13 @@
   function tfTagHtml(t){ return '<span class="tag">'+esc(CATS[t.c] || '')+'</span>'; }
   function renderTfHome(){
     var tt = tfTotals(); var weakN = tfWeakIds().length;
-    var html = '<div class="center-col"><div class="big-title">⭕❌ ○×チャレンジ</div>';
+    var html = '<div class="center-col"><div class="big-title">⭕❌ まるBAつ問題</div>';
     html += '<p class="desc">文章が「正しい（○）」か「誤り（×）」かを答える練習です。本番の複数選択（問41〜50）の引っかけ対策に。</p>';
     html += '<div class="tf-meter"><div><b>' + tt.rate + '%</b><span>ひっかかり対策率</span></div><div><b>' + (tt.lv.blue + tt.lv.green) + '</b><span>覚えた問題 / ' + TF_ITEMS.length + '</span></div><div><b>' + tt.seen + '</b><span>回答した回数</span></div></div>';
     html += '<div class="tf-scope"><button type="button" data-tfscope="all" class="' + (tfScope==='all'?'on':'') + '">🎯 全分野</button><button type="button" data-tfscope="weak" class="' + (tfScope==='weak'?'on':'') + '"' + (weakN ? '' : ' disabled') + '>⚠️ 間違えた問題だけ（' + weakN + '）</button></div>';
     html += '<button class="tf-mode" id="btnTfSingle" type="button"><b>⭕❌ 1問ずつ答える（' + TF_COUNT + '問）</b><span>○か×をタップ。すぐに答えと解説が出ます</span></button>';
     html += '<button class="tf-mode alt" id="btnTfMulti" type="button"><b>📝 本番形式（4問 × ' + TF_MULTI_SETS + 'セット）</b><span>4問のうち正しいものを全部選ぶ。全部合って正解</span></button>';
-    html += '<button class="text-link-btn" id="btnTfBrowse" type="button">📋 ○×問題を一覧で見る（' + TF_ITEMS.length + '問）</button>';
+    html += '<button class="text-link-btn" id="btnTfBrowse" type="button">📋 まるBAつ問題を一覧で見る（' + TF_ITEMS.length + '問）</button>';
     html += '<button class="text-link-btn" id="btnTfHomeBack" type="button">ホーム画面に戻る</button></div>';
     return html;
   }
@@ -2952,7 +3080,7 @@
   }
   function renderTfQuestion(){
     var r = tfRound, html = '';
-    html += '<div class="q-actions"><span></span><span style="display:flex;align-items:center;gap:6px;">' + soundToggleHtml() + '<button class="text-link-btn" id="btnTfQuit" type="button">○×チャレンジに戻る</button></span></div>';
+    html += '<div class="q-actions"><span></span><span style="display:flex;align-items:center;gap:6px;">' + soundToggleHtml() + '<button class="text-link-btn" id="btnTfQuit" type="button">まるBAつ問題に戻る</button></span></div>';
     if(r.kind === 'tf'){
       var t = getTf(r.ids[r.idx]); var ans = r.answered;
       html += '<div class="q-tags">' + tfTagHtml(t) + '</div><div class="qnum">' + (r.idx+1) + ' / ' + r.ids.length + ' 問目</div>';
@@ -2966,7 +3094,7 @@
       html += '</div>';
       if(ans){
         html += '<div class="tf-result ' + (ans.ok ? 'ok' : 'ng') + '">' + (ans.ok ? '⭕ 正解' : '❌ 不正解') + '　答えは <b>' + (t.a ? '⭕ 正しい' : '❌ 誤り') + '</b></div>';
-        html += '<div class="note">💡 ' + esc(t.n) + '</div>';
+        html += '<div class="note">💡 ' + tfNote(t.n) + '</div>';
         html += '<div class="actions"><button class="btn" id="btnTfNext" type="button">' + (r.idx+1 >= r.ids.length ? '結果を見る' : '次の問題へ') + '</button></div>';
       }
     } else {
@@ -2977,7 +3105,7 @@
         var t = getTf(id); var on = r.picked.indexOf(i) !== -1;
         if(a){
           var ok = (on === t.a);
-          var note = '<small class="tf-mini-note">' + (on ? 'あなた：選んだ' : 'あなた：選ばなかった') + '　／　答え：' + (t.a ? '⭕ 正しい' : '❌ 誤り') + (ok ? '' : '　← ここで間違い') + '<br>' + esc(t.n) + '</small>';
+          var note = '<small class="tf-mini-note">' + (on ? 'あなた：選んだ' : 'あなた：選ばなかった') + '　／　答え：' + (t.a ? '⭕ 正しい' : '❌ 誤り') + (ok ? '' : '　← ここで間違い') + '<br>' + tfNote(t.n) + '</small>';
           html += multiOptHtml(i, t.s, on, ok ? ' correct' : ' wrong', 'data-mi="' + i + '"', true, on ? '✓' : '', note);
         } else { html += multiOptHtml(i, t.s, on, '', 'data-mi="' + i + '"', false); }
       });
@@ -3017,18 +3145,18 @@
   }
   function renderTfSummary(){
     var r = tfRound, n = r.results.length, ok = r.results.filter(function(x){ return x.ok; }).length, miss = n - ok;
-    var html = '<div class="center-col"><div class="big-title">○×チャレンジ 結果</div>';
+    var html = '<div class="center-col"><div class="big-title">まるBAつ問題 結果</div>';
     html += '<div class="score-big">' + ok + ' / ' + n + '</div><div class="score-sub">正解した問題　／　今回のひっかかり対策率 <b>' + (n ? Math.round(ok/n*100) : 0) + '%</b></div>';
     if(r.kind === 'multi'){ var full = (r.setResults || []).filter(Boolean).length; html += '<p class="desc">本番形式の完答：<b>' + full + ' / ' + r.sets.length + 'セット</b>（本番なら ' + (full*2) + ' / ' + (r.sets.length*2) + '点）</p>'; }
     html += '<p class="desc">全体のひっかかり対策率：<b>' + tfTotals().rate + '%</b></p>';
     var wrong = r.results.filter(function(x){ return !x.ok; });
     if(wrong.length){
       html += '<div class="tf-miss-list"><div class="tf-miss-head">❌ 間違えた問題（' + wrong.length + '）</div>';
-      wrong.forEach(function(x){ var t = getTf(x.id); html += '<div class="tf-miss"><div><b>' + (t.a ? '⭕' : '❌') + '</b> ' + esc(t.s) + '</div><small>💡 ' + esc(t.n) + '</small></div>'; });
+      wrong.forEach(function(x){ var t = getTf(x.id); html += '<div class="tf-miss"><div><b>' + (t.a ? '⭕' : '❌') + '</b> ' + esc(t.s) + '</div><small>💡 ' + tfNote(t.n) + '</small></div>'; });
       html += '</div>';
     } else { html += '<p class="desc">🎉 全問正解です！</p>'; }
     html += '<button class="btn" id="btnTfAgain" type="button" style="width:100%;max-width:340px;">▶ ' + (r.kind === 'multi' ? 'もう一度 本番形式' : '次の' + TF_COUNT + '問へ') + '</button>';
-    html += '<button class="btn secondary" id="btnTfToTop" type="button">○×チャレンジのトップへ</button><button class="text-link-btn" id="btnTfSumHome" type="button">ホーム画面に戻る</button></div>';
+    html += '<button class="btn secondary" id="btnTfToTop" type="button">まるBAつ問題のトップへ</button><button class="text-link-btn" id="btnTfSumHome" type="button">ホーム画面に戻る</button></div>';
     return html;
   }
   function bindTfSummary(){
@@ -3037,23 +3165,23 @@
     document.getElementById('btnTfSumHome').onclick = goHome;
   }
   function renderTfBrowse(){
-    var html = '<div><button class="text-link-btn" id="btnTfBrowseBack" type="button">← ○×チャレンジに戻る</button>';
-    html += '<div class="big-title" style="margin-top:10px;text-align:left;">○×問題 一覧（' + TF_ITEMS.length + '問）</div>';
+    var html = '<div><button class="text-link-btn" id="btnTfBrowseBack" type="button">← まるBAつ問題に戻る</button>';
+    html += '<div class="big-title" style="margin-top:10px;text-align:left;">まるBAつ問題 一覧（' + TF_ITEMS.length + '問）</div>';
     html += '<p class="desc" style="text-align:left;max-width:none;">分野をタップすると開きます。各問題をタップすると、○か×と解説が表示されます。</p>';
     Object.keys(CATS).forEach(function(k){
       var list = TF_ITEMS.filter(function(t){ return t.c === k; }); if(!list.length) return;
       html += '<details class="cat-accordion"><summary>' + esc(CATS[k]) + '（' + list.length + '問）</summary><div class="cat-qlist">';
-      list.forEach(function(t, i){ html += '<details class="flashcard"><summary>' + (i+1) + '. ' + esc(t.s) + '</summary><div class="flashcard-answer"><div class="browse-answer">' + (t.a ? '⭕ 正しい' : '❌ 誤り') + '</div><div class="browse-note">💡 ' + esc(t.n) + '</div></div></details>'; });
+      list.forEach(function(t, i){ html += '<details class="flashcard"><summary>' + (i+1) + '. ' + esc(t.s) + '</summary><div class="flashcard-answer"><div class="browse-answer">' + (t.a ? '⭕ 正しい' : '❌ 誤り') + '</div><div class="browse-note">💡 ' + tfNote(t.n) + '</div></div></details>'; });
       html += '</div></details>';
     });
     return html + '</div>';
   }
   function bindTfBrowse(){ document.getElementById('btnTfBrowseBack').onclick = function(){ screen = 'tfHome'; render(); window.scrollTo(0,0); }; }
-  function tfLinkHtml(){ return '<button class="tf-link-btn" id="btnTfEntry" type="button"><b>⭕❌ ○×チャレンジ <span class="new-pill">NEW</span></b><span>正しい？誤り？ 本番の引っかけ対策（' + TF_ITEMS.length + '問）</span></button>'; }
+  function tfLinkHtml(){ return '<button class="tf-link-btn" id="btnTfEntry" type="button"><b>⭕❌ まるBAつ問題 <span class="new-pill">NEW</span></b><span>正しい？誤り？ 本番の引っかけ対策（' + TF_ITEMS.length + '問）</span></button>'; }
   function bindTfLink(){ var b = document.getElementById('btnTfEntry'); if(b) b.onclick = function(){ screen = 'tfHome'; render(); window.scrollTo(0,0); }; }
 
   // 学習記録：4択と○×をタブで切り替え（グラフは別、累計回答数は合算）
-  function statsTabsHtml(){ return '<div class="stats-tabs"><button type="button" data-stab="mc" class="' + (statsTab==='mc'?'on':'') + '">📘 4択問題</button><button type="button" data-stab="tf" class="' + (statsTab==='tf'?'on':'') + '">⭕❌ ○×問題</button></div>'; }
+  function statsTabsHtml(){ return '<div class="stats-tabs"><button type="button" data-stab="mc" class="' + (statsTab==='mc'?'on':'') + '">📘 4択問題</button><button type="button" data-stab="tf" class="' + (statsTab==='tf'?'on':'') + '">⭕❌ まるBAつ</button></div>'; }
   function bindStatsTabs(panel){ panel.querySelectorAll('[data-stab]').forEach(function(b){ b.onclick = function(){ statsTab = b.getAttribute('data-stab'); renderStatsPanel(); }; }); }
   function mcTotals(){ var seen = 0, correct = 0; QUESTIONS.forEach(function(q){ var s = stats[q.id]; if(s){ seen += s.seen; correct += s.correct; } }); return {seen:seen, correct:correct}; }
   function renderTfStats(panel){
@@ -3061,7 +3189,7 @@
     var p = function(x){ return x / N * 100; };
     var d1 = p(lv.blue), d2 = d1 + p(lv.green), d3 = d2 + p(lv.orange), d4 = d3 + p(lv.red);
     var gradient = 'conic-gradient(#3b82f6 0% '+d1+'%, #10b981 '+d1+'% '+d2+'%, #f59e0b '+d2+'% '+d3+'%, #ef4444 '+d3+'% '+d4+'%, #d1d5db '+d4+'% 100%)';
-    var html = statsTabsHtml() + '<h3>○×問題の進捗</h3><div class="stats-overview">';
+    var html = statsTabsHtml() + '<h3>まるBAつ問題の進捗</h3><div class="stats-overview">';
     html += '<div class="progress-donut" style="background:' + gradient + ';"><div class="donut-inner"><div class="donut-pct">' + tt.rate + '%</div><div class="donut-lbl">ひっかかり<br>対策率</div></div></div>';
     html += '<div class="pie-legend">';
     html += '<div class="legend-item"><div class="legend-label"><div class="legend-dot blue"></div>完璧 (3回以上正解)</div><div class="legend-count">' + lv.blue + '問</div></div>';
@@ -3079,10 +3207,10 @@
     weak.sort(function(a,b){ return b.rate - a.rate || (b.s.seen - b.s.correct) - (a.s.seen - a.s.correct); });
     html += '<details class="cat-accordion" style="margin-top:20px;border:2px solid rgba(239, 68, 68, 0.3);"><summary style="color:#ef4444;font-size:14.5px;">▶︎ ⚠️ 間違えやすい問題トップ10</summary><div class="cat-qlist" style="padding-top:12px;">';
     if(!weak.length){ html += '<p class="desc" style="text-align:left;">まだ間違えた問題はありません。</p>'; }
-    weak.slice(0,10).forEach(function(w){ html += '<div class="tf-miss"><div><b>' + (w.t.a ? '⭕' : '❌') + '</b> ' + esc(w.t.s) + '</div><small>💡 ' + esc(w.t.n) + '　（正解 ' + w.s.correct + ' / ' + w.s.seen + '回）</small></div>'; });
+    weak.slice(0,10).forEach(function(w){ html += '<div class="tf-miss"><div><b>' + (w.t.a ? '⭕' : '❌') + '</b> ' + esc(w.t.s) + '</div><small>💡 ' + tfNote(w.t.n) + '　（正解 ' + w.s.correct + ' / ' + w.s.seen + '回）</small></div>'; });
     html += '</div></details>';
     var mc = mcTotals();
-    html += '<div class="stats-foot"><span>累計回答数（4択＋○×）：' + (mc.seen + tt.seen) + '問</span><span>○×のひっかかり対策率：' + tt.rate + '%</span></div>';
+    html += '<div class="stats-foot"><span>累計回答数（4択＋まるBAつ）：' + (mc.seen + tt.seen) + '問</span><span>まるBAつのひっかかり対策率：' + tt.rate + '%</span></div>';
     if(!pendingResetConfirm){ html += '<div class="reset-zone"><button class="btn ghost" id="btnResetAsk" type="button">学習記録をリセットする</button></div>'; }
     else { html += '<div class="confirm-row">本当にすべての記録を削除しますか？<button class="btn ghost" id="btnResetYes" type="button" style="color:var(--forest-deep);">はい、削除する</button><button class="btn ghost" id="btnResetNo" type="button">キャンセル</button></div>'; }
     panel.innerHTML = html;
