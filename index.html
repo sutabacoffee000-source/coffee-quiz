@@ -43,6 +43,9 @@
   .badges{display:flex;gap:8px;justify-content:center;margin-bottom:22px;flex-wrap:wrap;}
   .badge{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:12.5px;color:var(--ink-soft);display:flex;align-items:center;gap:6px;}
   .badge b{color:var(--forest-deep);font-weight:700;}
+  .sound-badge{cursor:pointer;font-family:var(--font-body);font-weight:700;color:var(--forest-deep);border-color:var(--forest);}
+  .sound-badge.off{color:var(--ink-soft);border-color:var(--line);}
+  .badges.slim{margin-bottom:12px;}
   .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px 22px;box-shadow:0 14px 34px rgba(43,27,18,0.10);}
   .q-actions{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;}
   .q-tags{margin-bottom:2px;}
@@ -234,6 +237,63 @@
   .tf-stats-note{font-size:11.5px;color:var(--ink-soft);line-height:1.6;margin:10px 0 0;text-align:left;}
   .legend-count{white-space:nowrap;}
   .cat-bar-fill.tf{background:linear-gradient(90deg,#f59e0b,#ef4444);}
+  .hub-card{display:flex;align-items:center;gap:14px;width:100%;max-width:360px;text-align:left;background:var(--gold-soft);border:1.5px solid var(--gold);border-radius:16px;padding:16px;margin-top:12px;cursor:pointer;font-family:var(--font-body);color:#4A3212;}
+  .hub-card.mine{background:#EEF3F8;border-color:#6C8EAD;color:#23405C;}
+  .hub-card .hub-ico{font-size:30px;}
+  .hub-card b{display:block;font-size:15px;margin-bottom:3px;} .hub-card small{font-size:11.5px;opacity:.85;line-height:1.5;}
+  .my-empty{background:var(--paper);border:1.5px dashed var(--line);border-radius:14px;padding:18px;text-align:center;font-size:13px;color:var(--ink-soft);margin:10px 0;line-height:1.7;}
+  .my-deck{display:block;width:100%;text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:8px;cursor:pointer;font-family:var(--font-body);color:var(--ink);}
+  .my-deck b{display:block;font-size:15px;margin-bottom:2px;} .my-deck span{font-size:12px;color:var(--ink-soft);}
+  .my-deck small{font-size:11.5px;color:var(--ink-soft);}
+  .my-bar{height:7px;background:var(--line);border-radius:4px;overflow:hidden;margin-bottom:4px;} .my-bar div{height:100%;background:linear-gradient(90deg,var(--gold),var(--forest));}
+  .my-new{display:flex;gap:8px;margin-top:12px;} .my-new input{flex:1;margin:0;} .my-new .btn{flex-shrink:0;padding:10px 16px;}
+  .my-import{margin-top:16px;} .my-import summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--forest-deep);padding:6px 0;} .my-import p{font-size:12px;margin:4px 0 0;}
+  .my-foot{display:flex;justify-content:space-between;gap:10px;margin-top:14px;flex-wrap:wrap;}
+  .my-msg{color:var(--clay) !important;font-weight:700;min-height:16px;}
+  .my-title-row{display:flex;align-items:center;gap:6px;margin-top:10px;} .my-title-input{flex:1;font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--forest-deep);border:none;border-bottom:1.5px dashed var(--line);background:transparent;padding:4px 0;}
+  .my-study-row{display:flex;gap:8px;flex-wrap:wrap;} .my-study-row .btn{flex:1;min-width:140px;}
+  .my-rev{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-soft);margin:8px 0 4px;}
+  .my-add{display:flex;flex-direction:column;gap:8px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:12px;margin:14px 0;} .my-add b{font-size:13.5px;color:var(--forest-deep);}
+  .my-add textarea,.my-card textarea{width:100%;box-sizing:border-box;font-family:var(--font-body);font-size:14px;padding:10px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);resize:vertical;}
+  .my-list-head{display:flex;justify-content:space-between;align-items:center;margin:16px 0 8px;} .my-list-head b{font-size:14px;color:var(--forest-deep);}
+  .my-share-btn{padding:7px 14px;font-size:12.5px;}
+  .my-sel-hint{font-size:12px;color:var(--forest-deep);font-weight:700;margin:0 0 8px;}
+  .my-card{display:flex;align-items:flex-start;gap:10px;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:7px;}
+  .my-card.editing{flex-direction:column;} .my-card-btns{display:flex;gap:8px;}
+  .my-card.selectable{cursor:pointer;} .my-card.selected{border-color:var(--forest);background:rgba(28,59,50,0.10);box-shadow:0 0 0 2px rgba(28,59,50,0.15);}
+  .my-check{flex:0 0 22px;height:22px;border-radius:6px;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#F6EFDD;margin-top:2px;}
+  .my-card.selected .my-check{background:var(--forest);border-color:var(--forest);}
+  .my-card-body{flex:1;min-width:0;} .my-f{font-size:14px;font-weight:700;color:var(--ink);line-height:1.5;word-break:break-word;} .my-b{font-size:13px;color:var(--ink-soft);line-height:1.5;margin-top:3px;padding-top:3px;border-top:1px dashed var(--line);word-break:break-word;}
+  .my-card-side{display:flex;flex-direction:column;align-items:flex-end;gap:4px;} .my-icon{background:none;border:none;font-size:16px;cursor:pointer;padding:2px;}
+  .my-ok{font-size:10px;font-weight:700;color:#F6EFDD;background:var(--forest);border-radius:999px;padding:2px 7px;white-space:nowrap;margin-right:6px;vertical-align:2px;}
+  .deck-tabs{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;margin:0 -4px 6px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .deck-tabs::-webkit-scrollbar{display:none;}
+  .deck-tab{flex:0 0 auto;scroll-snap-align:center;display:flex;align-items:center;gap:6px;background:var(--card);border:1.5px solid var(--line);border-radius:999px;padding:9px 14px;font-size:13.5px;font-weight:700;color:var(--ink);cursor:pointer;font-family:var(--font-body);white-space:nowrap;}
+  .deck-tab small{font-size:11px;font-weight:700;color:var(--ink-soft);background:var(--paper);border-radius:999px;padding:1px 7px;}
+  .deck-tab.on{background:var(--forest);border-color:var(--forest);color:#F6EFDD;} .deck-tab.on small{background:rgba(255,255,255,0.18);color:#F6EFDD;}
+  .deck-tab.add{color:var(--forest-deep);border-style:dashed;}
+  .my-panel{display:flex;flex-direction:column;gap:8px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:12px;margin:10px 0;} .my-panel b{font-size:13.5px;color:var(--forest-deep);}
+  .my-panel textarea,.my-edit-fields textarea{width:100%;box-sizing:border-box;font-family:var(--font-body);font-size:14px;padding:9px 10px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);resize:vertical;}
+  .my-note{font-size:11.5px;color:var(--ink-soft);margin:6px 0;line-height:1.6;}
+  .my-view-head{display:flex;justify-content:space-between;align-items:center;margin:6px 0 18px;font-size:12.5px;color:var(--ink-soft);font-weight:700;}
+  .my-view-btns{display:flex;gap:6px;}
+  .my-chip{background:var(--card);border:1.5px solid var(--forest);color:var(--forest-deep);border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:var(--font-body);}
+  .wcard{display:flex;flex-direction:column;justify-content:center;align-items:center;width:100%;text-align:center;background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:34px 22px;margin-bottom:16px;cursor:pointer;font-family:var(--font-body);min-height:150px;position:relative;box-shadow:0 3px 10px rgba(0,0,0,0.05);}
+  .wcard .wf{display:block;font-size:20px;font-weight:700;color:var(--ink);line-height:1.7;white-space:pre-wrap;word-break:break-word;}
+  .wcard .wb{display:none;font-size:20px;font-weight:700;color:var(--forest-deep);line-height:1.7;white-space:pre-wrap;word-break:break-word;}
+  .wcard.back{background:rgba(28,59,50,0.08);border-color:var(--forest);} .wcard.back .wf{display:none;} .wcard.back .wb{display:block;}
+  .wcard::after{content:'表';position:absolute;top:10px;right:14px;font-size:11px;font-weight:700;color:var(--ink-soft);} .wcard.back::after{content:'裏';color:var(--forest);}
+  .my-edit-head{display:flex;gap:8px;align-items:center;margin-bottom:6px;} .my-edit-head .my-title-input{min-width:0;width:100%;} .my-edit-head .btn{flex-shrink:0;padding:9px 18px;}
+  .my-edit-card{display:flex;gap:8px;align-items:flex-start;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px;}
+  .my-edit-no{flex:0 0 22px;font-size:12px;font-weight:700;color:var(--ink-soft);padding-top:22px;text-align:center;}
+  .my-edit-fields{flex:1;display:flex;flex-direction:column;gap:6px;} .my-edit-fields label{font-size:11px;font-weight:700;color:var(--ink-soft);display:flex;flex-direction:column;gap:3px;}
+  .my-del{flex-shrink:0;align-self:center;background:#FFF0F0;border:1.5px solid #E03B3B;color:#C62828;border-radius:10px;padding:8px 12px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:var(--font-body);}
+  .my-del.wide{display:block;width:100%;margin-top:16px;}
+  .flip-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;width:100%;min-height:220px;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:22px 16px;cursor:pointer;font-family:var(--font-body);box-shadow:0 6px 16px rgba(0,0,0,0.06);}
+  .flip-card.flipped{border-color:var(--forest);background:rgba(28,59,50,0.06);}
+  .flip-label{font-size:11px;font-weight:700;color:#F6EFDD;background:var(--ink-soft);border-radius:999px;padding:2px 10px;} .flip-card.flipped .flip-label{background:var(--forest);}
+  .flip-text{font-size:19px;font-weight:700;color:var(--ink);line-height:1.6;white-space:pre-wrap;word-break:break-word;}
+  .flip-hint{font-size:11.5px;color:var(--ink-soft);} .flip-sub{font-size:12px;color:var(--ink-soft);border-top:1px dashed var(--line);padding-top:8px;white-space:pre-wrap;}
   .battle-link-btn{background:#A8492E;border:1.5px solid #82341E;color:#FFF;}
   .battle-link-btn:hover{background:#82341E;}
   .browse-link-btn b, .exam-link-btn b, .battle-link-btn b{font-size:14.5px;}
@@ -288,6 +348,7 @@
   .flashcard summary .question-pic { max-width:220px; margin-top:8px; }
   .cat-accordion.map-group > summary { color:#1C3B32; }
   .new-pill { display:inline-block; background:#E03B3B; color:#FFF; font-size:10px; font-weight:800; border-radius:8px; padding:1px 6px; margin-left:4px; vertical-align:middle; }
+  .new-pill.big { color:#FFF !important; opacity:1 !important; font-size:12px !important; font-weight:800 !important; line-height:1.4; letter-spacing:0.05em; padding:3px 10px; border-radius:999px; border:2px solid #FFF; box-shadow:0 2px 6px rgba(224,59,59,0.45); vertical-align:2px; }
   .exam-card { position:relative; width:100%; background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:16px; margin:10px 0; box-sizing:border-box; text-align:left; }
   .exam-card.past { border:2px solid var(--gold); background:#FFF8EC; }
   .exam-card-tag { position:absolute; top:-9px; right:14px; background:#E03B3B; color:#FFF; font-size:11px; font-weight:800; border-radius:10px; padding:2px 10px; }
@@ -353,8 +414,6 @@
   .battle-status-msg { text-align:center; font-weight:700; color:var(--clay); font-size:18px; margin-bottom:16px; min-height:27px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .input-room { font-size:20px; padding:10px; width:140px; text-align:center; border:2px solid var(--line); border-radius:8px; font-family:var(--font-display); letter-spacing:0.2em; }
   
-  .sound-fab { position:fixed; top:calc(env(safe-area-inset-top, 0px) + 8px); right:8px; z-index:9000; width:40px; height:40px; padding:0; display:flex; align-items:center; justify-content:center; background:var(--card); border:1.5px solid var(--forest); border-radius:50%; font-size:19px; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.12); }
-  .sound-fab.off { border-color:var(--line); color:var(--ink-soft); }
   .sound-toggle { background:transparent; border:1px solid var(--line); border-radius:14px; padding:4px 10px; font-size:11px; color:var(--ink-soft); cursor:pointer; font-family:var(--font-body); white-space:nowrap; }
   .nick-card { width:100%; background:#FFF8F2; border:2px solid #A8492E; border-radius:14px; padding:14px 16px; margin:10px 0 4px; text-align:left; box-sizing:border-box; }
   .nick-card .step { display:inline-block; background:#A8492E; color:#FFF; font-size:11px; font-weight:800; border-radius:10px; padding:2px 8px; margin-right:6px; }
@@ -421,7 +480,7 @@
   .score-board.compact .sb-score { font-size:13px !important; }
   .owner-panel { width:100%; max-width:300px; background:#FFF8EC; border:1.5px solid var(--gold); border-radius:14px; padding:12px; margin:8px 0 12px; box-sizing:border-box; text-align:center; }
   .owner-title { font-size:12px; font-weight:800; color:#8A6420; margin-bottom:8px; }
-  .battle-notice { position:fixed; top:20px; left:50%; transform:translateX(-50%); z-index:10000; background:var(--forest-deep); color:#FFF; font-weight:800; padding:14px 22px; border-radius:14px; box-shadow:0 10px 25px rgba(0,0,0,0.3); transition:opacity .6s; white-space:nowrap; }
+  .battle-notice { width:max-content; max-width:calc(100vw - 32px); box-sizing:border-box; text-align:center; line-height:1.5; position:fixed; top:20px; left:50%; transform:translateX(-50%); z-index:10000; background:var(--forest-deep); color:#FFF; font-weight:800; padding:14px 22px; border-radius:14px; box-shadow:0 10px 25px rgba(0,0,0,0.3); transition:opacity .6s; white-space:normal; }
   .rank-list { width:100%; display:flex; flex-direction:column; gap:6px; margin-bottom:20px; }
   .rank-row { display:flex; align-items:center; gap:10px; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:10px 12px; }
   .rank-row.me { border:2px solid var(--forest); background:rgba(28,59,50,0.08); }
@@ -1105,17 +1164,10 @@
   // 音の切り替えは、画面右上に常に表示するボタンにまとめた（各画面には置かない）
   function soundToggleHtml() { return ''; }
   function bindSoundToggle() {}
-  function mountSoundFab() {
-    var b = document.getElementById('soundFab');
-    if(!b){
-      b = document.createElement('button'); b.id = 'soundFab'; b.className = 'sound-fab'; b.type = 'button'; b.title = '効果音のオン/オフ';
-      document.body.appendChild(b);
-      b.onclick = function(){ setSoundOn(!soundOn); mountSoundFab(); if(soundOn) { initAudio(); playSoftCorrect(); } };
-    }
-    b.textContent = soundOn ? '🔊' : '🔇';
-    b.setAttribute('aria-label', soundOn ? '効果音：オン（タップでオフ）' : '効果音：オフ（タップでオン）');
-    b.title = soundOn ? '効果音：オン（タップでオフ）' : '効果音：オフ（タップでオン）';
-    b.classList.toggle('off', !soundOn);
+  function soundBadgeHtml(){ return '<button class="badge sound-badge' + (soundOn ? '' : ' off') + '" id="btnSoundBadge" type="button" title="効果音のオン/オフ">' + (soundOn ? '🔊 音あり' : '🔇 音なし') + '</button>'; }
+  function bindSoundBadge(){
+    var b = document.getElementById('btnSoundBadge');
+    if(b) b.onclick = function(){ setSoundOn(!soundOn); b.textContent = soundOn ? '🔊 音あり' : '🔇 音なし'; b.classList.toggle('off', !soundOn); if(soundOn) { initAudio(); playSoftCorrect(); } };
   }
 
   // delay: 何秒後に鳴らすか（setTimeoutより正確にスケジュールできる）
@@ -1276,6 +1328,7 @@
     streak = await loadJSON('bac-streak', {lastDate:null,count:0});
     bookmarkedIds = (await loadJSON('bac-bookmarks', [])).filter(function(id){ return !!getQ(id); });
     tfStats = await loadJSON('bac-tf-stats', {});
+    myDecks = loadJSON('bac-my-decks', []);
     var validKeys = pickGroups().map(function(g){ return g.key; });
     pickAll = !!(await loadJSON('bac-pick-all', false));
     pickedCats = (await loadJSON('bac-pick-cats', validKeys)).filter(function(k){ return validKeys.indexOf(k) !== -1; });
@@ -1395,29 +1448,33 @@
   async function doReset(){ deleteKey('bac-stats'); deleteKey('bac-tf-stats'); tfStats = {}; deleteKey('bac-streak'); listKeysWithPrefix('bac-daily-').forEach(function(k){ deleteKey(k); }); stats = {}; streak = {lastDate:null,count:0}; daily = null; mode='daily'; screen='home'; answeredThisQ=null; pendingResetConfirm=false; pendingMode='all'; render(); }
   function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-  function updateHeader(){
+  function updateHeader(onlySound){
     var badges = document.getElementById('badges');
+    if(onlySound){ badges.innerHTML = soundBadgeHtml(); bindSoundBadge(); return; } // 模擬試験・バトル中は音ボタンだけ
     var streakTxt = streak.count>0 ? ('🔥 連続 <b>'+streak.count+'</b> 日') : '🔥 今日から始めよう';
     var modeBadge = '';
     if(daily && daily.categoryFilter==='core'){ modeBadge = '<div class="badge">☕ コーヒー豆モード</div>'; }
     else if(daily && daily.categoryFilter && daily.categoryFilter.pick){ modeBadge = '<div class="badge">🗂 分野選択モード</div>'; }
     else if(daily && daily.categoryFilter==='bookmark'){ modeBadge = '<div class="badge">🔖 苦手克服モード</div>'; }
-    badges.innerHTML = '<div class="badge">'+streakTxt+'</div>' + modeBadge;
+    badges.innerHTML = '<div class="badge">'+streakTxt+'</div>' + modeBadge + soundBadgeHtml();
+    bindSoundBadge();
   }
 
   function render(){
     var isExamOrBattle = (screen==='examLock' || screen==='examReview' || screen==='examIntro' || screen==='examQuestion' || screen==='examResult' || screen==='pastPrint' || screen==='battleLobby' || screen==='battleRoom');
     var badgesEl = document.getElementById('badges');
     var statsToggleEl = document.querySelector('.stats-toggle');
-    if(badgesEl) badgesEl.style.display = isExamOrBattle ? 'none' : '';
+    if(badgesEl) badgesEl.classList.toggle('slim', isExamOrBattle);
     if(statsToggleEl) statsToggleEl.style.display = isExamOrBattle ? 'none' : '';
-    if(!isExamOrBattle){ updateHeader(); }
+    updateHeader(isExamOrBattle);
     
     var stage = document.getElementById('stage');
     if(screen==='home'){ stage.innerHTML = renderHome(); bindHome(); }
     else if(screen==='question'){ stage.innerHTML = renderQuestion(); bindQuestion(); }
     else if(screen==='summary'){ stage.innerHTML = renderSummary(); bindSummary(); }
     else if(screen==='browse'){ stage.innerHTML = renderBrowse(); bindBrowse(); }
+    else if(screen==='browseHub'){ stage.innerHTML = renderBrowseHub(); bindBrowseHub(); }
+    else if(screen==='myDecks'){ stage.innerHTML = renderMyDecks(); bindMyDecks(); }
     else if(screen==='tfHome'){ stage.innerHTML = renderTfHome(); bindTfHome(); }
     else if(screen==='tfQuestion'){ stage.innerHTML = renderTfQuestion(); bindTfQuestion(); }
     else if(screen==='tfSummary'){ stage.innerHTML = renderTfSummary(); bindTfSummary(); }
@@ -1436,9 +1493,9 @@
 
   // 単語帳に載せる問題（nb:true＝3レター逆引き問題などは載せない）
   function browseQuestions(){ return QUESTIONS.filter(function(q){ return !q.nb; }); }
-  function browseLinkHtml(){ return '<button class="browse-link-btn" id="btnBrowseAll" type="button"><b>📖 収録されている全問題の単語帳</b><span>タップして確認（'+browseQuestions().length+'問）</span></button>'; }
-  function bindBrowseLink(){ var ba = document.getElementById('btnBrowseAll'); if(ba) ba.onclick = function(){ screen='browse'; render(); }; }
-  function examLinkHtml(){ return '<button class="exam-link-btn" id="btnExamEntry" type="button"><b>📝 模擬試験・過去問 <span class="new-pill">NEW</span></b><span>本番形式の模擬試験＋2023〜2026年の過去問（50問・30分）</span></button>'; }
+  function browseLinkHtml(){ return '<button class="browse-link-btn" id="btnBrowseAll" type="button"><b>📖 単語帳 <span class="new-pill big">NEW</span></b><span>収録問題の単語帳（'+browseQuestions().length+'問）／自分で単語帳を作る</span></button>'; }
+  function bindBrowseLink(){ var ba = document.getElementById('btnBrowseAll'); if(ba) ba.onclick = function(){ screen='browseHub'; render(); window.scrollTo(0,0); }; }
+  function examLinkHtml(){ return '<button class="exam-link-btn" id="btnExamEntry" type="button"><b>📝 模擬試験・過去問</b><span>本番形式の模擬試験＋2023〜2026年の過去問（50問・30分）</span></button>'; }
   function bindExamLink(){ var eb = document.getElementById('btnExamEntry'); if(eb) eb.onclick = goExamArea; }
   function battleLinkHtml(){ return '<button class="battle-link-btn" id="btnBattleEntry" type="button"><b>🥊 BAバトル（オンライン早押し対戦）</b><span>友達とルームを作ってリアルタイム対決！</span></button>'; }
   function bindBattleLink(){ var bb = document.getElementById('btnBattleEntry'); if(bb) bb.onclick = function(){ screen='battleLobby'; render(); }; }
@@ -1566,6 +1623,15 @@
   // 3人以上なら1問につき2人まで、2人以下なら1人だけ答えられる
   // 参加人数÷2（小数点切り上げ）の人数まで解答できる。例：8人→4人、13人→7人
   function answerCapFor(n) { return Math.max(1, Math.ceil(n / 2)); }
+  // オーナーが決める「先着で答えられる人数」（0＝おまかせ：参加人数÷2切り上げ）
+  function capSelectHtml(id, cur) {
+    var h = '<select id="' + id + '" class="browse-search" style="margin-top:6px; padding:10px; width:100%;">';
+    h += '<option value="0"' + (!cur ? ' selected' : '') + '>おまかせ（参加人数÷2・切り上げ）</option>';
+    for (var i = 1; i <= 10; i++) h += '<option value="' + i + '"' + (cur === i ? ' selected' : '') + '>先着 ' + i + ' 人</option>';
+    return h + '</select>';
+  }
+  function capPrefLabel(st) { var c = (st.settings || {}).capPref || 0; return c ? '先着 ' + c + ' 人' : 'おまかせ（参加人数÷2・切り上げ）'; }
+  function capFor(st, n) { var c = (st.settings || {}).capPref || 0; return c ? Math.max(1, Math.min(c, n)) : answerCapFor(n); }
   // 何番手で押したかで得点が変わる：1番手20点、2番手15点、3番手以降10点
   function basePointsFor(order) { return order === 0 ? 20 : (order === 1 ? 15 : 10); }
   function orderLabel(i) { return ['🥇1番手','🥈2番手','🥉3番手'][i] || ((i + 1) + '番手'); }
@@ -1606,10 +1672,10 @@
     h += '<summary>📖 BAバトルのルール（タップで開閉）</summary><ul>';
     h += '<li>問題文が1文字ずつ出てきます。分かったら<b>早押しボタン</b>！</li>';
     h += '<li>押した人だけが4択で答えられます（制限時間<b>5秒</b>）</li>';
-    h += '<li>1問につき<b>参加人数÷2（切り上げ）</b>の人数まで押せます（例：2人→1人、8人→4人、13人→7人）</li>';
+    h += '<li>1問につき押せる人数は、オーナーが<b>「先着◯人」</b>で決められます。おまかせなら<b>参加人数÷2（切り上げ）</b>（例：2人→1人、8人→4人、13人→7人）</li>';
     h += '<li>正解の得点は押した順番で決まります：<b>1番手 <span class="plus">+20点</span></b>、<b>2番手 <span class="plus">+15点</span></b>、<b>3番手以降 <span class="plus">+10点</span></b></li>';
     h += '<li>✏️ <b>文字パネル問題</b>もまざります。押したら<b>ひらがな（またはカタカナ）を1文字ずつ</b>4つのパネルから選んで答えます（<b>1文字ごとに5秒</b>）。1文字でも間違えるとお手つき！</li>';
-    h += '<li>⭕❌ <b>まるBAつ問題</b>もまざります。問題文は最初から全部表示され、<b>全員</b>が<b>5秒以内</b>に⭕か❌で答えます。正解は <span class="plus">+10点</span>（連続正解ボーナスで2倍の<span class="plus">20点</span>）。間違い・時間切れは0点で、連続記録はリセット</li>';
+    h += '<li>⭕❌ <b>まるBAつ問題</b>もまざります。問題文は最初から全部表示され、<b>全員</b>が<b>5秒以内</b>に⭕か❌で答えます。正解は <span class="plus">+10点</span>（連続正解ボーナスで2倍の<span class="plus">20点</span>）。間違えると <b class="minus">-10点</b>、時間切れ（未回答）は0点。どちらも連続記録はリセット</li>';
     h += '<li>問題文が最後まで出たら、画面に<b>締め切りまでのカウントダウン（5秒）</b>が出ます</li>';
     h += '<li>誰かが押したあとも、解答枠が残っている間は問題文が流れ続けます。問題文が最後まで出てから5秒で締め切り</li>';
     h += '<li>🔥 <b>連続正解ボーナス</b>：前の問題に続けて正解すると<b>得点2倍</b>！<br>（20点→<b class="plus">40点</b>、15点→<b class="plus">30点</b>、10点→<b class="plus">20点</b>）</li>';
@@ -1741,8 +1807,9 @@
   function buildBattleQuestions(maxQ, withKana, withTf) {
     var share = (withKana && withTf) ? 0.25 : 0.3;
     var nKana = withKana ? Math.min(Math.max(1, Math.round(maxQ * share)), BATTLE_KANA_QUESTIONS.length) : 0;
-    var nTf = withTf ? Math.min(Math.max(1, Math.round(maxQ * share)), TF_ITEMS.length) : 0;
-    var tfQs = shuffleArrayInPlace(TF_ITEMS.slice()).slice(0, nTf).map(function(t){
+    var nTf = withTf ? Math.min(Math.max(1, Math.round(maxQ * share)), TF_ITEMS.length - TF_BATTLE_EASY.length) : 0;
+    var tfPool = TF_ITEMS.filter(function(t){ return TF_BATTLE_EASY.indexOf(t.id) === -1; });
+    var tfQs = shuffleArrayInPlace(tfPool.slice()).slice(0, nTf).map(function(t){
       return { id: t.id, type: 'tf', q: t.s, correctText: t.a ? '○' : '×', n: t.n || '' };
     });
     var kanaQs = shuffleArrayInPlace(BATTLE_KANA_QUESTIONS.slice()).slice(0, nKana).map(function(k){
@@ -1841,6 +1908,7 @@
     html += '</div>';
     html += '<label style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:bold; color:var(--ink); margin-bottom:12px; cursor:pointer;"><input type="checkbox" id="inputKana" checked style="width:18px; height:18px;">✏️ 文字パネル問題（ひらがな・カタカナで答える）もまぜる</label>';
     html += '<label style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:bold; color:var(--ink); margin:-4px 0 12px; cursor:pointer;"><input type="checkbox" id="inputTf" checked style="width:18px; height:18px;">⭕❌ まるBAつ問題（全員で○×を答える）もまぜる</label>';
+    html += '<label style="display:block; font-size:11px; color:var(--ink-soft); font-weight:bold; margin:0 0 12px;">🙋 1問につき先着で答えられる人数<br>' + capSelectHtml('inputCap', 0) + '</label>';
     html += '<button class="btn" id="btnCreateRoom" type="button" style="background:#A8492E; width:100%; margin-bottom:16px;">ルームを作る</button>';
     html += '<hr style="border:none; border-top:1px dashed var(--line); margin:0 0 16px;">';
     html += '<p style="font-size:13px; font-weight:bold; color:var(--ink); margin:0 0 10px;">💬 友達の部屋に入る</p>';
@@ -1889,6 +1957,7 @@
       var roomId = Math.floor(1000 + Math.random() * 9000).toString();
       var kanaOn = document.getElementById('inputKana').checked;
       var tfOn = document.getElementById('inputTf').checked;
+      var capPref = parseInt(document.getElementById('inputCap').value, 10) || 0;
       var battleQs = buildBattleQuestions(maxQ, kanaOn, tfOn);
       maxQ = battleQs.length;
 
@@ -1897,7 +1966,7 @@
 
       var newRoom = {
         owner: bMe,
-        status: 'waiting', settings: { maxQuestions: maxQ, maxPlayers: maxP, kana: kanaOn, tf: tfOn },
+        status: 'waiting', settings: { maxQuestions: maxQ, maxPlayers: maxP, kana: kanaOn, tf: tfOn, capPref: capPref },
         players: players, questions: battleQs, currentQ: 0,
         state: 'intro'
       };
@@ -2084,7 +2153,7 @@
 
   function startBattleGame() {
     var pKeys = Object.keys(bState.players || {});
-    var updates = { status: 'playing', 'settings/answerCap': answerCapFor(pKeys.length) };
+    var updates = { status: 'playing', 'settings/answerCap': capFor(bState, pKeys.length) };
     pKeys.forEach(function(k){ updates['players/' + k + '/ready'] = false; });
     db.ref('rooms/' + bRoom).update(updates);
   }
@@ -2140,15 +2209,15 @@
     var me = bState.players[bMe] || {};
     var correct = mark === qMeta.correctText;
     var combo = correct && me.lastCorrectQ === q - 1;            // 前の問題も正解なら得点2倍（4択と同じ）
-    var pts = correct ? TF_BATTLE_PTS * (combo ? 2 : 1) : 0;     // 間違い・時間切れは0点（お手つきの減点なし）
+    var pts = correct ? TF_BATTLE_PTS * (combo ? 2 : 1) : -10;   // 間違えたら-10点（時間切れで答えなかった場合は0点）
     var st = me.st || { correct: 0, wrong: 0, first: 0, cur: 0, max: 0 };
-    if (correct) { st.correct++; st.cur = combo ? st.cur + 1 : 1; st.max = Math.max(st.max, st.cur); } else { st.cur = 0; }
+    if (correct) { st.correct++; st.cur = combo ? st.cur + 1 : 1; st.max = Math.max(st.max, st.cur); } else { st.wrong++; st.cur = 0; }
     var updates = {};
     updates['answers/' + bMe] = { text: mark, correct: correct, pts: pts, combo: combo };
     updates['players/' + bMe + '/st'] = st;
     if (correct) updates['players/' + bMe + '/lastCorrectQ'] = q;
     db.ref('rooms/' + bRoom).update(updates);
-    if (pts) db.ref('rooms/' + bRoom + '/players/' + bMe + '/score').transaction(function(s){ return (s||0) + pts; });
+    db.ref('rooms/' + bRoom + '/players/' + bMe + '/score').transaction(function(s){ return (s||0) + pts; });
     playTone(1046.5, 'sine', 0.08, 0.06);
     render();
   }
@@ -2418,7 +2487,7 @@
       Object.keys(bState.players || {}).forEach(function(pid){
         var p = bState.players[pid], a = ans[pid];
         var v = !a ? '⏰ 時間切れ' : (a.correct ? '⭕ 正解' : '❌ 不正解') + '（' + (a.text === '○' ? '⭕' : '❌') + 'と解答）';
-        th += '<div class="battle-result-row ' + (a && a.correct ? 'ok' : (a ? 'ng' : '')) + '"><span><b>' + esc(p.name) + (pid === bMe ? '（あなた）' : '') + '</b><br><small>' + v + (a && a.combo ? ' ・🔥連続正解×2' : '') + '</small></span><span class="pts">' + (a && a.correct ? '+' + a.pts : '±0') + '</span></div>';
+        th += '<div class="battle-result-row ' + (a && a.correct ? 'ok' : (a ? 'ng' : '')) + '"><span><b>' + esc(p.name) + (pid === bMe ? '（あなた）' : '') + '</b><br><small>' + v + (a && a.combo ? ' ・🔥連続正解×2' : '') + '</small></span><span class="pts">' + (!a ? '±0' : (a.pts > 0 ? '+' + a.pts : String(a.pts))) + '</span></div>';
       });
       return th + '</div>';
     }
@@ -2470,6 +2539,7 @@
       } else {
         html += '<p class="desc" style="font-weight:bold; color:var(--forest);">✅ 準備OK！' + (full ? '他の人の準備を待っています...' : 'メンバーが集まるのを待っています...') + '</p>';
       }
+      html += '<p class="desc" style="font-size:12px; margin-bottom:4px;">🙋 1問につき答えられる人数：<b>' + capPrefLabel(bState) + '</b></p>';
       html += '<p class="desc" style="font-size:12px;">' + (full ? '全員そろいました！全員が「準備OK」を押すとスタートします' : '定員がそろって全員が「準備OK」を押すとスタートします') + '</p>';
       if(isHost) {
         html += '<div class="owner-panel"><div class="owner-title">👑 オーナー（あなた）の操作</div>';
@@ -2478,6 +2548,7 @@
         } else {
           html += '<p class="desc" style="font-size:12px; margin:0 0 8px;">2人以上集まると、定員前でもすぐに始められます</p>';
         }
+        html += '<label style="display:block; font-size:12px; font-weight:bold; color:var(--ink); margin:4px 0 10px; text-align:left;">🙋 先着で答えられる人数を変更' + capSelectHtml('ownerCap', (bState.settings || {}).capPref || 0) + '</label>';
         html += '<button class="text-link-btn" id="btnBattleCancel" type="button" style="color:#E03B3B;">ルームを解散する</button></div>';
       } else {
         html += '<p class="desc" style="font-size:12px;">👑 オーナー：' + esc((bState.players[battleOwnerId()] || {}).name || '') + '</p>';
@@ -2544,7 +2615,7 @@
     var qMeta = bState.questions[q];
 
     html += '<div class="qnum" style="text-align:center;font-weight:bold; font-size:14px; margin-bottom:8px;">第 ' + (q + 1) + ' 問 / 全' + bState.settings.maxQuestions + '問</div>';
-    if (isTfQ(qMeta)) html += '<div class="battle-mode-note">⭕❌ まるBAつ問題 ・ 全員が解答 ・ 正解で10点（連続正解なら20点）・' + TF_BATTLE_SEC + '秒以内</div>';
+    if (isTfQ(qMeta)) html += '<div class="battle-mode-note">⭕❌ まるBAつ問題 ・ 全員が解答 ・ 正解+10点（連続なら+20点）・間違い-10点・' + TF_BATTLE_SEC + '秒以内</div>';
     else html += '<div class="battle-mode-note">👥 ' + (cap >= 2 ? cap + '人まで解答OK ・ ' : '') + '1番手20点' + (cap >= 2 ? '・2番手15点' : '') + (cap >= 3 ? '・3番手以降10点' : '') + '</div>';
 
     var msg = '準備してね！';
@@ -2567,7 +2638,7 @@
         html += '<div class="kana-intro"><div class="kana-intro-tag">✏️ 文字パネル問題</div><div class="kana-intro-text">' + kanaPromptText(qMeta) + '</div><div class="kana-intro-sub">押したら' + (qMeta.ks === 'k' ? 'カタカナ' : 'ひらがな') + 'を1文字ずつ選んで答えよう！</div></div>';
       }
       if(isTfQ(qMeta)) {
-        html += '<div class="kana-intro"><div class="kana-intro-tag" style="background:#23405C;">⭕❌ まるBAつ問題</div><div class="kana-intro-text">全員で答えよう！</div><div class="kana-intro-sub">問題文が全部表示されたら、' + TF_BATTLE_SEC + '秒以内に⭕か❌をタップ。正解で10点（連続正解なら20点）！</div></div>';
+        html += '<div class="kana-intro"><div class="kana-intro-tag" style="background:#23405C;">⭕❌ まるBAつ問題</div><div class="kana-intro-text">全員で答えよう！</div><div class="kana-intro-sub">問題文が全部表示されたら、' + TF_BATTLE_SEC + '秒以内に⭕か❌をタップ。正解+10点（連続なら+20点）、間違いは-10点！</div></div>';
       }
       html += '</div>';
     } else {
@@ -2676,6 +2747,9 @@
       initAudio();
       if(confirm('今いる' + Object.keys(bState.players || {}).length + '人でゲームを始めますか？\n（準備OKを押していない人がいても始まります）')) startBattleGame();
     };
+
+    var ocSel = document.getElementById('ownerCap');
+    if(ocSel) ocSel.onchange = function(){ db.ref('rooms/' + bRoom + '/settings').update({ capPref: parseInt(ocSel.value, 10) || 0 }); };
 
     var rsBtn = document.getElementById('btnReadyStart');
     if(rsBtn) rsBtn.onclick = function() {
@@ -3048,9 +3122,8 @@
     {"id": "t151", "c": "core", "s": "ロースト時間が長いほど、コクは強くなり続ける。", "a": false, "n": "コクはある一定のロースト時間を過ぎると減少します。"},
     {"id": "t152", "c": "core", "s": "AUBは、秋の味覚との相性を考えて作られたブレンドである。", "a": true, "n": "AUB は「オータム ブレンド」です。AUBは秋の味覚に合うブレンドです。"},
     {"id": "t153", "c": "core", "s": "TYOの加工法は、水洗式と半水洗式である。", "a": true, "n": "TYO は「TOKYO ロースト」です。TYOは水洗式＋半水洗式です。"},
-    {"id": "t154", "c": "hist", "s": "スターバックス1号店は、1971年にシアトルでオープンした。", "a": true, "n": "パイクプレイスマーケットの近くにオープンしました。"},
+    {"id": "t154", "c": "hist", "s": "スターバックスの創業当初から販売されているコーヒー豆は、HOU・GUA・KEN・FREの4つである。", "a": true, "n": "創業当初からあるのは HOU（ハウス ブレンド）・GUA（グアテマラ アンティグア）・KEN（ケニア）・FRE（フレンチ ロースト）。VERは1975年、EDBは2008年に登場しました。"},
     {"id": "t155", "c": "hist", "s": "スターバックス1号店は、焙煎したコーヒー豆を量り売りする専門店だった。", "a": true, "n": "当初は抽出したコーヒーの提供はありませんでした。"},
-    {"id": "t156", "c": "hist", "s": "「スターバックス」の名前は、小説『白鯨』に登場する一等航海士の名にちなんでいる。", "a": true, "n": "一等航海士スターバックにちなんでいます。"},
     {"id": "t157", "c": "hist", "s": "北米以外で初めてのスターバックスの店舗は、1996年に東京・銀座にオープンした。", "a": true, "n": "1996年8月2日、銀座松屋通り店がオープンしました。"},
     {"id": "t158", "c": "hist", "s": "ハワード・シュルツがエスプレッソバーに感銘を受けたのは、フランス出張でのことである。", "a": false, "n": "1983年のイタリア出張です。"},
     {"id": "t159", "c": "hist", "s": "初のスターバックス リザーブ ロースタリーは、2014年にシアトルでオープンした。", "a": true, "n": "シアトルが1号店です。"},
@@ -3086,6 +3159,8 @@
     {"id": "t189", "c": "supply", "s": "サプライヤーからオファーされたコーヒーが基準に満たない場合は、その理由を伝えたうえで却下する。", "a": true, "n": "基準に満たない理由を伝えることで、生産者の品質向上につなげます。"}
   ];
   var TF_COUNT = 15, TF_MULTI_SETS = 5;
+  // BAバトルでは出さない、やさしめの文（ひとり練習では出題する）
+  var TF_BATTLE_EASY = ['t2','t21','t22','t40','t42','t43','t44','t63','t71','t72','t73','t81','t82','t92','t93','t102','t113','t125','t126','t132','t134','t136','t141','t143','t150','t152','t155','t157','t159','t165'];
   var tfStats = {};          // {id:{seen, correct, streak}}
   var tfScope = 'all';       // 'all'＝全分野 / 'weak'＝間違えた文だけ
   var tfRound = null;        // {kind:'tf'|'multi', ids:[...]|sets:[[...]], idx, results:[...], answered}
@@ -3258,7 +3333,7 @@
     return html + '</div>';
   }
   function bindTfBrowse(){ document.getElementById('btnTfBrowseBack').onclick = function(){ screen = 'tfHome'; render(); window.scrollTo(0,0); }; }
-  function tfLinkHtml(){ return '<button class="tf-link-btn" id="btnTfEntry" type="button"><b>⭕❌ まるBAつ問題 <span class="new-pill">NEW</span></b><span>正しい？誤り？ 本番の引っかけ対策（' + TF_ITEMS.length + '問）</span></button>'; }
+  function tfLinkHtml(){ return '<button class="tf-link-btn" id="btnTfEntry" type="button"><b>⭕❌ まるBAつ問題</b><span>正しい？誤り？ 本番の引っかけ対策（' + TF_ITEMS.length + '問）</span></button>'; }
   function bindTfLink(){ var b = document.getElementById('btnTfEntry'); if(b) b.onclick = function(){ screen = 'tfHome'; render(); window.scrollTo(0,0); }; }
 
   // 学習記録：4択と○×をタブで切り替え（グラフは別、累計回答数は合算）
@@ -3301,8 +3376,202 @@
     var no = document.getElementById('btnResetNo'); if(no) no.onclick = function(){ pendingResetConfirm=false; renderStatsPanel(); };
   }
 
+  /* ---------------- 自分で単語帳（作る・覚える・共有する） ---------------- */
+  var myDecks = [];            // [{id, title, cards:[{id, f, b, ok, seen}], at}]
+  var curDeckId = null, mySelectMode = false, mySelected = [];
+  var MY_MAX_LEN = 300, MY_SHARE_MAX = 300;
+  var myImportCode = '';
+  function myUid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+  function saveMyDecks(){ saveJSON('bac-my-decks', myDecks); }
+  function getMyDeck(id){ for(var i=0;i<myDecks.length;i++){ if(myDecks[i].id === id) return myDecks[i]; } return null; }
+  function goMy(scr){ screen = scr; render(); window.scrollTo(0,0); }
+
+  // 単語帳の入口：収録問題の単語帳か、自分で単語帳か
+  function renderBrowseHub(){
+    var html = '<div class="center-col"><div class="big-title">📖 単語帳</div><p class="desc">どちらの単語帳を使いますか？</p>';
+    html += '<button class="hub-card" id="btnHubBuiltin" type="button"><span class="hub-ico">📖</span><span><b>収録されている問題の単語帳</b><small>BAドリルの全' + browseQuestions().length + '問を分野ごとに確認</small></span></button>';
+    var cards = myDecks.reduce(function(n, d){ return n + d.cards.length; }, 0);
+    html += '<button class="hub-card mine" id="btnHubMine" type="button"><span class="hub-ico">✏️</span><span><b>自分で単語帳 <span class="new-pill big">NEW</span></b><small>' + (myDecks.length ? myDecks.length + '冊・' + cards + '枚のカード' : '自分だけの単語カードを作って、いつでも見返せる') + '</small></span></button>';
+    html += '<button class="text-link-btn" id="btnHubBack" type="button">ホーム画面に戻る</button></div>';
+    return html;
+  }
+  function bindBrowseHub(){
+    document.getElementById('btnHubBuiltin').onclick = function(){ goMy('browse'); };
+    document.getElementById('btnHubMine').onclick = function(){ goMy('myDecks'); };
+    document.getElementById('btnHubBack').onclick = goHome;
+  }
+
+  // 自分で単語帳：上のタブを横にスライドして単語帳を選ぶ → カードをタップで表・裏を切り替え
+  var myEditMode = false, myAllBack = false;
+  function renderMyDecks(){
+    if(curDeckId !== '__new' && !getMyDeck(curDeckId)) curDeckId = myDecks.length ? myDecks[0].id : '__new';
+    var html = '<div><button class="text-link-btn" id="btnMyBack" type="button">← 単語帳に戻る</button>';
+    html += '<div class="big-title" style="margin:8px 0 10px;text-align:left;">✏️ 自分で単語帳</div>';
+    html += '<div class="deck-tabs" id="deckTabs">';
+    myDecks.forEach(function(d){ html += '<button class="deck-tab' + (d.id === curDeckId ? ' on' : '') + '" data-deck="' + d.id + '" type="button">' + esc(d.title) + '<small>' + d.cards.length + '</small></button>'; });
+    html += '<button class="deck-tab add' + (curDeckId === '__new' ? ' on' : '') + '" data-deck="__new" type="button">＋ 新しい単語帳</button></div>';
+
+    if(curDeckId === '__new'){
+      html += '<div class="my-panel"><b>新しい単語帳を作る</b><div class="my-new"><input type="text" id="myNewTitle" class="browse-search" maxlength="30" placeholder="単語帳の名前（例：コア豆）"><button class="btn" id="btnMyCreate" type="button">作る</button></div></div>';
+      html += '<div class="my-panel"><b>友達の単語帳を追加</b><p class="my-note">届いた6けたの共有コードを入れてください。</p><div class="my-new"><input type="text" id="myImportCode" class="browse-search" inputmode="numeric" maxlength="6" placeholder="6けたのコード" value="' + esc(myImportCode) + '"><button class="btn secondary" id="btnMyImport" type="button">追加</button></div><p class="my-msg" id="myImportMsg"></p></div>';
+      return html + '</div>';
+    }
+
+    var d = getMyDeck(curDeckId);
+    if(mySelectMode){
+      html += '<p class="my-sel-hint">共有するカードを選んでください（タップで選択／解除）</p>';
+      d.cards.forEach(function(c){
+        var sel = mySelected.indexOf(c.id) !== -1;
+        html += '<div class="my-card selectable' + (sel ? ' selected' : '') + '" data-card="' + c.id + '"><span class="my-check">' + (sel ? '✓' : '') + '</span><div class="my-card-body"><div class="my-f">' + esc(c.f) + '</div><div class="my-b">' + esc(c.b) + '</div></div></div>';
+      });
+      html += '<div class="battle-next-spacer"></div><div class="battle-next-bar"><button class="btn" id="btnDoShare" type="button"' + (mySelected.length ? '' : ' disabled') + '>📤 ' + mySelected.length + '枚を共有する</button><button class="text-link-btn" id="btnSelCancel" type="button">やめる</button></div>';
+      return html + '</div>';
+    }
+
+    if(myEditMode){
+      html += '<div class="my-edit-head"><input type="text" id="myDeckTitle" class="my-title-input" maxlength="30" value="' + esc(d.title) + '"><button class="btn" id="btnEditDone" type="button">完了</button></div>';
+      html += '<div class="my-panel"><b>カードを追加</b><textarea id="myFront" maxlength="' + MY_MAX_LEN + '" rows="2" placeholder="表（問題）"></textarea><textarea id="myBack" maxlength="' + MY_MAX_LEN + '" rows="2" placeholder="裏（答え）"></textarea><button class="btn secondary" id="btnMyAdd" type="button">＋ 追加する</button></div>';
+      d.cards.forEach(function(c, i){
+        html += '<div class="my-edit-card"><div class="my-edit-no">' + (i + 1) + '</div><div class="my-edit-fields"><label>表<textarea data-ef="' + c.id + '" maxlength="' + MY_MAX_LEN + '" rows="2">' + esc(c.f) + '</textarea></label><label>裏<textarea data-eb="' + c.id + '" maxlength="' + MY_MAX_LEN + '" rows="2">' + esc(c.b) + '</textarea></label></div><button class="my-del" data-del="' + c.id + '" type="button">削除</button></div>';
+      });
+      html += '<p class="my-note" style="text-align:center;">書きかえた内容は自動で保存されます</p>';
+      html += '<button class="my-del wide" id="btnDeckDelete" type="button">この単語帳を削除する</button>';
+      return html + '</div>';
+    }
+
+    html += '<div class="my-view-head"><span>' + d.cards.length + '枚</span><span class="my-view-btns">' + (d.cards.length ? '<button class="my-chip" id="btnAllFlip" type="button">' + (myAllBack ? '表に戻す' : '全部めくる') + '</button>' : '') + '<button class="my-chip" id="btnEditMode" type="button">✏️ 編集・追加</button></span></div>';
+    if(!d.cards.length){ html += '<div class="my-empty">まだカードがありません。<br>「✏️ 編集・追加」からカードを作ろう！</div>'; }
+    d.cards.forEach(function(c){
+      html += '<button class="wcard' + (myAllBack ? ' back' : '') + '" type="button" data-flip="1"><span class="wf">' + esc(c.f) + '</span><span class="wb">' + esc(c.b) + '</span></button>';
+    });
+    if(d.cards.length) html += '<p class="my-note" style="text-align:center;">カードをタップすると、表と裏が切り替わります</p><button class="text-link-btn" id="btnShareMode" type="button" style="display:block;margin:4px auto 0;">📤 カードを選んで友達に共有</button>';
+    return html + '</div>';
+  }
+  function bindMyDecks(){
+    document.getElementById('btnMyBack').onclick = function(){ myEditMode = false; mySelectMode = false; goMy('browseHub'); };
+    var tabs = document.getElementById('deckTabs');
+    var on = tabs.querySelector('.deck-tab.on'); if(on && on.scrollIntoView) on.scrollIntoView({ block: 'nearest', inline: 'center' });
+    tabs.querySelectorAll('[data-deck]').forEach(function(b){ b.onclick = function(){
+      curDeckId = b.getAttribute('data-deck'); myEditMode = false; mySelectMode = false; myAllBack = false; render();
+    }; });
+    var cr = document.getElementById('btnMyCreate');
+    if(cr) cr.onclick = function(){
+      var t = document.getElementById('myNewTitle').value.trim().slice(0, 30);
+      if(!t){ document.getElementById('myNewTitle').focus(); return; }
+      var d = { id: myUid(), title: t, cards: [], at: Date.now() };
+      myDecks.push(d); saveMyDecks(); curDeckId = d.id; myEditMode = true; render();
+      var ff = document.getElementById('myFront'); if(ff) ff.focus();
+    };
+    var im = document.getElementById('btnMyImport'); if(im) im.onclick = function(){ importSharedDeck(document.getElementById('myImportCode').value.trim()); };
+    var d = getMyDeck(curDeckId); if(!d) return;
+    // 見る：タップで表裏を切り替え（画面は描き直さない）
+    document.querySelectorAll('[data-flip]').forEach(function(el){ el.onclick = function(){ el.classList.toggle('back'); }; });
+    var af = document.getElementById('btnAllFlip'); if(af) af.onclick = function(){ myAllBack = !myAllBack; render(); };
+    var em = document.getElementById('btnEditMode'); if(em) em.onclick = function(){ myEditMode = true; render(); window.scrollTo(0,0); };
+    // 編集
+    var done = document.getElementById('btnEditDone'); if(done) done.onclick = function(){ myEditMode = false; render(); };
+    var ti = document.getElementById('myDeckTitle');
+    if(ti) ti.onchange = function(){ var t = ti.value.trim().slice(0, 30); if(t){ d.title = t; saveMyDecks(); var tab = document.querySelector('.deck-tab.on'); if(tab) tab.firstChild.textContent = t; } else { ti.value = d.title; } };
+    var add = document.getElementById('btnMyAdd');
+    if(add) add.onclick = function(){
+      var f = document.getElementById('myFront').value.trim(), b = document.getElementById('myBack').value.trim();
+      if(!f || !b){ (f ? document.getElementById('myBack') : document.getElementById('myFront')).focus(); return; }
+      d.cards.push({ id: myUid(), f: f.slice(0, MY_MAX_LEN), b: b.slice(0, MY_MAX_LEN) }); saveMyDecks();
+      render(); var ff = document.getElementById('myFront'); if(ff) ff.focus();
+    };
+    var setField = function(id, key, val){ val = val.trim().slice(0, MY_MAX_LEN); if(!val) return false; d.cards.forEach(function(c){ if(c.id === id) c[key] = val; }); saveMyDecks(); return true; };
+    document.querySelectorAll('[data-ef]').forEach(function(t){ t.onchange = function(){ if(!setField(t.getAttribute('data-ef'), 'f', t.value)) render(); }; });
+    document.querySelectorAll('[data-eb]').forEach(function(t){ t.onchange = function(){ if(!setField(t.getAttribute('data-eb'), 'b', t.value)) render(); }; });
+    document.querySelectorAll('[data-del]').forEach(function(b){ b.onclick = function(){
+      if(!confirm('このカードを削除しますか？')) return;
+      var id = b.getAttribute('data-del'); d.cards = d.cards.filter(function(c){ return c.id !== id; }); saveMyDecks();
+      var y = window.scrollY; render(); window.scrollTo(0, y);
+    }; });
+    var dd = document.getElementById('btnDeckDelete');
+    if(dd) dd.onclick = function(){ if(!confirm('「' + d.title + '」を削除しますか？（カードもすべて消えます）')) return; myDecks = myDecks.filter(function(x){ return x.id !== d.id; }); saveMyDecks(); curDeckId = null; myEditMode = false; render(); };
+    // 共有
+    var sm = document.getElementById('btnShareMode'); if(sm) sm.onclick = function(){ mySelectMode = true; mySelected = d.cards.map(function(c){ return c.id; }); render(); window.scrollTo(0,0); };
+    var sc = document.getElementById('btnSelCancel'); if(sc) sc.onclick = function(){ mySelectMode = false; mySelected = []; render(); };
+    if(mySelectMode) document.querySelectorAll('[data-card]').forEach(function(el){ el.onclick = function(){
+      var id = el.getAttribute('data-card'), i = mySelected.indexOf(id);
+      if(i === -1) mySelected.push(id); else mySelected.splice(i, 1);
+      var y = window.scrollY; render(); window.scrollTo(0, y);
+    }; });
+    var ds = document.getElementById('btnDoShare'); if(ds) ds.onclick = function(){ shareMyCards(d); };
+  }
+
+  // 共有：選んだカードをクラウドに保存して6けたのコードを発行（使えないときはリンクで共有）
+  function shareText(title, n, code, link){
+    return '📚 BAドリルの単語帳「' + title + '」（' + n + '枚）を共有します！\n' + (code ? '共有コード：' + code + '\nBAドリルの「単語帳 → 自分で単語帳 → 共有コードで追加」に入れてね。\n' : '') + (link ? link + '\n' : '') + '#BAドリル';
+  }
+  function deliverShare(text){
+    if(navigator.share){ navigator.share({ text: text }).catch(function(){}); }
+    else if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(function(){ alert('共有用の文章をコピーしました！LINEなどに貼り付けて送ってください✨'); }).catch(function(){ prompt('この文章をコピーして送ってください', text); }); }
+    else { prompt('この文章をコピーして送ってください', text); }
+  }
+  function appBaseUrl(){ return /^https?:/.test(location.protocol) ? location.origin + location.pathname : ''; }
+  function b64urlEncode(str){ return btoa(unescape(encodeURIComponent(str))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+  function b64urlDecode(str){ str = str.replace(/-/g,'+').replace(/_/g,'/'); while(str.length % 4) str += '='; return decodeURIComponent(escape(atob(str))); }
+  function shareMyCards(d){
+    var cards = d.cards.filter(function(c){ return mySelected.indexOf(c.id) !== -1; }).slice(0, MY_SHARE_MAX).map(function(c){ return { f: c.f, b: c.b }; });
+    if(!cards.length) return;
+    var payload = { title: d.title, cards: cards, at: Date.now() };
+    var fallback = function(){
+      var base = appBaseUrl();
+      var link = base ? base + '#deckdata=' + b64urlEncode(JSON.stringify({ t: d.title, c: cards.map(function(c){ return [c.f, c.b]; }) })) : '';
+      if(!link){ alert('この環境では共有コードを作れませんでした。'); return; }
+      deliverShare(shareText(d.title, cards.length, '', link));
+    };
+    if(!initFirebase()){ fallback(); return; }
+    var tries = 0;
+    var attempt = function(){
+      var code = String(Math.floor(100000 + Math.random() * 900000)); tries++;
+      db.ref('decks/' + code).once('value').then(function(snap){
+        if(snap.val() && tries < 5) return attempt();
+        return db.ref('decks/' + code).set(payload).then(function(){
+          mySelectMode = false; mySelected = []; render();
+          var base = appBaseUrl();
+          deliverShare(shareText(d.title, cards.length, code, base ? base + '?deck=' + code : ''));
+        });
+      }).catch(function(){ fallback(); });
+    };
+    attempt();
+  }
+  function addImportedDeck(title, cards){
+    var d = { id: myUid(), title: (title || '共有された単語帳').slice(0, 30), cards: cards.slice(0, MY_SHARE_MAX).map(function(c){ return { id: myUid(), f: String(c.f || '').slice(0, MY_MAX_LEN), b: String(c.b || '').slice(0, MY_MAX_LEN), ok: false, seen: 0 }; }).filter(function(c){ return c.f && c.b; }), at: Date.now() };
+    if(!d.cards.length) return false;
+    myDecks.unshift(d); saveMyDecks(); curDeckId = d.id; mySelectMode = false; myEditMode = false; myImportCode = '';
+    goMy('myDecks'); showBattleNotice('📥 「' + d.title + '」（' + d.cards.length + '枚）を自分の単語帳に追加しました');
+    return true;
+  }
+  function importSharedDeck(code){
+    var msg = document.getElementById('myImportMsg');
+    if(!/^\d{6}$/.test(code)){ if(msg) msg.textContent = '6けたの数字を入れてください'; return; }
+    if(!initFirebase()){ if(msg) msg.textContent = '通信に失敗しました。電波のよい場所でもう一度お試しください。'; return; }
+    if(msg) msg.textContent = '読み込み中…';
+    db.ref('decks/' + code).once('value').then(function(snap){
+      var v = snap.val();
+      if(!v || !v.cards){ if(msg) msg.textContent = 'このコードの単語帳は見つかりませんでした'; return; }
+      var cards = Array.isArray(v.cards) ? v.cards : Object.keys(v.cards).map(function(k){ return v.cards[k]; });
+      if(!addImportedDeck(v.title, cards) && msg) msg.textContent = 'カードが入っていませんでした';
+    }).catch(function(){ if(msg) msg.textContent = '読み込みに失敗しました。もう一度お試しください。'; });
+  }
+  // 共有リンクから開かれたとき（?deck=コード または #deckdata=）
+  function handleDeckLink(){
+    try{
+      var m = location.search.match(/[?&]deck=(\d{6})/);
+      if(m){ myImportCode = m[1]; history.replaceState(null, '', location.pathname); curDeckId = '__new'; screen = 'myDecks'; render(); setTimeout(function(){ importSharedDeck(m[1]); }, 300); return; }
+      var h = location.hash.match(/deckdata=([A-Za-z0-9_-]+)/);
+      if(h){
+        var obj = JSON.parse(b64urlDecode(h[1])); history.replaceState(null, '', location.pathname);
+        var cards = (obj.c || []).map(function(x){ return { f: x[0], b: x[1] }; });
+        addImportedDeck(obj.t, cards);
+      }
+    }catch(e){}
+  }
+
   function renderBrowse(){
-    var html = '<div><button class="text-link-btn" id="btnBrowseBack" type="button">← ホーム画面に戻る</button>';
+    var html = '<div><button class="text-link-btn" id="btnBrowseBack" type="button">← 単語帳に戻る</button>';
     html += '<div class="big-title" style="margin-top:10px;text-align:left;">収録されている全問題の単語帳（'+browseQuestions().length+'問）</div>';
     html += '<input type="text" id="browseSearchInput" class="browse-search" placeholder="🔍 キーワードで検索（例：カティカティ、C.A.F.E.）">';
     html += '<div id="browseResults">' + buildBrowseResults('') + '</div></div>';
@@ -3349,7 +3618,7 @@
   }
 
   function bindBrowse(){
-    document.getElementById('btnBrowseBack').onclick = function(){ screen='home'; render(); };
+    document.getElementById('btnBrowseBack').onclick = function(){ screen='browseHub'; render(); window.scrollTo(0,0); };
     var searchInput = document.getElementById('browseSearchInput');
     if(searchInput){ searchInput.oninput = function(){ var resultsDiv = document.getElementById('browseResults'); if(resultsDiv){ resultsDiv.innerHTML = buildBrowseResults(searchInput.value); } }; }
   }
@@ -3529,7 +3798,7 @@
     // 過去問
     PAST_EXAMS.forEach(function(p){
       var voidNos = p.questions.filter(function(q){ return q.void; }).map(function(q){ return '問' + q.no; });
-      html += '<div class="exam-card past"><div class="exam-card-tag">NEW</div><div class="exam-card-title">📜 ' + esc(p.label) + '</div><div class="exam-card-sub">' + esc(p.sub) + '</div>';
+      html += '<div class="exam-card past"><div class="exam-card-title">📜 ' + esc(p.label) + '</div><div class="exam-card-sub">' + esc(p.sub) + '</div>';
       html += '<p class="desc" style="text-align:left; margin:8px 0;">・' + esc(p.sub.split(' ')[0]) + '本番の50問を、問題順もそのままに再現<br>・制限時間30分／100点満点／<b>合格ライン' + p.pass + '点</b><br>・問41〜50は正しいものを全て選ぶ形式（部分点なし）<br>・<span style="color:#C0392B;">' + voidNos.join('・') + 'は過去のプロモーションコーヒーの問題のため、今年は範囲外です。問題中に正解を表示し、0点扱いにしています。</span></p>';
       html += examHistoryBoxHtml(p.key);
       html += '<button class="btn" data-past-start="' + p.key + '" type="button" style="width:100%;">' + esc(p.label) + 'を解く</button>';
@@ -3765,7 +4034,7 @@
   }
 
   /* ---------------- お知らせ（過去問の追加） ---------------- */
-  var NEWS_KEY = 'bac-news-pastexam-fy23-26';
+  var NEWS_KEY = 'bac-news-mydeck';
   function maybeShowNews(){
     if(loadJSON(NEWS_KEY, false)) return;
     if(screen !== 'home') return;
@@ -3773,20 +4042,20 @@
     if(ov && ov.style.display === 'flex') return; // 初回の使い方ガイドを閉じたあとに表示
     var box = document.createElement('div');
     box.className = 'news-overlay'; box.id = 'newsOverlay';
-    box.innerHTML = '<div class="news-card"><div class="news-tag">📢 NEW</div><div class="news-title">過去問が解けるようになりました！</div>'
-      + '<p class="news-text">ホーム画面の<span class="news-red">「📝 模擬試験・過去問」</span>から、<span class="news-red">2023年〜2026年（FY23〜FY26）の4年分</span>の本番問題に挑戦できます。<br>点数は記録され、LINEなどでシェアもできます。紙で勉強したい人は印刷（PDF）もOK！</p>'
-      + '<button class="btn" id="btnNewsGo" type="button" style="width:100%;">さっそく見てみる</button><button class="text-link-btn" id="btnNewsClose" type="button">閉じる</button></div>';
+    box.innerHTML = '<div class="news-card"><div class="news-tag">📢 NEW</div><div class="news-title">「自分で単語帳」ができました！</div>'
+      + '<p class="news-text">ホームの<span class="news-red">「📖 単語帳」→「✏️ 自分で単語帳」</span>から、自分だけの単語カードを作れます。<br>カードは<b>タップするだけで表と裏が切り替わる</b>ので、すきま時間にさらっと見返せます。作ったカードは選んで友達に共有もできます。</p>'
+      + '<button class="btn" id="btnNewsGo" type="button" style="width:100%;">さっそく作ってみる</button><button class="text-link-btn" id="btnNewsClose" type="button">閉じる</button></div>';
     document.body.appendChild(box);
     function close(){ saveJSON(NEWS_KEY, true); if(box.parentNode) box.parentNode.removeChild(box); }
     document.getElementById('btnNewsClose').onclick = close;
     box.onclick = function(e){ if(e.target === box) close(); };
-    document.getElementById('btnNewsGo').onclick = function(){ close(); goExamArea(); };
+    document.getElementById('btnNewsGo').onclick = function(){ close(); curDeckId = myDecks.length ? myDecks[0].id : '__new'; screen = 'myDecks'; render(); window.scrollTo(0,0); };
   }
 
   document.getElementById('statsToggleBtn').onclick = function(){ document.getElementById('statsPanel').classList.toggle('open'); };
 
   init();
-  mountSoundFab();
+  setTimeout(handleDeckLink, 600);
 })();
 
 if('serviceWorker' in navigator){
