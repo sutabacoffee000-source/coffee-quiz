@@ -1627,11 +1627,11 @@
   // オーナーが決める「先着で答えられる人数」（0＝おまかせ：参加人数÷2切り上げ）
   function capSelectHtml(id, cur) {
     var h = '<select id="' + id + '" class="browse-search" style="margin-top:6px; padding:10px; width:100%;">';
-    h += '<option value="0"' + (!cur ? ' selected' : '') + '>おまかせ（参加人数÷2・切り上げ）</option>';
+    h += '<option value="0"' + (!cur ? ' selected' : '') + '>おまかせ（参加者の約半分）</option>';
     for (var i = 1; i <= 10; i++) h += '<option value="' + i + '"' + (cur === i ? ' selected' : '') + '>先着 ' + i + ' 人</option>';
     return h + '</select>';
   }
-  function capPrefLabel(st) { var c = (st.settings || {}).capPref || 0; return c ? '先着 ' + c + ' 人' : 'おまかせ（参加人数÷2・切り上げ）'; }
+  function capPrefLabel(st) { var c = (st.settings || {}).capPref || 0; return c ? '先着 ' + c + ' 人' : 'おまかせ（参加者の約半分）'; }
   function capFor(st, n) { var c = (st.settings || {}).capPref || 0; return c ? Math.max(1, Math.min(c, n)) : answerCapFor(n); }
   // 何番手で押したかで得点が変わる：1番手20点、2番手15点、3番手以降10点
   function basePointsFor(order) { return order === 0 ? 20 : (order === 1 ? 15 : 10); }
@@ -1673,7 +1673,7 @@
     h += '<summary>📖 BAバトルのルール（タップで開閉）</summary><ul>';
     h += '<li>問題文が1文字ずつ出てきます。分かったら<b>早押しボタン</b>！</li>';
     h += '<li>押した人だけが4択で答えられます（制限時間<b>5秒</b>）</li>';
-    h += '<li>1問につき押せる人数は、オーナーが<b>「先着◯人」</b>で決められます。おまかせなら<b>参加人数÷2（切り上げ）</b>（例：2人→1人、8人→4人、13人→7人）</li>';
+    h += '<li>1問につき押せる人数は、オーナーが<b>「先着◯人」</b>で決められます。おまかせなら<b>参加者の約半分</b>（例：2人→1人、8人→4人、13人→7人）</li>';
     h += '<li>正解の得点は押した順番で決まります：<b>1番手 <span class="plus">+20点</span></b>、<b>2番手 <span class="plus">+15点</span></b>、<b>3番手以降 <span class="plus">+10点</span></b></li>';
     h += '<li>✏️ <b>文字パネル問題</b>もまざります。押したら<b>ひらがな（またはカタカナ）を1文字ずつ</b>4つのパネルから選んで答えます（<b>1文字ごとに5秒</b>）。1文字でも間違えるとお手つき！</li>';
     h += '<li>⭕❌ <b>まるBAつ問題</b>もまざります。問題文は最初から全部表示され、<b>全員</b>が<b>5秒以内</b>に⭕か❌で答えます。正解は <span class="plus">+10点</span>（連続正解ボーナスで2倍の<span class="plus">20点</span>）。間違えると <b class="minus">-10点</b>、時間切れ（未回答）は0点。どちらも連続記録はリセット</li>';
