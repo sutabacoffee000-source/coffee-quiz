@@ -266,6 +266,27 @@
   .my-card-body{flex:1;min-width:0;} .my-f{font-size:14px;font-weight:700;color:var(--ink);line-height:1.5;word-break:break-word;} .my-b{font-size:13px;color:var(--ink-soft);line-height:1.5;margin-top:3px;padding-top:3px;border-top:1px dashed var(--line);word-break:break-word;}
   .my-card-side{display:flex;flex-direction:column;align-items:flex-end;gap:4px;} .my-icon{background:none;border:none;font-size:16px;cursor:pointer;padding:2px;}
   .my-ok{font-size:10px;font-weight:700;color:#F6EFDD;background:var(--forest);border-radius:999px;padding:2px 7px;white-space:nowrap;margin-right:6px;vertical-align:2px;}
+  .hub-card.zukan{background:#F3EAE0;border-color:#8A6B4E;color:#4A3212;}
+  .zk-tabs{display:flex;gap:6px;margin-bottom:14px;}
+  .zk-tabs button{flex:1;white-space:nowrap;background:var(--paper);border:1.5px solid var(--line);border-radius:999px;padding:9px 4px;font-size:12.5px;font-weight:700;color:var(--ink-soft);cursor:pointer;font-family:var(--font-body);}
+  .zk-tabs button.on{background:var(--forest);border-color:var(--forest);color:#F6EFDD;}
+  .zk-sec{display:inline-block;font-size:12.5px;font-weight:800;letter-spacing:0.04em;border-radius:999px;padding:4px 12px;margin:14px 0 10px;color:#FFF;}
+  .zk-sec.zk-blonde{background:#D9A441;} .zk-sec.zk-medium{background:#9A6234;} .zk-sec.zk-dark{background:#3E2414;} .zk-sec.zk-none{background:#9AA0A6;}
+  .zk-card{background:var(--card);border:1.5px solid var(--line);border-left-width:6px;border-radius:16px;padding:16px 16px 14px;margin-bottom:14px;}
+  .zk-card.zk-blonde{border-left-color:#D9A441;} .zk-card.zk-medium{border-left-color:#9A6234;} .zk-card.zk-dark{border-left-color:#3E2414;} .zk-card.zk-none{border-left-color:#9AA0A6;}
+  .zk-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
+  .zk-code{font-family:var(--font-display);font-size:26px;font-weight:800;color:var(--forest-deep);letter-spacing:0.04em;}
+  .zk-name{font-size:14px;font-weight:700;color:var(--ink);}
+  .zk-tag{font-size:10.5px;font-weight:700;color:#FFF;background:var(--clay);border-radius:999px;padding:2px 8px;}
+  .zk-meters{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--paper);border-radius:12px;padding:10px 12px;margin-bottom:12px;}
+  .zk-meters div{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:13px;}
+  .zk-meters b{font-size:13px;color:var(--forest-deep);} .zk-meters small{font-size:11px;color:var(--ink-soft);}
+  .zk-lbl{font-size:11.5px;font-weight:700;color:var(--ink-soft);width:100%;}
+  .zk-dots{display:inline-flex;gap:3px;} .zk-dots i{width:8px;height:8px;border-radius:50%;background:var(--line);display:inline-block;} .zk-dots i.on{background:var(--forest);}
+  .zk-dl{display:grid;grid-template-columns:auto 1fr;gap:8px 12px;margin:0;font-size:13.5px;line-height:1.6;}
+  .zk-dl dt{font-size:11.5px;font-weight:700;color:var(--ink-soft);padding-top:2px;white-space:nowrap;} .zk-dl dd{margin:0;color:var(--ink);font-weight:600;}
+  .zk-memo{margin-top:12px;font-size:12px;color:var(--ink-soft);background:rgba(185,138,62,0.10);border-radius:10px;padding:8px 10px;line-height:1.6;}
+  .zk-none{color:var(--ink-soft);font-weight:400;}
   .deck-tabs{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;margin:0 -4px 6px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
   .deck-tabs::-webkit-scrollbar{display:none;}
   .deck-tab{flex:0 0 auto;scroll-snap-align:center;display:flex;align-items:center;gap:6px;background:var(--card);border:1.5px solid var(--line);border-radius:999px;padding:9px 14px;font-size:13.5px;font-weight:700;color:var(--ink);cursor:pointer;font-family:var(--font-body);white-space:nowrap;}
@@ -395,6 +416,19 @@
   #printRoot .cp-ans-title { font-weight:bold; margin-bottom:1.2mm; }
   #printRoot .cp-year { font-size:11pt; font-weight:bold; border:0.8pt solid #111; display:inline-block; padding:0.6mm 3mm; margin-bottom:1.5mm; }
   #printRoot .cp-ans-grid { display:grid; grid-template-columns:repeat(10, 1fr); gap:1mm 2mm; font-size:7.6pt; }
+  .zk-high b, .zk-high small, .zk-red { color:#C62828 !important; font-weight:800; } .zk-high .zk-dots i.on { background:#C62828; }
+  .zk-print { width:100%; margin:0 0 12px; }
+  .zk-info { background:#FFF7E0; border:1px solid #E8D49A; border-radius:10px; padding:8px 12px; font-size:13px; margin:0 0 12px; }
+  #printRoot.zp-root { font-size:8pt; line-height:1.35; }
+  #printRoot .zp-title { font-size:14pt; font-weight:800; margin-bottom:2mm; } #printRoot .zp-title small { font-size:8pt; font-weight:normal; margin-left:3mm; }
+  #printRoot .zp-group { font-size:10pt; font-weight:bold; background:#EEE; padding:1mm 2mm; margin:3mm 0 1.5mm; }
+  #printRoot .zp-table { width:100%; border-collapse:collapse; }
+  #printRoot .zp-table th { font-size:7.5pt; text-align:left; border-bottom:0.8pt solid #111; padding:1mm; }
+  #printRoot .zp-table td { border-bottom:0.4pt solid #BBB; padding:1.2mm 1mm; vertical-align:top; }
+  #printRoot .zp-table tr { break-inside:avoid; page-break-inside:avoid; }
+  #printRoot .zp-code { font-size:10pt; } #printRoot .zp-sub { color:#555; font-size:7pt; }
+  #printRoot .zp-tag { font-size:6.5pt; border:0.5pt solid #111; padding:0 1mm; }
+  #printRoot .zp-high { color:#C62828; font-weight:800; }
   @media print {
     @page { size:A4; margin:8mm 9mm; }
     body { background:#FFF !important; padding:0 !important; }
@@ -1043,7 +1077,7 @@
     {id:732,c:'core',q:'風味のキーワードが「ナッツやココアを思わせるバランスの取れた味わい」のコーヒーは次のうちどれでしょう？',o:['CLG','HOU','EDR','LNB'],a:1,hot:true,n:'正解は HOU（ハウス ブレンド）。コアコーヒーです。',nb:true},
     {id:733,c:'core',q:'風味のキーワードが「クルミを思わせる香ばしさとハーブのような風味」のコーヒーは次のうちどれでしょう？',o:['HOU','KEN','CLG','TYO'],a:2,hot:true,n:'正解は CLG（コロンビア）。コアコーヒーです。',nb:true},
     {id:734,c:'core',q:'風味のキーワードが「まろやかで心温まる味わい」のコーヒーは次のうちどれでしょう？',o:['EDR','GUA','VER','TYO'],a:3,hot:true,n:'正解は TYO（TOKYO ロースト）。コアコーヒーです。',nb:true},
-    {id:735,c:'core',q:'風味のキーワードが「シトラスとスイートチョコレートを思わせる風味」のコーヒーは次のうちどれでしょう？',o:['CBR','GCC','EAB','AUB'],a:0,n:'正解は CBR（コールドブリュー ブレンド）。シーズナルコーヒーです。',nb:true},
+    {id:735,c:'core',q:'風味のキーワードが「シトラスとスイートチョコレートを思わせる風味」のコーヒーは次のうちどれでしょう？',o:['CBR','GCC','EAB','AUB'],a:0,n:'正解は CBR（コールドブリュー ブレンド）。コアコーヒーです。',nb:true},
     {id:736,c:'core',q:'風味のキーワードが「大地を思わせる風味としっかりとしたコク」のコーヒーは次のうちどれでしょう？',o:['HOU','KEN','EDR','SUM'],a:3,hot:true,n:'正解は SUM（スマトラ）。コアコーヒーです。',nb:true},
     {id:737,c:'core',q:'風味のキーワードが「フレッシュなハーブの風味とスパイシーな余韻」のコーヒーは次のうちどれでしょう？',o:['EDR','ITA','GUA','KDR'],a:3,hot:true,n:'正解は KDR（コモドドラゴン ブレンド）。コアコーヒーです。',nb:true},
     {id:738,c:'core',q:'風味のキーワードが「豊かな風味とキャラメルのような甘み」のコーヒーは次のうちどれでしょう？',o:['TYO','BRK','EDR','ESP'],a:3,hot:true,n:'正解は ESP（エスプレッソ ロースト）。コアコーヒーです。',nb:true},
@@ -1455,6 +1489,7 @@
     else if(screen==='summary'){ stage.innerHTML = renderSummary(); bindSummary(); }
     else if(screen==='browse'){ stage.innerHTML = renderBrowse(); bindBrowse(); }
     else if(screen==='browseHub'){ stage.innerHTML = renderBrowseHub(); bindBrowseHub(); }
+    else if(screen==='zukan'){ stage.innerHTML = renderZukan(); bindZukan(); }
     else if(screen==='myDecks'){ stage.innerHTML = renderMyDecks(); bindMyDecks(); }
     else if(screen==='tfHome'){ stage.innerHTML = renderTfHome(); bindTfHome(); }
     else if(screen==='tfQuestion'){ stage.innerHTML = renderTfQuestion(); bindTfQuestion(); }
@@ -1474,7 +1509,7 @@
 
   // 単語帳に載せる問題（nb:true＝3レター逆引き問題などは載せない）
   function browseQuestions(){ return QUESTIONS.filter(function(q){ return !q.nb; }); }
-  function browseLinkHtml(){ return '<button class="browse-link-btn" id="btnBrowseAll" type="button"><b>📖 単語帳 <span class="new-pill big">NEW</span></b><span>収録問題の単語帳（'+browseQuestions().length+'問）／自分で単語帳を作る</span></button>'; }
+  function browseLinkHtml(){ return '<button class="browse-link-btn" id="btnBrowseAll" type="button"><b>📖 単語帳 <span class="new-pill big">NEW</span></b><span>収録問題の単語帳（'+browseQuestions().length+'問）／豆図鑑／自分で単語帳</span></button>'; }
   function bindBrowseLink(){ var ba = document.getElementById('btnBrowseAll'); if(ba) ba.onclick = function(){ screen='browseHub'; render(); window.scrollTo(0,0); }; }
   function examLinkHtml(){ return '<button class="exam-link-btn" id="btnExamEntry" type="button"><b>📝 模擬試験・過去問</b><span>本番形式の模擬試験＋2023〜2026年の過去問（50問・30分）</span></button>'; }
   function bindExamLink(){ var eb = document.getElementById('btnExamEntry'); if(eb) eb.onclick = goExamArea; }
@@ -3369,8 +3404,9 @@
 
   // 単語帳の入口：収録問題の単語帳か、自分で単語帳か
   function renderBrowseHub(){
-    var html = '<div class="center-col"><div class="big-title">📖 単語帳</div><p class="desc">どちらの単語帳を使いますか？</p>';
+    var html = '<div class="center-col"><div class="big-title">📖 単語帳</div><p class="desc">どれを使いますか？</p>';
     html += '<button class="hub-card" id="btnHubBuiltin" type="button"><span class="hub-ico">📖</span><span><b>収録されている問題の単語帳</b><small>BAドリルの全' + browseQuestions().length + '問を分野ごとに確認</small></span></button>';
+    html += '<button class="hub-card zukan" id="btnHubZukan" type="button"><span class="hub-ico">☕</span><span><b>コーヒー豆図鑑 <span class="new-pill big">NEW</span></b><small>コア豆・プロモ豆のロースト／酸味／コク／キーワードを一覧でチェック</small></span></button>';
     var cards = myDecks.reduce(function(n, d){ return n + d.cards.length; }, 0);
     html += '<button class="hub-card mine" id="btnHubMine" type="button"><span class="hub-ico">✏️</span><span><b>自分で単語帳 <span class="new-pill big">NEW</span></b><small>' + (myDecks.length ? myDecks.length + '冊・' + cards + '枚のカード' : '自分だけの単語カードを作って、いつでも見返せる') + '</small></span></button>';
     html += '<button class="text-link-btn" id="btnHubBack" type="button">ホーム画面に戻る</button></div>';
@@ -3379,6 +3415,7 @@
   function bindBrowseHub(){
     document.getElementById('btnHubBuiltin').onclick = function(){ goMy('browse'); };
     document.getElementById('btnHubMine').onclick = function(){ goMy('myDecks'); };
+    document.getElementById('btnHubZukan').onclick = function(){ goMy('zukan'); };
     document.getElementById('btnHubBack').onclick = goHome;
   }
 
@@ -3549,6 +3586,101 @@
         addImportedDeck(obj.t, cards);
       }
     }catch(e){}
+  }
+
+  /* ---------------- コーヒー豆図鑑（勉強用・問題には出さない） ---------------- */
+  var BEAN_BOOK = [
+    {"c": "LNB", "n": "ライトノート ブレンド", "g": "core", "r": "BLONDE", "a": "MEDIUM", "b": "LIGHT", "rg": "ラテンアメリカ", "p": "水洗式", "k": "軽めのコクとミルクチョコレートのような風味", "f": "ミルクチョコレート、煎ったナッツ", "s": false, "m": ""},
+    {"c": "BEB", "n": "ブロンド エスプレッソ ロースト", "g": "core", "r": "BLONDE", "a": "MEDIUM", "b": "MEDIUM", "rg": "マルチリージョン", "p": "水洗式", "k": "キャンディードアップルやチョコレートを思わせる甘みのある風味", "f": "レモン、オレンジ、キャラメル", "s": false, "m": ""},
+    {"c": "BRK", "n": "ブレックファースト ブレンド", "g": "core", "r": "MEDIUM", "a": "HIGH", "b": "MEDIUM", "rg": "ラテンアメリカ", "p": "水洗式", "k": "1日のはじまりにふさわしいシトラスを思わせる風味", "f": "ナッツ、リンゴ、ブルーベリー、レモン", "s": false, "m": ""},
+    {"c": "SRN", "n": "サイレン ブレンド", "g": "core", "r": "MEDIUM", "a": "MEDIUM", "b": "MEDIUM", "rg": "マルチリージョン", "p": "水洗式", "k": "シトラスを感じる調和のとれた味わい", "f": "キャンディードシトラス、チョコレート", "s": false, "m": ""},
+    {"c": "KEN", "n": "ケニア", "g": "core", "r": "MEDIUM", "a": "HIGH", "b": "MEDIUM", "rg": "アフリカ（ケニア）", "p": "水洗式", "k": "グレープフルーツやブラックカラントを思わせる風味", "f": "グレープフルーツ、ベリー類、カラント（スグリ）", "s": true, "m": ""},
+    {"c": "EDB", "n": "パイクプレイス ロースト", "g": "core", "r": "MEDIUM", "a": "MEDIUM", "b": "MEDIUM", "rg": "ラテンアメリカ", "p": "水洗式", "k": "ほのかな香ばしさとなめらかな口あたり", "f": "ナッツ、チョコレート、シナモン", "s": false, "m": ""},
+    {"c": "GUA", "n": "グアテマラ アンティグア", "g": "core", "r": "MEDIUM", "a": "MEDIUM", "b": "MEDIUM", "rg": "ラテンアメリカ（グアテマラ）", "p": "水洗式", "k": "ココアやスパイスを思わせる洗練された風味", "f": "チョコレート、ナッツ、キャラメル、リンゴ", "s": true, "m": ""},
+    {"c": "HOU", "n": "ハウス ブレンド", "g": "core", "r": "MEDIUM", "a": "MEDIUM", "b": "MEDIUM", "rg": "ラテンアメリカ", "p": "水洗式", "k": "ナッツやココアを思わせるバランスの取れた味わい", "f": "ナッツ、リンゴ、ブルーベリー", "s": true, "m": ""},
+    {"c": "DHO", "n": "ディカフェ ハウス ブレンド", "g": "core", "r": "MEDIUM", "a": "MEDIUM", "b": "MEDIUM", "rg": "ラテンアメリカ", "p": "水洗式", "k": "ナッツやココアを思わせるバランスの取れた味わい", "f": "ナッツ、リンゴ、ブルーベリー", "s": false, "m": "ハウス ブレンドのディカフェ版"},
+    {"c": "CLG", "n": "コロンビア", "g": "core", "r": "MEDIUM", "a": "MEDIUM", "b": "MEDIUM", "rg": "ラテンアメリカ（コロンビア）", "p": "水洗式", "k": "クルミを思わせる香ばしさとハーブのような風味", "f": "ミルクチョコレート、ピーカンナッツ", "s": false, "m": ""},
+    {"c": "TYO", "n": "TOKYO ロースト", "g": "core", "r": "MEDIUM", "a": "MEDIUM", "b": "MEDIUM", "rg": "マルチリージョン", "p": "水洗式、半水洗式", "k": "まろやかで心温まる味わい", "f": "シナモン、レーズン、オートミール、チョコレート", "s": false, "m": ""},
+    {"c": "SUM", "n": "スマトラ", "g": "core", "r": "DARK", "a": "LOW", "b": "FULL", "rg": "アジア／太平洋（インドネシア）", "p": "半水洗式", "k": "大地を思わせる風味としっかりとしたコク", "f": "シナモン、オートミール、メープル、バター、トフィー、チーズ", "s": false, "m": ""},
+    {"c": "KDR", "n": "コモドドラゴン ブレンド", "g": "core", "r": "DARK", "a": "LOW", "b": "FULL", "rg": "アジア／太平洋", "p": "水洗式、半水洗式", "k": "フレッシュなハーブの風味とスパイシーな余韻", "f": "シナモン、メープル、バター、チーズ、ハーブ", "s": false, "m": ""},
+    {"c": "VER", "n": "カフェ ベロナ", "g": "core", "r": "DARK", "a": "LOW", "b": "FULL", "rg": "マルチリージョン", "p": "水洗式、半水洗式", "k": "ダークココアのような風味とローストの甘みと深み", "f": "ミルクチョコレート、ダークチョコレート、カラメル", "s": false, "m": "1975年の「80/20ブレンド」がルーツ。ポストローストブレンド"},
+    {"c": "ESP", "n": "エスプレッソ ロースト", "g": "core", "r": "DARK", "a": "MEDIUM", "b": "FULL", "rg": "マルチリージョン", "p": "水洗式、半水洗式", "k": "豊かな風味とキャラメルのような甘み", "f": "キャラメル、チョコレート、スパイス、ナッツ", "s": false, "m": ""},
+    {"c": "EDR", "n": "スターバックス 1971 ダーク ロースト", "g": "core", "r": "DARK", "a": "LOW", "b": "FULL", "rg": "マルチリージョン（インドネシア、コロンビア、ブラジル）", "p": "水洗式、半水洗式", "k": "クルミや焦がした砂糖のような香ばしい甘みと深み", "f": "ダークチョコレート、カラメル", "s": false, "m": "EDR＝Everyday Dark Roast。2026年発売"},
+    {"c": "ITA", "n": "イタリアン ロースト", "g": "core", "r": "DARK", "a": "LOW", "b": "MEDIUM", "rg": "マルチリージョン", "p": "水洗式、半水洗式", "k": "ロースト感のある甘みとカラメルのような風味", "f": "ダークチョコレート、カラメル、スパイス", "s": false, "m": ""},
+    {"c": "FRE", "n": "フレンチ ロースト", "g": "core", "r": "DARK", "a": "LOW", "b": "LIGHT", "rg": "マルチリージョン", "p": "生産地域によって異なる", "k": "スモーキーさと個性的で力強い風味", "f": "煎ったナッツ、ローストした野菜、カラメル", "s": true, "m": ""},
+    {"c": "CBR", "n": "コールドブリュー ブレンド", "g": "core", "r": "MEDIUM", "a": "LOW", "b": "FULL", "rg": "マルチリージョン（ラテンアメリカ、アフリカ）", "p": "水洗式", "k": "シトラスとスイートチョコレートを思わせる風味", "f": "シトラス、ナッツ、ココア", "s": false, "m": ""},
+    {"c": "ETH", "n": "シングルオリジン エチオピア", "g": "promo", "r": "BLONDE", "a": "MEDIUM", "b": "LIGHT", "rg": "アフリカ（エチオピア）", "p": "水洗式", "k": "タンジェリンやレモンバームを思わせる風味", "f": "オレンジ、バニラ、ミント、ジンジャー", "s": false, "m": "エチオピア産は創業当初から取り扱い"},
+    {"c": "EAB", "n": "カティカティ ブレンド", "g": "promo", "r": "BLONDE", "a": "HIGH", "b": "MEDIUM", "rg": "アフリカ（エチオピア、ケニア）", "p": "水洗式、乾燥式", "k": "グレープフルーツや赤いベリーを思わせる風味", "f": "シトラス、チョコレート", "s": false, "m": "2025年から軽めの焙煎に。カティカティ＝スワヒリ語で「〜の間」"},
+    {"c": "SMD", "n": "スマトラ マサデパン", "g": "promo", "r": "BLONDE", "a": "MEDIUM", "b": "MEDIUM", "rg": "アジア／太平洋（インドネシア）", "p": "水洗式、乾燥式", "k": "スイカや煎茶を思わせる風味", "f": "トロピカルフルーツ、ハーブ、バニラ、ベリー", "s": false, "m": "日本30周年。「未来」と「共創」がテーマ"},
+    {"c": "GCC", "n": "グアテマラ カシ シエロ", "g": "promo", "r": "MEDIUM", "a": "HIGH", "b": "MEDIUM", "rg": "ラテンアメリカ（グアテマラ）", "p": "水洗式", "k": "メイヤーレモンやカカオニブを思わせる風味", "f": "ナッツ、ソフトチーズ、シトラス", "s": false, "m": "カシ シエロ＝スペイン語で「Almost Heaven」"},
+    {"c": "SSB", "n": "スプリング シーズン ブレンド", "g": "promo", "r": "MEDIUM", "a": "MEDIUM", "b": "MEDIUM", "rg": "マルチリージョン（アジア／太平洋、ラテンアメリカ）", "p": "水洗式、半水洗式、乾燥式", "k": "ハニーブッシュやココアを思わせる風味", "f": "さくら、バニラ、チョコレート", "s": false, "m": "2024年から軽い焙煎の新レシピ"},
+    {"c": "KLB", "n": "コペラニ ブレンド", "g": "promo", "r": "MEDIUM", "a": "MEDIUM", "b": "MEDIUM", "rg": "ハワイ島・コナ地区", "p": "水洗式", "k": "チョコレートヌガーやマカダミアナッツを思わせる風味", "f": "キャラメル、バター風味のペストリー、チョコレート、トロピカルフルーツ", "s": false, "m": "コペラニ＝ハワイ語で「至福のコーヒー」"},
+    {"c": "ICB", "n": "アイスコーヒー ブレンド", "g": "promo", "r": "MEDIUM", "a": "MEDIUM", "b": "MEDIUM", "rg": "ラテンアメリカ", "p": "水洗式、乾燥式", "k": "ブラウンシュガーやミルクチョコレートを思わせる風味", "f": "キャラメル、ミルクチョコレート、ピーナッツバター", "s": false, "m": "2006年「テラッツァ ブレンド」として登場"},
+    {"c": "HAC", "n": "ハシエンダ アルサシア", "g": "promo", "r": "MEDIUM", "a": "MEDIUM", "b": "MEDIUM", "rg": "ラテンアメリカ（コスタリカ）", "p": "水洗式", "k": "キャンディードシトラスやミルクチョコレートを思わせる風味", "f": "はちみつ、アーモンド", "s": false, "m": "スターバックス初の自社農園（コスタリカ・ポアス火山）"},
+    {"c": "AUB", "n": "オータム ブレンド", "g": "promo", "r": "DARK", "a": "MEDIUM", "b": "FULL", "rg": "マルチリージョン（グアテマラ、インドネシア、エチオピア）", "p": "水洗式、半水洗式", "k": "キャンディードピーカンやセージを思わせる風味", "f": "ハーブ、チーズ", "s": false, "m": "2008年に北米で誕生（日本は2011年）"}
+  ];
+  var zukanTab = 'core';
+  var ZK_ACID = { LOW: ['少ない', 1], MEDIUM: ['ほどよい', 2], HIGH: ['はっきり', 3] };
+  var ZK_BODY = { LIGHT: ['軽い', 1], MEDIUM: ['ほどよい', 2], FULL: ['しっかり', 3] };
+  function zkMeter(v, map){
+    var m = map[v]; if(!m) return '<span class="zk-none">—</span>';
+    var h = '<span class="zk-dots">'; for(var i=1;i<=3;i++) h += '<i class="' + (i <= m[1] ? 'on' : '') + '"></i>'; return h + '</span><b>' + v + '</b><small>（' + m[0] + '）</small>';
+  }
+  function zkVal(v){ return v ? esc(v) : '<span class="zk-none">—</span>'; }
+  function renderZukan(){
+    var list = BEAN_BOOK.filter(function(b){ return b.g === zukanTab; });
+    var html = '<div><button class="text-link-btn" id="btnZkBack" type="button">← 単語帳に戻る</button>';
+    html += '<div class="big-title" style="margin:8px 0 4px;text-align:left;">☕ コーヒー豆図鑑</div>';
+    html += '<p class="desc" style="text-align:left;max-width:none;margin:0 0 10px;">ロースト・酸味・コク・キーワードなどを、いつでも見返せる勉強用のページです。<span class="zk-red">酸味がHIGHの豆は赤字</span>で表示しています。</p>';
+    html += '<button class="btn secondary zk-print" id="btnZkPrint" type="button">🖨 PDFで印刷（コア・プロモ全部）</button>';
+    html += '<div class="zk-tabs"><button type="button" data-zk="core" class="' + (zukanTab === 'core' ? 'on' : '') + '">コア（' + BEAN_BOOK.filter(function(b){ return b.g === 'core'; }).length + '）</button><button type="button" data-zk="promo" class="' + (zukanTab === 'promo' ? 'on' : '') + '">シーズナル・プロモ（' + BEAN_BOOK.filter(function(b){ return b.g === 'promo'; }).length + '）</button></div>';
+    if(zukanTab === 'promo') html += '<div class="zk-info">📌 プロモ豆の情報は、これから随時追加していきます。</div>';
+    [['BLONDE','ブロンド ロースト','blonde'],['MEDIUM','ミディアム ロースト','medium'],['DARK','ダーク ロースト','dark'],['','ローストレベル未掲載','none']].forEach(function(sec){
+      var beans = list.filter(function(b){ return b.r === sec[0]; }); if(!beans.length) return;
+      html += '<div class="zk-sec zk-' + sec[2] + '">' + sec[1] + '</div>';
+      beans.forEach(function(b){
+        html += '<div class="zk-card zk-' + sec[2] + '"><div class="zk-head"><span class="zk-code">' + esc(b.c) + '</span><span class="zk-name">' + esc(b.n) + '</span>' + (b.s ? '<span class="zk-tag">創業当初から</span>' : '') + '</div>';
+        html += '<div class="zk-meters"><div' + (b.a === 'HIGH' ? ' class="zk-high"' : '') + '><span class="zk-lbl">酸味</span>' + zkMeter(b.a, ZK_ACID) + '</div><div><span class="zk-lbl">コク</span>' + zkMeter(b.b, ZK_BODY) + '</div></div>';
+        html += '<dl class="zk-dl"><dt>リージョン</dt><dd>' + zkVal(b.rg) + '</dd><dt>加工法</dt><dd>' + zkVal(b.p) + '</dd><dt>キーワード</dt><dd>' + zkVal(b.k) + '</dd><dt>相性のよい風味</dt><dd>' + zkVal(b.f) + '</dd></dl>';
+        if(b.m) html += '<div class="zk-memo">💡 ' + esc(b.m) + '</div>';
+        html += '</div>';
+      });
+    });
+    html += '<p class="my-note" style="text-align:center;margin-top:14px;">コアの情報はスターバックス公式オンラインストアの表記に合わせています。' + (zukanTab === 'promo' ? 'プロモ豆は随時追加します。' : '') + '「—」はまだ掲載していない情報です</p>';
+    return html + '</div>';
+  }
+  function bindZukan(){
+    document.getElementById('btnZkBack').onclick = function(){ goMy('browseHub'); };
+    document.querySelectorAll('[data-zk]').forEach(function(b){ b.onclick = function(){ zukanTab = b.getAttribute('data-zk'); render(); }; });
+    document.getElementById('btnZkPrint').onclick = printZukan;
+  }
+  // 豆図鑑をA4で印刷（PDF保存もここから）
+  function zukanPrintHtml(){
+    var h = '<div class="zp-title">☕ コーヒー豆図鑑 <small>BAドリル／酸味がHIGHの豆は赤字</small></div>';
+    [['core','コア豆'],['promo','シーズナル・プロモ豆（随時追加）']].forEach(function(g){
+      h += '<div class="zp-group">' + g[1] + '</div><table class="zp-table"><thead><tr><th>コード／名前</th><th>ロースト</th><th>酸味</th><th>コク</th><th>リージョン／加工法</th><th>キーワード／相性のよい風味</th></tr></thead><tbody>';
+      ['BLONDE','MEDIUM','DARK',''].forEach(function(r){
+        BEAN_BOOK.filter(function(b){ return b.g === g[0] && b.r === r; }).forEach(function(b){
+          h += '<tr><td><b class="zp-code">' + esc(b.c) + '</b><br>' + esc(b.n) + (b.s ? '<br><span class="zp-tag">創業当初から</span>' : '') + '</td>'
+            + '<td>' + (b.r || '—') + '</td>'
+            + '<td' + (b.a === 'HIGH' ? ' class="zp-high"' : '') + '>' + (b.a || '—') + '</td>'
+            + '<td>' + (b.b || '—') + '</td>'
+            + '<td>' + (b.rg ? esc(b.rg) : '—') + '<br><span class="zp-sub">' + (b.p ? esc(b.p) : '—') + '</span></td>'
+            + '<td>' + (b.k ? esc(b.k) : '—') + '<br><span class="zp-sub">相性：' + (b.f ? esc(b.f) : '—') + '</span>' + (b.m ? '<br><span class="zp-sub">💡 ' + esc(b.m) + '</span>' : '') + '</td></tr>';
+        });
+      });
+      h += '</tbody></table>';
+    });
+    return h;
+  }
+  function printZukan(){
+    var old = document.getElementById('printRoot'); if(old) old.parentNode.removeChild(old);
+    var root = document.createElement('div'); root.id = 'printRoot'; root.className = 'zp-root';
+    root.innerHTML = zukanPrintHtml(); document.body.appendChild(root);
+    var oldTitle = document.title; document.title = 'BAドリル_コーヒー豆図鑑';
+    var cleanup = function(){ var r = document.getElementById('printRoot'); if(r) r.parentNode.removeChild(r); document.title = oldTitle; window.removeEventListener('afterprint', cleanup); };
+    window.addEventListener('afterprint', cleanup);
+    setTimeout(function(){ window.print(); }, 50);
   }
 
   function renderBrowse(){
@@ -4016,6 +4148,21 @@
 
   /* ---------------- お知らせ（過去問の追加） ---------------- */
   var NEWS_KEY = 'bac-news-mydeck';
+  var ZUKAN_NEWS_KEY = 'bac-news-zukan', newsShownThisOpen = false;
+  // 豆図鑑のリリースのお知らせ（1回だけ）
+  function showZukanNews(){
+    newsShownThisOpen = true;
+    var box = document.createElement('div');
+    box.className = 'news-overlay'; box.id = 'newsOverlay';
+    box.innerHTML = '<div class="news-card"><div class="news-tag">📢 NEW</div><div class="news-title">☕ コーヒー豆図鑑が<br>できました！</div>'
+      + '<p class="news-text">ホームの<span class="news-red">「📖 単語帳」→「☕ コーヒー豆図鑑」</span>から、コア豆・プロモ豆の<b>ロースト・酸味・コク・キーワード</b>をいつでも見返せます。<br>PDFで印刷もできます。プロモ豆の情報は随時追加していきます。</p>'
+      + '<button class="btn" id="btnNewsGo" type="button" style="width:100%;">図鑑を見てみる</button><button class="text-link-btn" id="btnNewsClose" type="button">閉じる</button></div>';
+    document.body.appendChild(box);
+    function close(){ saveJSON(ZUKAN_NEWS_KEY, true); if(box.parentNode) box.parentNode.removeChild(box); }
+    document.getElementById('btnNewsClose').onclick = close;
+    box.onclick = function(e){ if(e.target === box) close(); };
+    document.getElementById('btnNewsGo').onclick = function(){ close(); zukanTab = 'core'; screen = 'zukan'; render(); window.scrollTo(0,0); };
+  }
   // FY27 エントリー期間のお知らせ：「エントリーした！」を押すまで1日1回表示（締め切りを過ぎたら出さない）
   var ENTRY_DONE_KEY = 'bac-entry-fy27-done', ENTRY_SHOWN_KEY = 'bac-entry-fy27-shown';
   var ENTRY_START = '2026-10-06', ENTRY_END = '2026-11-03';
@@ -4044,10 +4191,13 @@
     var ov0 = document.getElementById('onboardOverlay');
     if(ov0 && ov0.style.display === 'flex') return;
     if(entryPopupDue()){ showEntryPopup(); return; }
+    if(newsShownThisOpen) return;
+    if(!loadJSON(ZUKAN_NEWS_KEY, false)){ showZukanNews(); return; }
     if(loadJSON(NEWS_KEY, false)) return;
     if(screen !== 'home') return;
     var ov = document.getElementById('onboardOverlay');
     if(ov && ov.style.display === 'flex') return; // 初回の使い方ガイドを閉じたあとに表示
+    newsShownThisOpen = true;
     var box = document.createElement('div');
     box.className = 'news-overlay'; box.id = 'newsOverlay';
     box.innerHTML = '<div class="news-card"><div class="news-tag">📢 NEW</div><div class="news-title">「自分で単語帳」ができました！</div>'
