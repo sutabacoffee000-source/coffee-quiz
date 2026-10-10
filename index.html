@@ -526,6 +526,22 @@
   .score-board.compact { grid-template-columns:repeat(auto-fill, minmax(56px, 1fr)); gap:4px; }
   .score-board.compact > div { padding:3px !important; }
   .score-board.compact .sb-score { font-size:13px !important; }
+  .bchat { width:100%; max-width:340px; background:var(--card); border:1.5px solid var(--line); border-radius:16px; padding:12px; margin:6px 0 14px; box-sizing:border-box; text-align:left; }
+  .bchat-cd { background:#A8492E; color:#FFF; border-radius:12px; padding:10px; text-align:center; font-size:15px; font-weight:700; margin-bottom:10px; } .bchat-cd b { font-size:20px; font-variant-numeric:tabular-nums; }
+  .bchat-title { font-size:13px; font-weight:800; color:var(--forest-deep); margin-bottom:6px; }
+  .bchat-log { max-height:180px; overflow-y:auto; background:var(--paper); border-radius:10px; padding:8px; display:flex; flex-direction:column; gap:6px; }
+  .bchat-empty { font-size:12px; color:var(--ink-soft); margin:4px 0; text-align:center; }
+  .bchat-msg { display:flex; flex-direction:column; align-self:flex-start; max-width:85%; background:#FFF; border:1px solid var(--line); border-radius:12px 12px 12px 4px; padding:5px 10px; }
+  .bchat-msg.me { align-self:flex-end; background:rgba(28,59,50,0.1); border-color:var(--forest); border-radius:12px 12px 4px 12px; }
+  .bchat-msg.sys { align-self:stretch; max-width:none; background:#FFF3E0; border-color:#E8B27A; }
+  .bchat-name { font-size:10.5px; font-weight:700; color:var(--ink-soft); } .bchat-text { font-size:14px; color:var(--ink); word-break:break-word; } .bchat-msg.sys .bchat-text { font-weight:700; color:#A8492E; }
+  .bchat-quick { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .bchat-quick button { background:var(--paper); border:1px solid var(--line); border-radius:999px; padding:6px 10px; font-size:12px; font-weight:700; color:var(--ink); cursor:pointer; font-family:var(--font-body); }
+  .bchat-input { display:flex; gap:6px; margin-top:8px; } .bchat-input input { flex:1; min-width:0; border:1.5px solid var(--line); border-radius:10px; padding:9px 10px; font-size:16px; font-family:var(--font-body); background:#FFF; }
+  .bchat-input button { background:var(--forest); color:#F6EFDD; border:none; border-radius:10px; padding:0 14px; font-weight:700; font-size:14px; cursor:pointer; font-family:var(--font-body); }
+  .bchat-owner { margin-top:10px; border-top:1px dashed var(--line); padding-top:8px; } .bchat-owner-t { font-size:12px; font-weight:800; color:var(--ink); }
+  .bchat-owner .bchat-quick button { background:#FFF8EC; border-color:var(--gold); }
+  .bchat-note { font-size:11px; color:var(--ink-soft); margin:6px 0 0; }
   .owner-panel { width:100%; max-width:300px; background:#FFF8EC; border:1.5px solid var(--gold); border-radius:14px; padding:12px; margin:8px 0 12px; box-sizing:border-box; text-align:center; }
   .owner-title { font-size:12px; font-weight:800; color:#8A6420; margin-bottom:8px; }
   .battle-notice { width:max-content; max-width:calc(100vw - 32px); box-sizing:border-box; text-align:center; line-height:1.5; position:fixed; top:20px; left:50%; transform:translateX(-50%); z-index:10000; background:var(--forest-deep); color:#FFF; font-weight:800; padding:14px 22px; border-radius:14px; box-shadow:0 10px 25px rgba(0,0,0,0.3); transition:opacity .6s; white-space:normal; }
@@ -1284,6 +1300,81 @@
   var bRoom = null;
   var bMe = null; 
   var bState = null; 
+  // 待機室のチャット：入力中の文字とフォーカスは、画面が描き直されても保つ
+  var bChatDraft = '', bChatFocus = false, bWaitTicker = null, bAutoStartFired = 0;
+  var CHAT_QUICK = ['よろしくお願いします！', 'ちょっと待って🙏', '準備できました！', 'いつでもOK👍'];
+  function chatList(){
+    var c = (bState && bState.chat) || {};
+    return Object.keys(c).map(function(k){ return c[k]; }).sort(function(a, b){ return a.ts - b.ts; }).slice(-30);
+  }
+  function sendBattleChat(text, sys){
+    text = String(text || '').trim().slice(0, 60);
+    if(!text || !bRoom || !bState) return;
+    var me = (bState.players || {})[bMe] || {};
+    var key = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    var upd = {};
+    upd['chat/' + key] = { k: bMe, n: me.name || '', t: text, ts: Date.now(), sys: !!sys };
+    // 古いメッセージは40件を超えたら消す
+    var c = bState.chat || {}, keys = Object.keys(c).sort(function(a, b){ return c[a].ts - c[b].ts; });
+    keys.slice(0, Math.max(0, keys.length - 39)).forEach(function(k){ upd['chat/' + k] = null; });
+    db.ref('rooms/' + bRoom).update(upd);
+  }
+  function fmtCd(ms){ var t = Math.max(0, Math.ceil(ms / 1000)); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+  function battleChatHtml(isHost){
+    var h = '<div class="bchat">';
+    if(bState.startAt){
+      var left = bState.startAt - Date.now();
+      h += '<div class="bchat-cd" id="startCd">' + (left > 0 ? '⏰ あと <b>' + fmtCd(left) + '</b> で開始予定' : '⏰ まもなく開始します') + '</div>';
+    }
+    h += '<div class="bchat-title">💬 メッセージ</div><div class="bchat-log" id="chatLog">';
+    var list = chatList();
+    if(!list.length) h += '<p class="bchat-empty">まだメッセージはありません</p>';
+    list.forEach(function(m){
+      h += '<div class="bchat-msg' + (m.k === bMe ? ' me' : '') + (m.sys ? ' sys' : '') + '"><span class="bchat-name">' + (m.k === battleOwnerId() ? '👑 ' : '') + esc(m.n) + '</span><span class="bchat-text">' + esc(m.t) + '</span></div>';
+    });
+    h += '</div><div class="bchat-quick">' + CHAT_QUICK.map(function(t, i){ return '<button type="button" data-chatq="' + i + '">' + esc(t) + '</button>'; }).join('') + '</div>';
+    h += '<div class="bchat-input"><input type="text" id="chatInput" maxlength="60" placeholder="メッセージを入力" value="' + esc(bChatDraft) + '"><button type="button" id="btnChatSend">送信</button></div>';
+    if(isHost){
+      h += '<div class="bchat-owner"><div class="bchat-owner-t">👑 開始時間をみんなに知らせる</div><div class="bchat-quick">' + [1, 3, 5, 10].map(function(m){ return '<button type="button" data-startin="' + m + '">' + m + '分後</button>'; }).join('') + '</div>';
+      if(bState.startAt) h += '<button type="button" class="text-link-btn" id="btnStartAtCancel" style="font-size:12px;">開始予告を取り消す</button>';
+      h += '<p class="bchat-note">時間になると、2人以上いれば自動でスタートします</p></div>';
+    }
+    return h + '</div>';
+  }
+  function bindBattleChat(){
+    var inp = document.getElementById('chatInput');
+    var log = document.getElementById('chatLog');
+    if(log) log.scrollTop = log.scrollHeight;
+    if(inp){
+      inp.oninput = function(){ bChatDraft = inp.value; };
+      inp.onfocus = function(){ bChatFocus = true; };
+      inp.onblur = function(){ bChatFocus = false; };
+      inp.onkeydown = function(e){ if(e.key === 'Enter' && !e.isComposing){ e.preventDefault(); send(); } };
+      if(bChatFocus){ inp.focus(); var n = inp.value.length; try{ inp.setSelectionRange(n, n); }catch(e){} }
+    }
+    function send(){ var t = bChatDraft; bChatDraft = ''; if(inp) inp.value = ''; sendBattleChat(t); }
+    var sb = document.getElementById('btnChatSend'); if(sb) sb.onclick = send;
+    document.querySelectorAll('[data-chatq]').forEach(function(b){ b.onclick = function(){ sendBattleChat(CHAT_QUICK[+b.getAttribute('data-chatq')]); }; });
+    document.querySelectorAll('[data-startin]').forEach(function(b){ b.onclick = function(){
+      var m = +b.getAttribute('data-startin'), at = Date.now() + m * 60000, d = new Date(at);
+      db.ref('rooms/' + bRoom).update({ startAt: at });
+      sendBattleChat('⏰ あと' + m + '分後（' + d.getHours() + ':' + ('0' + d.getMinutes()).slice(-2) + 'ごろ）に始めます！', true);
+    }; });
+    var cc = document.getElementById('btnStartAtCancel');
+    if(cc) cc.onclick = function(){ db.ref('rooms/' + bRoom).update({ startAt: null }); sendBattleChat('⏰ 開始予告を取り消しました', true); };
+    // 開始予告のカウントダウン（時間になったらオーナーの端末がスタートさせる）
+    if(bWaitTicker){ clearInterval(bWaitTicker); bWaitTicker = null; }
+    if(bState && bState.status === 'waiting' && bState.startAt){
+      bWaitTicker = setInterval(function(){
+        if(!bState || bState.status !== 'waiting' || !bState.startAt || screen !== 'battleRoom'){ clearInterval(bWaitTicker); bWaitTicker = null; return; }
+        var left = bState.startAt - Date.now(), el = document.getElementById('startCd');
+        if(el) el.innerHTML = left > 0 ? '⏰ あと <b>' + fmtCd(left) + '</b> で開始予定' : (Object.keys(bState.players || {}).length >= 2 ? '⏰ まもなく開始します' : '⏰ 時間になりました（2人以上で開始できます）');
+        if(left <= 0 && isBattleOwner() && Object.keys(bState.players || {}).length >= 2 && bAutoStartFired !== bState.startAt){
+          bAutoStartFired = bState.startAt; startBattleGame();
+        }
+      }, 500);
+    }
+  }
   var answerTimer = null;
   var typeInterval = null;
   var currentTypedLength = 0;
@@ -1862,7 +1953,7 @@
       r.settings.maxPlayers = Math.max(n, 2);
       r.status = 'waiting'; r.currentQ = 0; r.state = 'intro';
       r.round = (r.round || 1) + 1;
-      delete r.buzzers; delete r.answers;
+      delete r.buzzers; delete r.answers; delete r.startAt;
       Object.keys(r.players || {}).forEach(function(k){
         var p = r.players[k];
         p.score = 0; p.ready = false; p.lastCorrectQ = -99; delete p.st; delete p.skipped;
@@ -2171,7 +2262,7 @@
 
   function startBattleGame() {
     var pKeys = Object.keys(bState.players || {});
-    var updates = { status: 'playing', 'settings/answerCap': capFor(bState, pKeys.length) };
+    var updates = { status: 'playing', startAt: null, 'settings/answerCap': capFor(bState, pKeys.length) };
     pKeys.forEach(function(k){ updates['players/' + k + '/ready'] = false; });
     db.ref('rooms/' + bRoom).update(updates);
   }
@@ -2559,6 +2650,8 @@
       }
       html += '<p class="desc" style="font-size:12px; margin-bottom:4px;">🙋 1問につき答えられる人数：<b>' + capPrefLabel(bState) + '</b></p>';
       html += '<p class="desc" style="font-size:12px;">' + (full ? '全員そろいました！全員が「準備OK」を押すとスタートします' : '定員がそろって全員が「準備OK」を押すとスタートします') + '</p>';
+      if(document.activeElement && document.activeElement.id === 'chatInput') bChatFocus = true;
+      html += battleChatHtml(isHost);
       if(isHost) {
         html += '<div class="owner-panel"><div class="owner-title">👑 オーナー（あなた）の操作</div>';
         if(pKeys.length >= 2) {
@@ -2766,6 +2859,7 @@
       if(confirm('今いる' + Object.keys(bState.players || {}).length + '人でゲームを始めますか？\n（準備OKを押していない人がいても始まります）')) startBattleGame();
     };
 
+    if(bState && bState.status === 'waiting') bindBattleChat();
     var ocSel = document.getElementById('ownerCap');
     if(ocSel) ocSel.onchange = function(){ db.ref('rooms/' + bRoom + '/settings').update({ capPref: parseInt(ocSel.value, 10) || 0 }); };
 
