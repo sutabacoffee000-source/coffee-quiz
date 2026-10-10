@@ -526,6 +526,9 @@
   .score-board.compact { grid-template-columns:repeat(auto-fill, minmax(56px, 1fr)); gap:4px; }
   .score-board.compact > div { padding:3px !important; }
   .score-board.compact .sb-score { font-size:13px !important; }
+  .room-share { display:flex; gap:8px; justify-content:center; margin:0 0 22px; flex-wrap:wrap; }
+  .room-share button { border:none; border-radius:999px; padding:10px 16px; font-size:14px; font-weight:800; cursor:pointer; font-family:var(--font-body); }
+  .room-share .rs-line { background:#06C755; color:#FFF; } .room-share .rs-other { background:var(--paper); color:var(--ink); border:1.5px solid var(--line); }
   .bchat { width:100%; max-width:340px; background:var(--card); border:1.5px solid var(--line); border-radius:16px; padding:12px; margin:6px 0 14px; box-sizing:border-box; text-align:left; }
   .bchat-cd { background:#A8492E; color:#FFF; border-radius:12px; padding:10px; text-align:center; font-size:15px; font-weight:700; margin-bottom:10px; } .bchat-cd b { font-size:20px; font-variant-numeric:tabular-nums; }
   .bchat-title { font-size:13px; font-weight:800; color:var(--forest-deep); margin-bottom:6px; }
@@ -1300,6 +1303,8 @@
   var bRoom = null;
   var bMe = null; 
   var bState = null; 
+  var bRoomClosed = false;  // 順位画面の途中でオーナーが部屋を閉じた
+  var pendingJoinRoom = '';  // 共有リンクから開いたときの部屋番号
   // 待機室のチャット：入力中の文字とフォーカスは、画面が描き直されても保つ
   var bChatDraft = '', bChatFocus = false, bWaitTicker = null, bAutoStartFired = 0;
   var CHAT_QUICK = ['よろしくお願いします！', 'ちょっと待って🙏', '準備できました！', 'いつでもOK👍'];
@@ -1541,6 +1546,7 @@
   
   function goHome(){ 
     mode = 'daily'; screen = 'home'; answeredThisQ = null; 
+    bRoomClosed = false; pendingJoinRoom = '';
     playedIntroForQ = -1;
     if(db && bRoom) { 
       db.ref('rooms/'+bRoom).off(); 
@@ -1803,29 +1809,17 @@
      s: 'h' = ひらがなで答える / 'k' = カタカナで答える
      ※普段のドリル・模擬試験には出題されません */
   var BATTLE_KANA_QUESTIONS = [
-    {id:1, t:'word', s:'h', q:'「スターバックス」という社名の由来となった、ハーマン・メルヴィルの小説は？', a:'はくげい', n:'小説『白鯨（Moby-Dick）』に登場する一等航海士「スターバック」が社名の由来です。'},
-    {id:2, t:'word', s:'h', q:'コーヒーチェリーの一番外側にある層を、漢字2文字で何という？', a:'かひ', n:'外側から「果皮 → 果肉（パルプ）→ 内果皮（パーチメント）→ シルバースキン → 生豆」の順です。'},
     {id:3, t:'word', s:'h', q:'果皮のすぐ内側にあり、コーヒーチェリーの総重量のおよそ80%を占める層を、漢字2文字で何という？', a:'かにく', n:'果肉は「パルプ」とも呼ばれ、チェリーの総重量のおよそ80%を占めます。'},
     {id:4, t:'word', s:'h', q:'コーヒー豆を保護する硬い層「パーチメント」を、漢字3文字で何という？', a:'ないかひ', n:'パーチメント（内果皮）は、豆を守る硬い殻のような層です。'},
-    {id:5, t:'word', s:'h', q:'果肉を除去したあと発酵タンクで寝かせ、水洗いしてから乾燥させる加工法は？', a:'すいせんしき', n:'水洗式は発酵の工程を伴う加工法。「TANGY（はじけるような）」風味につながります。'},
-    {id:6, t:'word', s:'h', q:'コーヒーチェリーの果肉をつけたまま乾燥させる加工法は？', a:'かんそうしき', n:'乾燥式はエチオピア・イエメン・ブラジルで代表的。「WILD」「BERRY」な風味になります。'},
-    {id:7, t:'word', s:'h', q:'インドネシア・スマトラ島で伝統的に採用されている加工法は？', a:'はんすいせんしき', n:'半水洗式は「FULL BODIED」「SMOOTH」な風味につながります。'},
-    {id:8, t:'fill', s:'h', q:'「コーヒーベルト」とは、北回帰線と（　）回帰線に挟まれた地帯のことである。', a:'みなみ', n:'コーヒーは北回帰線と南回帰線に挟まれた「コーヒーベルト」で栽培されています。'},
-    {id:9, t:'fill', s:'h', q:'コーヒーテイスティング4ステップの最初のステップは「（　）をかぐ」。', a:'かおり', n:'テイスティングはまず香りをかぐところから始まります。'},
     {id:10, t:'fill', s:'h', q:'OUR VALUESの「CRAFT」は、「思いを（　）にする」。', a:'かたち', n:'OUR VALUES：CRAFT「思いをかたちにする」、COURAGE「勇気をもって向き合う」、JOY「楽しむことを力に」。'},
-    {id:11, t:'fill', s:'h', q:'OUR VALUESの「COURAGE」は、「（　）をもって向き合う」。', a:'ゆうき', n:'OUR VALUES：CRAFT「思いをかたちにする」、COURAGE「勇気をもって向き合う」、JOY「楽しむことを力に」。'},
-    {id:12, t:'fill', s:'h', q:'OUR VALUESの「JOY」は、「（　）ことを力に」。', a:'たのしむ', n:'OUR VALUES：CRAFT「思いをかたちにする」、COURAGE「勇気をもって向き合う」、JOY「楽しむことを力に」。'},
     {id:13, t:'fill', s:'h', q:'OUR VALUESの前文「私たちは（　）を大切にしながら成長し続けます」', a:'にんげんらしさ', n:'OUR VALUESの前文は「人間らしさを大切にしながら成長し続けます」です。'},
     {id:14, t:'fill', s:'h', q:'OUR FARMER PROMISE「コーヒーの（　）を確かなものに」', a:'みらい', n:'OUR FARMER PROMISEは「コーヒーの未来を確かなものに」です。'},
     {id:15, t:'fill', s:'h', q:'OUR SHAREHOLDER PROMISE「たゆみなく永きにわたる（　）を」', a:'せいちょう', n:'OUR SHAREHOLDER PROMISEは「たゆみなく永きにわたる成長を」です。'},
-    {id:16, t:'word', s:'h', q:'「エシカル（ethical）」を日本語で言うと？（漢字3文字）', a:'りんりてき', n:'エシカル＝倫理的な。C.A.F.E.プラクティスなど、倫理的な調達につながる言葉です。'},
     {id:17, t:'fill', s:'k', q:'焙煎中にアミノ酸と還元糖が熱で結びつき、茶色く色づいて香ばしい風味が生まれる化学反応を「（　）反応」という。', a:'メイラード', n:'メイラード反応によって、焙煎したコーヒー豆の色と香ばしさが生まれます。'},
     {id:18, t:'fill', s:'k', q:'太平洋赤道域から南米沿岸にかけて海面水温が平年より高い状態が一年程度続き、コーヒー生産地にも影響を与える「（　）現象」。', a:'エルニーニョ', n:'エルニーニョ現象などの気候の変化は、コーヒー生産にも大きく影響します。'},
     {id:19, t:'fill', s:'h', q:'スイスウォータープロセスは、化学薬剤を使わず、水と（　）フィルターだけでカフェインを除去する。', a:'かっせいたん', n:'スイスウォータープロセスは水と活性炭（カーボン）フィルターでカフェインだけを取り除きます。'},
     {id:20, t:'fill', s:'h', q:'牛乳を凍らせて解凍し、濃厚な部分だけを取り出す技術を「（　）蒸留ミルク」という。', a:'とうけつ', n:'凍結蒸留ミルクは加熱せずに濃縮でき、コンデンスミルクのような甘みと濃厚さが得られます。'},
-    {id:21, t:'fill', s:'h', q:'シェードツリーとは、コーヒーの木に直射日光を遮る（　）を作るために植えられる背の高い樹木である。', a:'ひかげ', n:'シェードツリーは日陰を作り、チェリーがゆっくり熟して風味が発達します。野鳥のすみかにもなります。'},
     {id:22, t:'fill', s:'h', q:'スターバックス1号店では「焙煎したての豆・（　）・スパイス」が販売されていた。', a:'こうちゃ', n:'1号店のロゴには「Starbucks Coffee Tea Spices」と入っていました。'},
-    {id:23, t:'fill', s:'h', q:'一杯のコーヒーのおよそ98%は（　）でできている。', a:'みず', n:'コーヒーの約98%は水。だからこそ、おいしい水を使うことが大切です。'},
     {id:24, t:'fill', s:'h', q:'スプリング シーズン ブレンド（SSB）と相性の良い風味は「（　）、バニラ、チョコレート」。', a:'さくら', n:'SSBはハニーブッシュやココアを思わせる風味。さくら、バニラ、チョコレートと相性抜群です。'},
     {id:25, t:'fill', s:'h', q:'ハシエンダ アルサシア（HAC）と相性の良い風味は「（　）、アーモンド」。', a:'はちみつ', n:'HACはキャンディードシトラスやミルクチョコレートを思わせる風味です。'},
     {id:26, t:'fill', s:'h', q:'「カシ シエロ」は、スペイン語で「（　）のような」という意味である。', a:'てんごく', n:'グアテマラ カシ シエロ（GCC）はメイヤーレモンやカカオニブを思わせる風味です。'},
@@ -1836,31 +1830,18 @@
     {id:31, t:'word', s:'h', q:'1996年、北米以外で初の海外店舗がオープンした東京の街は？', a:'ぎんざ', n:'1996年、東京・銀座に北米以外で初めての店舗がオープンしました。'},
     {id:32, t:'word', s:'h', q:'STARBUCKS RESERVE ROASTERY TOKYOがある東京の街は？', a:'なかめぐろ', n:'東京・中目黒のロースタリーでは、約15種類の豆が随時焙煎されています。'},
     {id:33, t:'fill', s:'k', q:'スターバックス初の自社農園「ハシエンダ アルサシア」は、コスタリカの（　）火山の斜面に広がっている。', a:'ポアス', n:'ハシエンダ アルサシアでは、気候変動や病害に強い品種を研究し、生産者と知見を共有しています。'},
-    {id:34, t:'fill', s:'h', q:'コーヒー用語「EARTHY」は、「（　）のような」という意味である。', a:'だいち', n:'EARTHY（大地のような）は、インドネシア産コーヒーによく使われる表現です。'},
-    {id:35, t:'word', s:'h', q:'コーヒー用語「MOUTHFEEL」を日本語で言うと？', a:'くちあたり', n:'MOUTHFEEL（口当たり）は、コーヒーを味わう時に口の中で感じる感覚や重さのことです。'},
     {id:36, t:'fill', s:'h', q:'コーヒー用語「STALE」は、「（　）の落ちた」という意味である。', a:'せんど', n:'STALEは、酸素に長期間さらされて酸味が失われ、平坦な味になった状態です。'},
-    {id:37, t:'fill', s:'h', q:'コーヒー用語「BRIGHT」は、「（　）な」という意味である。', a:'あざやか', n:'BRIGHT（鮮やかな）は、口の中前方で感じるキリッとした酸味のことです。'},
-    {id:38, t:'fill', s:'h', q:'コーヒー用語「SMOOTH」は、「（　）な」という意味である。', a:'なめらか', n:'SMOOTH（なめらかな）は、尖りのない、丸みのあるバランスの良い口当たりです。'},
     {id:39, t:'fill', s:'h', q:'コーヒー用語「TANGY」は、「（　）ような」という意味である。', a:'はじける', n:'TANGY（はじけるような）は、はっきりしていて余韻を残す酸味を表します。'},
     {id:40, t:'fill', s:'h', q:'コーヒー用語「CLEAN」は、「（　）とした」という意味である。', a:'さっぱり', n:'CLEAN（さっぱりとした）は、後味のほとんど残らないコーヒーを指します。'},
     {id:41, t:'fill', s:'h', q:'かかるとコーヒーの木の葉にオレンジ色の斑点ができる病気を「コーヒー（　）病」という。', a:'さび', n:'コーヒーさび病は生産者にとって大きな脅威。耐性のある品種の研究が進められています。'},
     {id:42, t:'fill', s:'h', q:'コーヒーの「2050年問題」とは、気候変動により2050年までにアラビカ種の栽培適地が（　）する問題である。', a:'はんげん', n:'平均気温が1℃上がると、コーヒーの収量は約14%低下すると言われています。'},
-    {id:43, t:'word', s:'h', q:'生豆に熱を加えて煎ることを、漢字2文字で何という？', a:'ばいせん', n:'焙煎によってコーヒー豆の色・香り・風味が引き出されます。'},
-    {id:44, t:'word', s:'h', q:'コーヒーの成分をお湯や水で取り出すことを、漢字2文字で何という？', a:'ちゅうしゅつ', n:'スターバックスの推奨は、水180mlに対してコーヒー10gです。'},
-    {id:45, t:'fill', s:'h', q:'コールドブリュー コーヒーは、（　）を加えずに水でじっくりと抽出して作る。', a:'ねつ', n:'店舗のコールドブリューは、約14時間かけてじっくり抽出されます。'},
     {id:46, t:'fill', s:'h', q:'コーヒー生産者がまとまり、協力して販売と営業を行う組織形態を「（　）組合」という。', a:'きょうどう', n:'フェアトレード認証は、生産者による協同組合の運営を支援することを目的としています。'},
-    {id:47, t:'fill', s:'h', q:'「サードプレイス」とは、自宅でも（　）でもない、心地よい第三の場所のことである。', a:'しょくば', n:'スターバックスは、自宅でも職場でもない「サードプレイス」を目指しています。'},
-    {id:48, t:'word', s:'k', q:'1971年、スターバックス1号店がオープンしたアメリカの都市は？', a:'シアトル', n:'1号店は焙煎したコーヒー豆を量り売りする専門店でした。'},
     {id:49, t:'word', s:'k', q:'コーヒーチェリーの中に稀に1粒だけ入っている、丸い豆を何と呼ぶ？', a:'ピーベリー', n:'ピーベリーはコーヒーチェリー全体のおよそ5〜10%の割合で存在します。'},
     {id:50, t:'word', s:'k', q:'生豆を覆う、最後の薄くほとんど透明な保護層を何と呼ぶ？', a:'シルバースキン', n:'外側から「果皮 → 果肉 → パーチメント → シルバースキン → 生豆」の順です。'},
-    {id:51, t:'word', s:'k', q:'アラビカ種コーヒーの発祥の地とされる国は？', a:'エチオピア', n:'エチオピアでは、鉄鍋で焙煎し、粘土製のジャバナでコーヒーをいれる伝統があります。'},
     {id:52, t:'word', s:'k', q:'3〜5年熟成させる「エイジド コーヒー」の専用倉庫がある国は？', a:'シンガポール', n:'エイジド コーヒーはシンガポールの専用倉庫で3〜5年ほど熟成されます。'},
     {id:53, t:'word', s:'k', q:'コーヒーチェリーの果皮や果肉を乾燥させて作る、ハーブティーのように飲まれる飲み物は？', a:'カスカラ', n:'カスカラはスペイン語で「殻・皮」という意味です。'},
     {id:54, t:'word', s:'k', q:'パイクプレイス ロースト（EDB）のパッケージに描かれている、ブタのマスコットの名前は？', a:'レイチェル', n:'EDBのパッケージには、パイクプレイスマーケットがスクープの形で表現されています。'},
     {id:55, t:'word', s:'k', q:'グアテマラの国鳥で、グアテマラ アンティグア（GUA）のパッケージに描かれている鳥は？', a:'ケツァール', n:'GUAはココアやスパイスを思わせる洗練された風味です。'},
-    {id:56, t:'word', s:'k', q:'1983年、ハワード・シュルツが出張先でエスプレッソバーに感銘を受けた国は？', a:'イタリア', n:'この体験が、1984年の最初のエスプレッソドリンク「スターバックスラテ」につながりました。'},
-    {id:57, t:'word', s:'k', q:'スターバックス初の自社農園「ハシエンダ アルサシア」がある国は？', a:'コスタリカ', n:'2013年に購入。ポアス火山の斜面に広がる農園です。'},
-    {id:58, t:'word', s:'k', q:'コーヒーの花は、どんな花のような香りがすると言われる？', a:'ジャスミン', n:'コーヒーの木は開花から収穫まで、およそ9か月かかります。'},
     {id:59, t:'word', s:'k', q:'コーヒーの土壌管理と栽培の専門家を何と呼ぶ？', a:'アグロノミスト', n:'ファーマーサポートセンター（FSC）では、アグロノミストが生産者を直接支援しています。'},
     {id:60, t:'word', s:'k', q:'「バキューム・プレス」と呼ばれる独自の抽出技術を搭載し、フレンチプレスとサイフォンの長所を併せ持つ抽出マシンは？', a:'クローバー', n:'ロースタリー東京や一部のリザーブ店舗に導入されています。'},
     {id:61, t:'word', s:'k', q:'ロースタリー東京にもある、ビクトリア・アーデュイノ社製の最高峰マニュアルエスプレッソマシンは？', a:'ブラックイーグル', n:'ドージングからタンピング、抽出までバリスタの高度な手動技術が求められます。'},
@@ -1872,7 +1853,6 @@
     {id:67, t:'word', s:'k', q:'エチオピアの「ゲシャ村」で発見されたことが名前の由来の品種は？', a:'ゲイシャ', n:'繊細で華やかなフローラル風味で、世界中で圧倒的な人気を誇ります。'},
     {id:68, t:'word', s:'k', q:'エチオピアなどに自生、または代々受け継がれてきた歴史的な在来種を何と呼ぶ？', a:'エアルーム', n:'エチオピアには何千ものエアルーム種が存在します。'},
     {id:69, t:'word', s:'k', q:'干ばつ対策として、土壌を藁などで覆う農法を何と呼ぶ？', a:'マルチング', n:'土壌を覆うことで、水分の蒸発を防ぎます。'},
-    {id:70, t:'fill', s:'h', q:'干ばつ対策の「マルチング」では、土壌を（　）で覆う。', a:'わら', n:'マルチングは、土壌の乾燥を防ぐための農法です。'},
     {id:71, t:'fill', s:'h', q:'ハシエンダ アルサシアの研究成果や新品種の種子は、世界中の生産者に（　）で提供されている。', a:'むしょう', n:'サプライヤーか否かを問わず、オープンソースとして提供されています。'},
     {id:72, t:'fill', s:'k', q:'ハシエンダ アルサシアで2016年に導入された、水の使用量を80%削減できる加工設備を「（　）ミル」という。', a:'ウェット', n:'2016年に導入されたウェットミル等の技術です。'},
     {id:73, t:'fill', s:'h', q:'グアテマラの「バレー オブ ボルケーノ農園」は、（　）農家の現実的な課題の解決策を研究している。', a:'しょうきぼ', n:'2024年に開設。コスタリカの「ハイランズ オブ アルサシア農園」はドローン等の先端技術を研究しています。'},
@@ -1913,6 +1893,13 @@
 
   // 選択肢はそのまま全て使い、テキストベースで正解を保存することでインデックスズレのバグを回避する
   // withKana: 文字パネル問題、withTf: まるBAつ問題をまぜる（片方だけなら約3割、両方なら各約2.5割）
+  // BAバトルでは出さない、簡単すぎる4択問題
+  var BATTLE_EASY_Q = [1,2,3,6,7,13,18,574,767,768,769,770, 19,23,29,31,630,524,525,526, 78,81,597,704,713, 113,114,115,577,581,648,
+    164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,696, 97,98,99,100,101,102,108,109,151,153,155,156,158,184,225, 139,141];
+  function battleChoicePool(n){
+    var pool = QUESTIONS.filter(function(q){ return q.c !== 'mission' && !q.nb && BATTLE_EASY_Q.indexOf(q.id) === -1; });
+    return shuffleArrayInPlace(pool.map(function(q){ return q.id; })).slice(0, n);
+  }
   function buildBattleQuestions(maxQ, withKana, withTf) {
     var share = (withKana && withTf) ? 0.25 : 0.3;
     var nKana = withKana ? Math.min(Math.max(1, Math.round(maxQ * share)), BATTLE_KANA_QUESTIONS.length) : 0;
@@ -1924,7 +1911,7 @@
     var kanaQs = shuffleArrayInPlace(BATTLE_KANA_QUESTIONS.slice()).slice(0, nKana).map(function(k){
       return { id: 'k' + k.id, type: 'kana', kt: k.t, ks: k.s, q: k.q, correctText: k.a, panels: makeKanaPanels(k.a, k.s === 'k'), n: k.n || '' };
     });
-    var choiceQs = pickSet(null, maxQ - nKana - nTf).map(function(id) {
+    var choiceQs = battleChoicePool(maxQ - nKana - nTf).map(function(id) {
       var original = getQ(id);
       var chosenOpts = shuffleArrayInPlace(original.o.slice());
       return {
@@ -1938,7 +1925,12 @@
         n: original.n || ''
       };
     });
-    return shuffleArrayInPlace(choiceQs.concat(kanaQs, tfQs));
+    var all = shuffleArrayInPlace(choiceQs.concat(kanaQs, tfQs));
+    // 最後の問題は必ず4択にする
+    for (var i = all.length - 1; i >= 0; i--) {
+      if (!all[i].type) { var t = all[i]; all[i] = all[all.length - 1]; all[all.length - 1] = t; break; }
+    }
+    return all;
   }
 
   // 同じ部屋・同じメンバーでもう一戦（新しい問題で待合室に戻る）
@@ -1975,6 +1967,24 @@
     } else if (!needConfirm || confirm('本当に部屋から退出しますか？\n（退出するとこの対戦には戻れません）')) {
       leaveBattleRoom();
     }
+  }
+  function roomShareText(){
+    var url = location.origin + location.pathname + '?room=' + bRoom;
+    return 'BAドリルの「BAバトル」で対戦しよう！🥊\n部屋番号：' + bRoom + '\n↓このリンクから参加できます\n' + url;
+  }
+  function copyText(t, msg){
+    try {
+      if (navigator.clipboard) { navigator.clipboard.writeText(t).then(function(){ showBattleNotice(msg); }, function(){ prompt('コピーしてください', t); }); return; }
+    } catch(e){}
+    prompt('コピーしてください', t);
+  }
+  // ?room=1234 のリンクで開いたら、BAバトルの参加画面に部屋番号を入れておく
+  function handleRoomLink(){
+    var m = location.search.match(/[?&]room=(\d{3,8})/);
+    if(!m) return;
+    history.replaceState(null, '', location.pathname);
+    pendingJoinRoom = m[1]; screen = 'battleLobby'; render(); window.scrollTo(0, 0);
+    showBattleNotice('🥊 部屋番号 ' + m[1] + ' を入力しました。ニックネームを入れて参加してください');
   }
   function showBattleNotice(msg) {
     var el = document.createElement('div');
@@ -2021,7 +2031,7 @@
     html += '<button class="btn" id="btnCreateRoom" type="button" style="background:#A8492E; width:100%; margin-bottom:16px;">ルームを作る</button>';
     html += '<hr style="border:none; border-top:1px dashed var(--line); margin:0 0 16px;">';
     html += '<p style="font-size:13px; font-weight:bold; color:var(--ink); margin:0 0 10px;">💬 友達の部屋に入る</p>';
-    html += '<input type="number" id="inputRoomId" class="input-room" placeholder="部屋番号" style="margin-bottom:10px; width:100%;">';
+    html += '<input type="number" id="inputRoomId" class="input-room" placeholder="部屋番号" style="margin-bottom:10px; width:100%;"' + (pendingJoinRoom ? ' value="' + esc(pendingJoinRoom) + '"' : '') + '>';
     html += '<button class="btn secondary" id="btnJoinRoom" type="button" style="width:100%; border-color:#A8492E; color:#A8492E;">入室する</button>';
     html += '</div>';
     html += '<div style="margin-bottom:6px;">' + soundToggleHtml() + '</div>';
@@ -2132,13 +2142,22 @@
 
   function listenBattleRoom() {
     screen = 'battleRoom';
+    bRoomClosed = false; pendingJoinRoom = '';
     db.ref('rooms/' + bRoom).on('value', function(snap){
       var newState = snap.val();
-      if(!newState) { goHome(); showBattleNotice('🚪 ルームが解散されました'); return; }
+      if(!newState) {
+        // 順位画面を見ている途中でオーナーが部屋を閉じても、結果はそのまま見られるようにする
+        if (bState && bState.status === 'finished') {
+          db.ref('rooms/' + bRoom).off(); bRoomClosed = true; render();
+          showBattleNotice('👑 オーナーが部屋を閉じました（結果はそのまま見られます）');
+          return;
+        }
+        goHome(); showBattleNotice('🚪 ルームが解散されました'); return;
+      }
 
       var prev = bState;
       // 自分が参加者から外された（「次の問題へ」を押さずに2回進められた）
-      if (prev && prev.players && prev.players[bMe] && !(newState.players || {})[bMe]) {
+      if (prev && prev.players && prev.players[bMe] && !(newState.players || {})[bMe] && newState.status !== 'finished') {
         goHome(); showBattleNotice('⚠️ 「次の問題へ」を押さなかったため退出になりました'); return;
       }
       var prevStateStr = prev ? prev.state : '';
@@ -2427,6 +2446,8 @@
     var nextQ = bState.currentQ + 1;
     var updates = extra || {};
     if(nextQ >= bState.settings.maxQuestions) {
+        // 最終結果へ進むときは、誰も退出させない（順位画面を全員が見られるように）
+        Object.keys(updates).forEach(function(k){ if (/^players\/[^\/]+$/.test(k) && updates[k] === null) delete updates[k]; });
         updates['status'] = 'finished';
     } else {
         updates['currentQ'] = nextQ;
@@ -2631,7 +2652,8 @@
       html += '<div class="center-col" style="padding:40px 0;">';
       if((bState.round || 1) > 1) html += '<p class="desc" style="font-weight:bold; color:#A8492E; margin-bottom:4px;">🔁 ' + bState.round + '戦目の準備中</p>';
       html += '<div class="big-title">部屋番号: <span style="color:#A8492E;font-size:42px;">' + bRoom + '</span></div>';
-      html += '<p class="desc" style="margin-bottom:24px;">この番号を相手に教えてください</p>';
+      html += '<p class="desc" style="margin-bottom:10px;">この番号を相手に教えてください</p>';
+      html += '<div class="room-share"><button type="button" id="btnShareRoomLine" class="rs-line">LINEで送る</button><button type="button" id="btnShareRoomOther" class="rs-other">📤 ほかの方法で共有</button></div>';
 
       html += '<p class="desc" style="font-weight:bold;">参加者 (' + pKeys.length + '/' + bState.settings.maxPlayers + '人)</p>';
       html += '<div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:24px;">';
@@ -2694,9 +2716,14 @@
       html += battleTitlesHtml(pKeys);
 
       html += '<button class="btn secondary" id="btnShareResult" type="button" style="width:100%; max-width:300px; margin-bottom:10px;">📤 順位とポイントをシェア</button>';
-      html += '<button class="btn" id="btnRematch" type="button" style="background:#A8492E; width:100%; max-width:300px; margin-bottom:10px;">🔁 このメンバーで続けて遊ぶ</button>';
-      html += '<p class="desc" style="font-size:11px; margin:0 0 14px;">部屋はそのまま、新しい問題でもう一戦！</p>';
-      html += '<button class="btn secondary" id="btnBattleCancel" type="button">' + (isHost ? '👑 ルームを解散してホームに戻る' : '部屋を出てホームに戻る') + '</button>';
+      if (bRoomClosed) {
+        html += '<p class="desc" style="font-size:12px; margin:0 0 14px;">この部屋は閉じられました</p>';
+        html += '<button class="btn secondary" id="btnClosedHome" type="button">ホームに戻る</button>';
+      } else {
+        html += '<button class="btn" id="btnRematch" type="button" style="background:#A8492E; width:100%; max-width:300px; margin-bottom:10px;">🔁 このメンバーで続けて遊ぶ</button>';
+        html += '<p class="desc" style="font-size:11px; margin:0 0 14px;">部屋はそのまま、新しい問題でもう一戦！</p>';
+        html += '<button class="btn secondary" id="btnBattleCancel" type="button">' + (isHost ? '👑 ルームを解散してホームに戻る' : '部屋を出てホームに戻る') + '</button>';
+      }
       html += '</div>';
       return html;
     }
@@ -2844,6 +2871,16 @@
     var cBtn = document.getElementById('btnBattleCancel');
     if(cBtn) cBtn.onclick = function(){ leaveOrDisband(false); };
 
+    var chBtn = document.getElementById('btnClosedHome');
+    if(chBtn) chBtn.onclick = function(){ goHome(); };
+    var srBtn = document.getElementById('btnShareRoomLine');
+    if(srBtn) srBtn.onclick = function(){ window.open('https://line.me/R/share?text=' + encodeURIComponent(roomShareText()), '_blank'); };
+    var soBtn = document.getElementById('btnShareRoomOther');
+    if(soBtn) soBtn.onclick = function(){
+      var t = roomShareText();
+      if (navigator.share) { navigator.share({ text: t }).catch(function(){}); return; }
+      copyText(t, '📋 部屋番号と参加リンクをコピーしました');
+    };
     var shBtn = document.getElementById('btnShareResult');
     if(shBtn) shBtn.onclick = shareBattleResult;
 
@@ -4409,6 +4446,7 @@
 
   init();
   setTimeout(handleDeckLink, 600);
+  setTimeout(handleRoomLink, 650);
 })();
 
 if('serviceWorker' in navigator){
