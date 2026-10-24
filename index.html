@@ -594,6 +594,68 @@
     #splashScreen .sp-ba,#splashScreen .sp-sub{animation:subIn .4s ease both;}
     #splashScreen{animation:spBg .4s ease 1.2s forwards;}
   }
+  /* BAシミュレーション */
+  .sim-hero{display:block;box-sizing:border-box;width:100%;max-width:340px;margin:18px auto 4px;padding:0;border:none;-webkit-tap-highlight-color:transparent;border-radius:20px;overflow:hidden;background:#1C3B32;cursor:pointer;font-family:var(--font-body);box-shadow:0 10px 24px rgba(28,59,50,.28);text-align:center;transition:transform .15s;}
+  .sim-hero:active{transform:scale(.98);}
+  .sim-hero-scene{position:relative;display:block;width:100%;height:150px;overflow:hidden;background:#2E5A4C;}
+  .sh-win{position:absolute;top:14px;width:46px;height:32px;background:linear-gradient(160deg,#D8EEF2,#A3CED8);border:3px solid #E9DCC2;border-radius:5px;} .sh-win.l{left:18px;} .sh-win.r{right:18px;}
+  .sh-door{position:absolute;left:50%;top:22px;width:40px;height:56px;margin-left:-20px;background:linear-gradient(#6A4429,#3E2716);border:3px solid #E9DCC2;border-bottom:none;border-radius:5px 5px 0 0;}
+  .sh-floor{position:absolute;left:-30%;right:-30%;top:78px;bottom:0;background:repeating-conic-gradient(#F1E6D0 0 25%,#C7B08A 0 50%) 0 0/34px 34px;transform:perspective(160px) rotateX(50deg);transform-origin:top;}
+  .sh-cust{position:absolute;left:38%;bottom:22px;width:58px;margin-left:-29px;animation:shWalk 2.6s ease-in-out infinite;transform-origin:50% 100%;}
+  .sh-cust .sim-person{width:100%;display:block;}
+  @keyframes shWalk{0%{transform:translateY(-34px) scale(.45);opacity:0;}15%{opacity:1;}60%,100%{transform:none;opacity:1;}}
+  .sh-counter{position:absolute;left:0;right:0;bottom:0;height:30px;background:linear-gradient(#8A5532,#5A341C);border-top:6px solid #1C3B32;}
+  .sh-bubble{position:absolute;right:12px;top:44px;background:#FFF;color:var(--ink);border-radius:12px;padding:6px 9px;font-size:11px;font-weight:800;line-height:1.4;text-align:left;box-shadow:0 4px 10px rgba(0,0,0,.2);animation:shBub 2.6s ease infinite;}
+  @keyframes shBub{0%,55%{opacity:0;transform:translateY(4px);}65%,100%{opacity:1;transform:none;}}
+  .sim-hero-body{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;box-sizing:border-box;padding:14px 16px 18px;color:#F6EFDD;text-align:center;}
+  .sim-hero-tag{font-size:10.5px;font-weight:800;letter-spacing:.08em;background:#E03B3B;color:#FFF;border-radius:999px;padding:2px 10px;}
+  .sim-hero-title{font-family:var(--font-display);font-size:19px;font-weight:800;}
+  .sim-hero-sub{font-size:12px;opacity:.85;line-height:1.55;}
+  .sim-hero-cta{margin-top:6px;background:#D4AA5C;color:#1C3B32;font-weight:800;font-size:15px;border-radius:999px;padding:9px 26px;}
+  .sim-link-btn{display:flex;flex-direction:column;align-items:center;gap:3px;width:100%;max-width:340px;border-radius:14px;padding:13px 16px;margin-top:10px;cursor:pointer;font-family:var(--font-body);background:#FFF4E2;border:1.5px solid #D4A04C;color:#6B4510;}
+  .sim-link-btn b{font-size:14.5px;} .sim-link-btn span{font-size:11.5px;opacity:.85;}
+  .sim-rules{text-align:left;background:var(--paper);border-radius:14px;padding:12px 14px;font-size:13px;line-height:1.75;margin:6px 0 14px;width:100%;max-width:380px;box-sizing:border-box;}
+  .sim-hud{display:flex;justify-content:space-between;font-weight:800;font-size:14px;color:var(--forest-deep);margin:0 2px 8px;}
+  .sim-scene{position:relative;height:400px;border-radius:16px;overflow:hidden;background:#EADBC0;user-select:none;}
+  .sim-wall{position:absolute;left:0;right:0;top:0;height:44%;background:linear-gradient(#2E5A4C,#22463B);display:flex;align-items:center;justify-content:space-between;padding:0 7%;box-sizing:border-box;}
+  .sim-win{width:30%;height:52%;margin-top:14%;background:linear-gradient(160deg,#D8EEF2,#A3CED8);border:4px solid #E9DCC2;border-radius:6px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.5);}
+  .sim-gap{width:60px;}
+  .sim-lamp{position:absolute;top:0;width:2px;height:22%;background:#1B1B1B;} .sim-lamp::after{content:"";position:absolute;left:-12px;bottom:-10px;width:26px;height:14px;border-radius:14px 14px 4px 4px;background:#D4AA5C;box-shadow:0 8px 22px 6px rgba(255,214,140,.45);}
+  .sim-lamp.a{left:22%;} .sim-lamp.b{right:22%;}
+  .sim-floor{position:absolute;left:-40%;right:-40%;top:44%;bottom:0;background:repeating-conic-gradient(#F1E6D0 0 25%,#C7B08A 0 50%) 0 0/46px 46px;transform:perspective(240px) rotateX(50deg);transform-origin:top;}
+  .sim-door{position:absolute;left:50%;top:19%;width:54px;height:25%;transform:translateX(-50%);background:linear-gradient(#6A4429,#3E2716);border:4px solid #E9DCC2;border-bottom:none;border-radius:6px 6px 0 0;}
+  .sim-door::after{content:"";position:absolute;right:7px;top:52%;width:5px;height:5px;border-radius:50%;background:#D4AA5C;}
+  .sim-table{position:absolute;top:56%;width:70px;height:48px;}
+  .sim-table::before{content:"";position:absolute;left:0;right:0;top:0;height:16px;border-radius:50%;background:#3B7A88;box-shadow:inset 0 -3px 0 rgba(0,0,0,.2);}
+  .sim-table::after{content:"";position:absolute;left:32px;top:12px;width:6px;height:34px;background:#8D8D8D;}
+  .sim-table.l{left:5%;} .sim-table.r{right:5%;}
+  .sim-cust{position:absolute;left:50%;bottom:56px;width:112px;transform:translate(-50%,0);transform-origin:50% 100%;z-index:3;}
+  .sim-person{width:100%;display:block;}
+  .sim-cust.walking .sim-person{animation:simBob .38s ease-in-out infinite alternate;transform-origin:50% 100%;}
+  @keyframes simBob{from{transform:translateY(0) rotate(-2deg);}to{transform:translateY(-7px) rotate(2deg);}}
+  .sim-counter{position:absolute;left:0;right:0;bottom:0;height:72px;background:linear-gradient(#8A5532,#5A341C);border-top:9px solid #2E5A4C;z-index:4;box-shadow:0 -4px 10px rgba(0,0,0,.18);}
+  .sim-counter::before{content:"";position:absolute;left:0;right:0;top:-9px;height:3px;background:rgba(255,255,255,.35);}
+  .sim-bubble{position:absolute;left:10px;right:10px;top:10px;z-index:5;background:#FFF;border-radius:16px;padding:10px 13px;font-size:14.5px;font-weight:700;line-height:1.55;color:var(--ink);box-shadow:0 6px 16px rgba(0,0,0,.18);opacity:0;transform:translateY(-8px) scale(.97);transition:opacity .3s ease, transform .3s ease;}
+  .sim-bubble::after{content:"";position:absolute;left:50%;bottom:-9px;margin-left:-9px;border:9px solid transparent;border-top-color:#FFF;border-bottom:0;}
+  .sim-bubble.show{opacity:1;transform:none;} .sim-bubble p{margin:0;} .sim-bubble .brew{margin-top:5px;color:#A8492E;} .sim-bubble .react{text-align:center;font-size:15.5px;}
+  .sim-patience{position:absolute;left:12px;right:12px;bottom:12px;height:9px;background:rgba(255,255,255,.28);border-radius:99px;z-index:6;overflow:hidden;}
+  .sim-patience i{display:block;height:100%;width:100%;background:#7BD389;border-radius:99px;transition:width .2s linear;} .sim-patience i.low{background:#E5533D;}
+  .sim-panel{margin-top:12px;transition:opacity .2s;} .sim-panel.wait{opacity:.45;pointer-events:none;}
+  .sim-lbl{font-size:12.5px;font-weight:800;color:var(--forest-deep);margin:10px 0 6px;}
+  .sim-shelf{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;}
+  .sim-bag{position:relative;height:48px;font-size:13px !important;border-radius:5px 5px 10px 10px;border:2px solid rgba(0,0,0,.08);font-family:var(--font-display);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:10px 0 0;transition:transform .12s;}
+  .sim-bag-top{position:absolute;top:0;left:0;right:0;height:10px;background:rgba(0,0,0,.2);border-radius:5px 5px 0 0;}
+  .sim-bag.blonde{background:#F3D98B;color:#5A4210;} .sim-bag.medium{background:#B7804F;color:#FFF;} .sim-bag.dark{background:#5B3A7E;color:#FFF;}
+  .sim-bag.on{border-color:#1E7A46;box-shadow:0 0 0 3px rgba(30,122,70,.4);transform:translateY(-3px);}
+  .sim-grind{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 6px;-webkit-overflow-scrolling:touch;}
+  .sim-grind button{flex:0 0 auto;min-width:40px;height:40px;border-radius:50%;border:1.5px solid var(--line);background:var(--paper);font-weight:800;font-size:15px;color:var(--ink);cursor:pointer;font-family:var(--font-body);}
+  .sim-grind button.wb{border-radius:999px;padding:0 12px;font-size:12.5px;}
+  .sim-grind button.on{background:var(--forest);border-color:var(--forest);color:#F6EFDD;}
+  .sim-serve{width:100%;margin-top:14px;font-size:17px;} .sim-serve:disabled{opacity:.45;}
+  .sim-result{margin-top:12px;background:var(--paper);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;}
+  .sim-res-head{font-size:16px;font-weight:800;margin-bottom:6px;} .sim-res-head.ok{color:#1E7A46;} .sim-res-head.ng{color:#B42318;}
+  .sim-res-row{font-size:13.5px;margin:6px 0 10px;line-height:1.6;color:var(--ink);} .sim-res-row small{color:var(--ink-soft);}
+  .sim-log{width:100%;max-width:380px;text-align:left;margin:10px 0 16px;} .sim-log-row{font-size:13px;padding:7px 0;border-bottom:1px dashed var(--line);} .sim-log-row span{color:var(--ink-soft);font-size:12px;}
 </style>
 </head>
 <body>
@@ -1651,7 +1713,7 @@
   }
 
   function render(){
-    var isExamOrBattle = (screen==='examLock' || screen==='examReview' || screen==='examIntro' || screen==='examQuestion' || screen==='examResult' || screen==='pastPrint' || screen==='battleLobby' || screen==='battleRoom');
+    var isExamOrBattle = (screen==='examLock' || screen==='examReview' || screen==='examIntro' || screen==='examQuestion' || screen==='examResult' || screen==='pastPrint' || screen==='battleLobby' || screen==='battleRoom' || screen==='sim');
     var badgesEl = document.getElementById('badges');
     var statsToggleEl = document.querySelector('.stats-toggle');
     if(badgesEl) badgesEl.classList.toggle('slim', isExamOrBattle);
@@ -1665,6 +1727,7 @@
     else if(screen==='browse'){ stage.innerHTML = renderBrowse(); bindBrowse(); }
     else if(screen==='browseHub'){ stage.innerHTML = renderBrowseHub(); bindBrowseHub(); }
     else if(screen==='zukan'){ stage.innerHTML = renderZukan(); bindZukan(); }
+    else if(screen==='sim'){ stage.innerHTML = renderSim(); bindSim(); }
     else if(screen==='myDecks'){ stage.innerHTML = renderMyDecks(); bindMyDecks(); }
     else if(screen==='tfHome'){ stage.innerHTML = renderTfHome(); bindTfHome(); }
     else if(screen==='tfQuestion'){ stage.innerHTML = renderTfQuestion(); bindTfQuestion(); }
@@ -1689,7 +1752,7 @@
     tfHome:['btnTfHomeBack','← ホームに戻る'], tfQuestion:['btnTfQuit',''], tfSummary:['btnTfSumHome','← ホームに戻る'], tfBrowse:['btnTfBrowseBack','← まるBAつ問題に戻る'],
     examLock:['btnLockBack','← ホームに戻る'], examIntro:['btnExamCancel','← ホームに戻る'], examQuestion:['btnExamQuit','← 試験を中断してホームに戻る'],
     examResult:['btnExamHome','← ホームに戻る'], examReview:['btnReviewBack','← 模擬試験・過去問に戻る'], pastPrint:['btnPrintBack','← 戻る'],
-    battleLobby:['btnBattleCancel','← ホームに戻る']
+    battleLobby:['btnBattleCancel','← ホームに戻る'], sim:['btnSimHome','← ホームに戻る']
   };
   function placeBackLink(){
     var def = BACK_LINKS[screen], stage = document.getElementById('stage');
@@ -1775,6 +1838,7 @@
       if(daily && daily.completed){ html += '<button class="text-link-btn" id="btnViewSummary" type="button" style="margin-top:0;">今日の1周目の結果を見る</button>'; }
     }
     html += '</div>';
+    html += simHeroHtml();
     html += otherLinksHtml() + '</div>';
     return html;
   }
@@ -1797,7 +1861,7 @@
     };
     var vs = document.getElementById('btnViewSummary');
     if(vs) vs.onclick = viewTodaySummary;
-    bindBrowseLink(); bindTfLink(); bindExamLink(); bindBattleLink();
+    bindBrowseLink(); bindTfLink(); bindSimLink(); bindExamLink(); bindBattleLink();
   }
 
   /* ---------------- BAバトルモード 実装 ---------------- */
@@ -3917,6 +3981,263 @@
         addImportedDeck(obj.t, cards);
       }
     }catch(e){}
+  }
+
+  /* ---------------- BAシミュレーション（お客様の要望に合わせて豆と挽き具合を選ぶ） ---------------- */
+  // 抽出器具とマルコニックの挽き具合（FY27電車版の推奨。範囲があるものは範囲内なら正解）
+  var SIM_BREWS = [
+    { d:'デロンギ デディカ アルテ（エスプレッソマシン）', ok:[3,4], best:'3〜4番（推奨4番）', say:['家のデロンギ デディカ アルテでエスプレッソをいれます','エスプレッソマシン（デディカ アルテ）で使います'] },
+    { d:'ソロフィルター', ok:[5], best:'5番', say:['ソロフィルターで1杯ずついれます','家ではソロフィルターを使っています'] },
+    { d:'ペーパー用（ペーパーフィルターのドリッパー）', ok:[7], best:'7番', say:['ペーパー用でお願いします','ペーパーフィルターのドリッパーでいれます'] },
+    { d:'kMix ドリップコーヒーメーカー', ok:[7], best:'7番', say:['デロンギのkMixドリップコーヒーメーカーでいれます'] },
+    { d:'オリジナル セラミック ドリッパー', ok:[7,8,9,10], best:'7〜10番', say:['オリジナルのセラミックドリッパーでいれます'] },
+    { d:'サイフォン', ok:[8], best:'8番', say:['サイフォンでいれるのが好きなんです','家ではサイフォンを使っています'] },
+    { d:'直火式エスプレッソメーカー（モカポット）', ok:[8], best:'8番', say:['モカポットでいれます','直火式のエスプレッソメーカーで使います'] },
+    { d:'グラスドリップコーヒーメーカー', ok:[8,9,10], best:'8〜10番', say:['グラスドリップコーヒーメーカーでいれます'] },
+    { d:'オリジナル ステンレス コーンフィルター', ok:[8,9,10], best:'8〜10番（推奨10番）', say:['ステンレスのコーンフィルターでいれます'] },
+    { d:'コールドブリューストレーナー', ok:[10], best:'10番', say:['コールドブリューストレーナーで水出しにします','家で水出しコーヒーを作ります（コールドブリューストレーナー）'] },
+    { d:'BALMUDA The Brew', ok:[10], best:'10番', say:['BALMUDA The Brewでいれます'] },
+    { d:'コーヒープレス', ok:[13], best:'13番', say:['コーヒープレスでいれます','家ではコーヒープレスを使っています'] },
+    { d:'パーコレーター', ok:[13], best:'13番', say:['キャンプでパーコレーターを使います'] },
+    { d:'豆のまま', ok:['WB'], best:'挽かずに豆のまま', say:['家にミルがあるので、豆のままでお願いします','自分で挽くので、挽かなくて大丈夫です'] }
+  ];
+  var SIM_N = 5, SIM_PATIENCE = 30;  // 1回の営業のお客様の数・待ってくれる秒数
+  var SIM_LOOKS = [
+    { skin:'#F2C9A5', hair:'#3B2418', shirt:'#C0392B', style:'bob' }, { skin:'#E8B892', hair:'#1E1A18', shirt:'#2E6F9E', style:'short' },
+    { skin:'#F5D3B5', hair:'#8A5A2B', shirt:'#3E8E5E', style:'long' }, { skin:'#D9A47E', hair:'#2A1B12', shirt:'#7A4BA0', style:'bun' },
+    { skin:'#F0C49E', hair:'#C9A063', shirt:'#E08A2E', style:'short' }, { skin:'#E9BC97', hair:'#5A3A22', shirt:'#2F4858', style:'long' }
+  ];
+  // 常連のおばあちゃん：赤いバンダナ・黒いボーダーの白Tシャツ・白髪・細身
+  var SIM_GRANNY = { skin:'#EEC6A4', hair:'#ECECEC', shirt:'#FFFFFF', style:'granny' };
+  var sim = null;  // 営業中の状態
+  var simTick = null;
+
+  // CBR（コールドブリュー ブレンド）は豆の販売をしていないので、棚にも正解にも入れない
+  function simPool(){ return BEAN_BOOK.filter(function(b){ return b.g === 'core' && b.c !== 'CBR'; }); }
+  function simShuffle(a){ return shuffleArrayInPlace(a.slice()); }
+  function simPick(a){ return a[Math.floor(Math.random() * a.length)]; }
+  var SIM_ROAST = { BLONDE:'ブロンドロースト', MEDIUM:'ミディアムロースト', DARK:'ダークロースト' };
+  var SIM_ACID = { LOW:'酸味は控えめ', MEDIUM:'酸味はほどよく', HIGH:'酸味はしっかり' };
+  var SIM_BODY = { LIGHT:'コクが軽い', MEDIUM:'コクがほどよい', FULL:'コクがしっかりした' };
+  // お客様のリクエストを作る。ヒントに合う豆は全部正解にする
+  function simMakeOrder(bean, pool){
+    var decaf = bean.c === 'DHO';
+    var kinds = []; if(bean.k) kinds.push('k'); if(bean.f) kinds.push('f');
+    // ロースト・酸味・コクのヒントは、当てはまる豆が2つまでのときだけ使う（多すぎると簡単になるため）
+    if(bean.r && bean.a && bean.b && pool.filter(function(b){ return b.r === bean.r && b.a === bean.a && b.b === bean.b; }).length <= 2) kinds.push('rab');
+    var kind = simPick(kinds), line, match;
+    var granny = Math.random() < 0.2;  // 5回に1回、常連のおばあちゃん（タメ口）が来る
+    if(kind === 'k'){
+      var k = bean.k.replace('を思わせる', 'みたいな').replace('のような', 'みたいな');
+      line = granny ? simPick(['ねぇ、「' + k + '」のやつちょうだい！', '「' + k + '」のコーヒー、あるでしょ？あれ出してよ〜。'])
+                    : simPick(['「' + k + '」のコーヒーが飲みたいです。', '「' + k + '」のコーヒーってありますか？']);
+      match = function(b){ return b.k === bean.k; };
+    } else if(kind === 'f'){
+      line = granny ? simPick(['「' + bean.f + '」に合うやつ、選んでよ〜。', 'ねぇねぇ、「' + bean.f + '」と一緒に飲むやつ、何がいい？'])
+                    : simPick(['「' + bean.f + '」と相性のいいコーヒーを探しています。', '「' + bean.f + '」と一緒に楽しめるコーヒーをください。']);
+      match = function(b){ return b.f === bean.f; };
+    } else {
+      line = granny ? SIM_ROAST[bean.r] + 'でさ、' + SIM_ACID[bean.a] + '、' + SIM_BODY[bean.b] + 'のがいいな〜。'
+                    : SIM_ROAST[bean.r] + 'で、' + SIM_ACID[bean.a] + '、' + SIM_BODY[bean.b] + 'コーヒーがいいです。';
+      match = function(b){ return b.r === bean.r && b.a === bean.a && b.b === bean.b; };
+    }
+    if(decaf) line += granny ? 'カフェインは控えめで頼むよ！' : 'カフェインは控えたいです。';
+    var ok = decaf ? ['DHO'] : pool.filter(match).map(function(b){ return b.c; });
+    var brew = simPick(SIM_BREWS);
+    var brewLine = granny ? (brew.ok[0] === 'WB' ? '豆のままでいいよ、自分で挽くからさ！' : 'うちは' + brew.d + 'で淹れるから、よろしくね〜。') : simPick(brew.say) + '。';
+    return { bean:bean.c, ok:ok, line:line, brew:brew, brewLine:brewLine, look:granny ? SIM_GRANNY : simPick(SIM_LOOKS), granny:granny };
+  }
+  function simStart(){
+    var pool = simPool();
+    var beans = simShuffle(pool).slice(0, SIM_N);
+    sim = { i:0, score:0, results:[], orders:beans.map(function(b){ return simMakeOrder(b, pool); }), selBean:'', selGrind:'', phase:'walk', left:SIM_PATIENCE };
+    screen = 'sim'; render(); window.scrollTo(0, 0);
+  }
+  function simGrannySvg(lk){
+    var id = 'gs' + Math.random().toString(36).slice(2, 7);
+    return '<svg viewBox="0 0 120 200" class="sim-person" aria-hidden="true"><defs><pattern id="' + id + '" width="12" height="11" patternUnits="userSpaceOnUse"><rect width="12" height="11" fill="#FFF"/><rect y="0" width="12" height="3.2" fill="#1B1B1B"/></pattern></defs>' +
+      '<path d="M34 200 Q33 128 60 122 Q87 128 86 200 Z" fill="url(#' + id + ')" stroke="#1B1B1B" stroke-width="1.2"/>' +
+      '<path d="M50 122 Q60 132 70 122" fill="none" stroke="#1B1B1B" stroke-width="2"/>' +
+      '<rect x="55" y="96" width="10" height="28" rx="4" fill="' + lk.skin + '"/>' +
+      '<path d="M26 64 Q20 44 32 40 L88 40 Q100 44 94 64 Q96 80 88 84 L32 84 Q24 80 26 64 Z" fill="#E6E6E6" stroke="#BDBDBD" stroke-width="1"/>' +
+      '<ellipse cx="60" cy="62" rx="29" ry="36" fill="' + lk.skin + '"/>' +
+      '<path d="M30 52 Q31 20 60 20 Q89 20 90 52 Q77 40 60 40 Q43 40 30 52 Z" fill="#D7263D"/>' +
+      '<circle cx="44" cy="31" r="1.8" fill="#FFF"/><circle cx="58" cy="26" r="1.8" fill="#FFF"/><circle cx="72" cy="29" r="1.8" fill="#FFF"/><circle cx="82" cy="38" r="1.6" fill="#FFF"/><circle cx="36" cy="42" r="1.6" fill="#FFF"/>' +
+      '<path d="M88 44 L104 36 L100 50 Z" fill="#D7263D"/><path d="M88 46 L102 56 L92 60 Z" fill="#B81E33"/><circle cx="89" cy="46" r="3.5" fill="#B81E33"/>' +
+      '<path d="M40 58 Q46 55 52 58 M68 58 Q74 55 80 58" stroke="#BDBDBD" stroke-width="2.4" fill="none" stroke-linecap="round"/>' +
+      '<ellipse cx="47" cy="66" rx="3.3" ry="4.2" fill="#2A1B12"/><ellipse cx="73" cy="66" rx="3.3" ry="4.2" fill="#2A1B12"/>' +
+      '<path d="M38 70 Q41 73 44 72 M76 72 Q79 73 82 70" stroke="#C8957A" stroke-width="1.3" fill="none"/>' +
+      '<path d="M44 82 Q46 86 48 84 M72 84 Q74 86 76 82" stroke="#C8957A" stroke-width="1.3" fill="none"/>' +
+      '<ellipse cx="40" cy="78" rx="5" ry="3" fill="#F19C9C" opacity=".5"/><ellipse cx="80" cy="78" rx="5" ry="3" fill="#F19C9C" opacity=".5"/>' +
+      '<path class="sim-mouth" d="M50 82 Q60 91 70 82" stroke="#8A3B2E" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+      '</svg>';
+  }
+  function simPersonSvg(lk){
+    if(lk.style === 'granny') return simGrannySvg(lk);
+    var hairBack = lk.style === 'long' ? '<path d="M18 40 Q16 86 30 96 L90 96 Q104 86 102 40 Z" fill="' + lk.hair + '"/>' : '';
+    var hairTop = lk.style === 'bun' ? '<circle cx="60" cy="14" r="12" fill="' + lk.hair + '"/><path d="M26 44 Q28 16 60 16 Q92 16 94 44 Q84 30 60 30 Q36 30 26 44 Z" fill="' + lk.hair + '"/>'
+      : lk.style === 'short' ? '<path d="M25 46 Q24 14 60 14 Q96 14 95 46 Q88 28 60 28 Q34 28 25 46 Z" fill="' + lk.hair + '"/>'
+      : '<path d="M22 56 Q18 14 60 14 Q102 14 98 56 Q94 34 80 30 Q60 40 34 32 Q24 40 22 56 Z" fill="' + lk.hair + '"/>';
+    return '<svg viewBox="0 0 120 200" class="sim-person" aria-hidden="true">' + hairBack +
+      '<path d="M20 200 Q20 120 60 116 Q100 120 100 200 Z" fill="' + lk.shirt + '"/>' +
+      '<path d="M48 118 L60 134 L72 118 Z" fill="#FFF" opacity=".85"/>' +
+      '<rect x="52" y="96" width="16" height="22" rx="6" fill="' + lk.skin + '"/>' +
+      '<ellipse cx="60" cy="58" rx="36" ry="40" fill="' + lk.skin + '"/>' + hairTop +
+      '<ellipse cx="46" cy="62" rx="4" ry="5.5" fill="#2A1B12"/><ellipse cx="74" cy="62" rx="4" ry="5.5" fill="#2A1B12"/>' +
+      '<circle cx="47.5" cy="60" r="1.4" fill="#FFF"/><circle cx="75.5" cy="60" r="1.4" fill="#FFF"/>' +
+      '<ellipse cx="38" cy="76" rx="6" ry="3.5" fill="#F19C9C" opacity=".55"/><ellipse cx="82" cy="76" rx="6" ry="3.5" fill="#F19C9C" opacity=".55"/>' +
+      '<path class="sim-mouth" d="M50 80 Q60 90 70 80" stroke="#8A3B2E" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+      '</svg>';
+  }
+  function simBagHtml(b){
+    var cls = b.r === 'BLONDE' ? 'blonde' : b.r === 'DARK' ? 'dark' : 'medium';
+    return '<button type="button" class="sim-bag ' + cls + (sim.selBean === b.c ? ' on' : '') + '" data-simbean="' + b.c + '"><span class="sim-bag-top"></span><b>' + esc(b.c) + '</b></button>';
+  }
+  function renderSimHome(){
+    var html = '<div class="center-col"><button class="text-link-btn" id="btnSimHome" type="button">ホームに戻る</button>';
+    html += '<div class="big-title">☕ BAシミュレーション</div>';
+    html += '<p class="desc">お店にやってくるお客様の要望を聞いて、<b>ぴったりのコーヒー豆</b>を選び、<b>飲み方に合った挽き具合</b>で提供しよう！</p>';
+    html += '<div class="sim-rules"><div>👂 お客様は<b>風味のキーワード・相性のよい風味・ロースト／酸味／コク</b>で好みを伝えてきます</div><div>⚙️ いれ方（器具）に合わせて、<b>マルコニックの番号</b>か「豆のまま」を選びます</div><div>⏳ 待たせすぎるとお客様は帰ってしまいます（' + SIM_PATIENCE + '秒）</div><div>🏆 1回の営業は' + SIM_N + '人。豆60点＋挽き具合40点＋スピードボーナス</div></div>';
+    var best = loadJSON('bac-sim-best', 0);
+    if(best) html += '<p class="desc" style="font-weight:700;">自己ベスト：' + best + '点</p>';
+    html += '<button class="btn" id="btnSimOpen" type="button" style="width:100%;max-width:320px;font-size:17px;">🔔 開店する</button></div>';
+    return html;
+  }
+  function renderSim(){
+    if(!sim) return renderSimHome();
+    if(sim.phase === 'done') return renderSimDone();
+    var o = sim.orders[sim.i];
+    var html = '<div class="sim-wrap"><button class="text-link-btn" id="btnSimHome" type="button">ホームに戻る</button>';
+    html += '<div class="sim-hud"><span>👤 ' + (sim.i + 1) + ' / ' + SIM_N + '人目</span><span>⭐ ' + sim.score + '点</span></div>';
+    html += '<div class="sim-scene" id="simScene"><div class="sim-wall"><div class="sim-win"></div><div class="sim-gap"></div><div class="sim-win"></div><div class="sim-lamp a"></div><div class="sim-lamp b"></div></div>';
+    html += '<div class="sim-floor"></div><div class="sim-door"></div><div class="sim-table l"></div><div class="sim-table r"></div>';
+    html += '<div class="sim-cust" id="simCust">' + simPersonSvg(o.look) + '</div>';
+    html += '<div class="sim-bubble" id="simBubble"><p>' + esc(o.line) + '</p><p class="brew">🫖 ' + esc(o.brewLine) + '</p></div>';
+    html += '<div class="sim-counter"></div><div class="sim-patience"><i id="simPat"></i></div></div>';
+    html += '<div class="sim-panel" id="simPanel">';
+    html += '<div class="sim-lbl">① コーヒー豆を選ぶ</div><div class="sim-shelf">' + simPool().map(simBagHtml).join('') + '</div>';
+    html += '<div class="sim-lbl">② 挽き具合を選ぶ（マルコニック）</div><div class="sim-grind">';
+    html += '<button type="button" data-simg="WB" class="wb' + (sim.selGrind === 'WB' ? ' on' : '') + '">豆のまま</button>';
+    for(var g = 1; g <= 13; g++) html += '<button type="button" data-simg="' + g + '" class="' + (String(sim.selGrind) === String(g) ? 'on' : '') + '">' + g + '</button>';
+    html += '</div><button class="btn sim-serve" id="btnSimServe" type="button"' + (sim.selBean && sim.selGrind !== '' ? '' : ' disabled') + '>☕ 提供する</button></div>';
+    html += '<div class="sim-result" id="simResult" style="display:none;"></div></div>';
+    return html;
+  }
+  function renderSimDone(){
+    var max = SIM_N * 120, pct = sim.score / max;
+    var stars = pct >= 0.85 ? '⭐⭐⭐' : pct >= 0.6 ? '⭐⭐' : pct >= 0.3 ? '⭐' : '—';
+    var best = loadJSON('bac-sim-best', 0); if(sim.score > best) saveJSON('bac-sim-best', sim.score);
+    var html = '<div class="center-col"><button class="text-link-btn" id="btnSimHome" type="button">ホームに戻る</button><div class="big-title">🌙 閉店！今日の営業結果</div>';
+    html += '<div class="score-big">' + sim.score + '<small style="font-size:18px;"> 点</small></div><div class="score-sub">' + stars + (sim.score > best ? '　🎉 自己ベスト更新！' : '') + '</div>';
+    html += '<div class="sim-log">';
+    sim.results.forEach(function(r, i){
+      html += '<div class="sim-log-row"><b>' + (i + 1) + '人目</b> ' + (r.bean ? '✅' : '❌') + '豆 ' + (r.grind ? '✅' : '❌') + '挽き　<span>' + esc(r.answer) + '</span></div>';
+    });
+    html += '</div><button class="btn" id="btnSimAgain" type="button" style="width:100%;max-width:320px;">🔔 もう一度開店する</button></div>';
+    return html;
+  }
+  function simBeanName(c){ var b = BEAN_BOOK.filter(function(x){ return x.c === c; })[0]; return b ? b.n : c; }
+  function bindSim(){
+    var hb = document.getElementById('btnSimHome'); if(hb) hb.onclick = function(){ simStop(); sim = null; goHome(); };
+    var ob = document.getElementById('btnSimOpen'); if(ob) ob.onclick = function(){ initAudio(); simStart(); };
+    var ab = document.getElementById('btnSimAgain'); if(ab) ab.onclick = function(){ simStart(); };
+    if(!sim || sim.phase === 'done') return;
+    document.querySelectorAll('[data-simbean]').forEach(function(b){ b.onclick = function(){ if(sim.phase !== 'order') return; sim.selBean = b.getAttribute('data-simbean'); document.querySelectorAll('[data-simbean]').forEach(function(x){ x.classList.toggle('on', x === b); }); simServeState(); }; });
+    document.querySelectorAll('[data-simg]').forEach(function(b){ b.onclick = function(){ if(sim.phase !== 'order') return; var v = b.getAttribute('data-simg'); sim.selGrind = v === 'WB' ? 'WB' : parseInt(v, 10); document.querySelectorAll('[data-simg]').forEach(function(x){ x.classList.toggle('on', x === b); }); simServeState(); }; });
+    var sv = document.getElementById('btnSimServe'); if(sv) sv.onclick = function(){ simServe(false); };
+    if(sim.phase === 'walk') simWalkIn();
+  }
+  function simServeState(){ var sv = document.getElementById('btnSimServe'); if(sv) sv.disabled = !(sim.selBean && sim.selGrind !== ''); }
+  function simStop(){ if(simTick){ clearInterval(simTick); simTick = null; } }
+  // お客様が奥の入り口から歩いてくる
+  function simWalkIn(){
+    var c = document.getElementById('simCust'), bub = document.getElementById('simBubble'), panel = document.getElementById('simPanel');
+    if(!c) return;
+    if(panel) panel.classList.add('wait');
+    var fromX = (Math.random() < 0.5 ? -1 : 1) * (20 + Math.random() * 30);
+    c.style.transition = 'none'; c.style.transform = 'translate(calc(-50% + ' + fromX + 'px), -96px) scale(.3)'; c.style.opacity = '0';
+    c.classList.add('walking'); c.offsetHeight;
+    c.style.transition = 'transform 2.4s cubic-bezier(.35,.1,.45,1), opacity .5s ease';
+    c.style.transform = 'translate(-50%, 0) scale(1)'; c.style.opacity = '1';
+    setTimeout(function(){
+      if(!sim || screen !== 'sim' || sim.phase !== 'walk') return;
+      c.classList.remove('walking'); if(bub) bub.classList.add('show'); if(panel) panel.classList.remove('wait');
+      sim.phase = 'order'; sim.left = SIM_PATIENCE; sim.t0 = Date.now();
+      try{ playSoftCorrect(); }catch(e){}
+      simStop();
+      simTick = setInterval(function(){
+        if(!sim || screen !== 'sim' || sim.phase !== 'order'){ simStop(); return; }
+        sim.left = SIM_PATIENCE - (Date.now() - sim.t0) / 1000;
+        var bar = document.getElementById('simPat');
+        if(bar){ var r = Math.max(0, sim.left / SIM_PATIENCE); bar.style.width = (r * 100) + '%'; bar.className = r < 0.3 ? 'low' : ''; }
+        if(sim.left <= 0) simServe(true);
+      }, 200);
+    }, 2500);
+  }
+  function simServe(timeout){
+    if(!sim || sim.phase !== 'order') return;
+    simStop(); sim.phase = 'result';
+    var o = sim.orders[sim.i];
+    var beanOk = !timeout && o.ok.indexOf(sim.selBean) !== -1;
+    var grindOk = !timeout && o.brew.ok.indexOf(sim.selGrind) !== -1;
+    var bonus = (!timeout && beanOk && grindOk) ? Math.ceil(Math.max(0, sim.left) / SIM_PATIENCE * 20) : 0;
+    var pts = (beanOk ? 60 : 0) + (grindOk ? 40 : 0) + bonus;
+    sim.score += pts;
+    var answer = o.ok.join('・') + '／' + o.brew.best;
+    sim.results.push({ bean:beanOk, grind:grindOk, answer:answer });
+    var c = document.getElementById('simCust'), bub = document.getElementById('simBubble');
+    var happy = beanOk && grindOk, say;
+    if(o.granny){
+      if(timeout) say = 'もう待てないよ〜、また来るね！';
+      else if(happy) say = simPick(['これこれ！わかってるねぇ〜！', 'さすが！また来るからね〜！', 'あんた、いい腕してるじゃない！']);
+      else if(beanOk) say = '豆はいいけどさ、挽き方がちがうよ〜。';
+      else if(grindOk) say = '挽き方はいいけど、それあたしの好みじゃないよ〜。';
+      else say = 'ちょっとちょっと、全然ちがうよ〜！';
+    }
+    else if(timeout) say = 'うーん、急いでいるのでまた来ます…';
+    else if(happy) say = simPick(['まさにこれです！ありがとう！', 'わぁ、ぴったり！また来ますね！', '最高です！おうちで楽しみます！']);
+    else if(beanOk) say = '豆はぴったり！でも挽き具合が…';
+    else if(grindOk) say = '挽き具合はいいけど、ちょっと好みと違うかも…';
+    else say = 'うーん、イメージと違うかも…';
+    if(bub) bub.innerHTML = '<p class="react">' + esc(say) + '</p>';
+    if(c){ var m = c.querySelector('.sim-mouth'); if(m) m.setAttribute('d', happy ? 'M46 78 Q60 96 74 78' : 'M50 86 Q60 78 70 86'); }
+    try{ if(happy) playSoftCorrect(); else playSoftWrong(); }catch(e){}
+    var rs = document.getElementById('simResult'), panel = document.getElementById('simPanel');
+    if(panel) panel.classList.add('wait');
+    if(rs){
+      var h = '<div class="sim-res-head ' + (happy ? 'ok' : 'ng') + '">' + (timeout ? '⏰ 時間切れ…' : happy ? '🎉 パーフェクト！ +' + pts + '点' + (bonus ? '（スピード+' + bonus + '）' : '') : '+' + pts + '点') + '</div>';
+      h += '<div class="sim-res-row"><b>' + (beanOk ? '✅' : '❌') + ' 豆</b>　正解：' + o.ok.map(function(cd){ return esc(cd) + '（' + esc(simBeanName(cd)) + '）'; }).join('、') + (beanOk || timeout || !sim.selBean ? '' : '<br><small>あなた：' + esc(sim.selBean) + '（' + esc(simBeanName(sim.selBean)) + '）</small>') + '</div>';
+      h += '<div class="sim-res-row"><b>' + (grindOk ? '✅' : '❌') + ' 挽き具合</b>　' + esc(o.brew.d) + ' → <b>' + esc(o.brew.best) + '</b>' + (grindOk || timeout || sim.selGrind === '' ? '' : '<br><small>あなた：' + (sim.selGrind === 'WB' ? '豆のまま' : sim.selGrind + '番') + '</small>') + '</div>';
+      h += '<button class="btn" id="btnSimNext" type="button" style="width:100%;">' + (sim.i + 1 < SIM_N ? '次のお客様へ →' : '閉店して結果を見る') + '</button>';
+      rs.innerHTML = h; rs.style.display = '';
+      document.getElementById('btnSimNext').onclick = simNext;
+      setTimeout(function(){ rs.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 50);
+    }
+    var hud = document.querySelector('.sim-hud span:last-child'); if(hud) hud.textContent = '⭐ ' + sim.score + '点';
+  }
+  function simNext(){
+    var c = document.getElementById('simCust'), bub = document.getElementById('simBubble');
+    if(bub) bub.classList.remove('show');
+    if(c){ c.classList.add('walking'); c.style.transition = 'transform 1.1s ease-in, opacity 1.1s ease-in'; c.style.transform = 'translate(calc(-50% + 170px), -50px) scale(.55)'; c.style.opacity = '0'; }
+    setTimeout(function(){
+      if(!sim) return;
+      sim.i++; sim.selBean = ''; sim.selGrind = '';
+      if(sim.i >= SIM_N){ sim.phase = 'done'; try{ playSoftFinish(); }catch(e){} } else sim.phase = 'walk';
+      render(); window.scrollTo(0, 0);
+    }, 900);
+  }
+  // ホームの目立つ入り口：お店の絵＋お客様＋吹き出し
+  function simHeroHtml(){
+    // Safari では <button> の中のレイアウトが崩れるので、div で組んでタップできるようにする
+    return '<div class="sim-hero" id="btnSimEntry" role="button" tabindex="0"><div class="sim-hero-scene"><div class="sh-win l"></div><div class="sh-win r"></div><div class="sh-door"></div><div class="sh-floor"></div>' +
+      '<div class="sh-cust">' + simPersonSvg(SIM_LOOKS[0]) + '</div><div class="sh-counter"></div><div class="sh-bubble">グレープフルーツみたいな<br>コーヒーをください！</div></div>' +
+      '<div class="sim-hero-body"><div class="sim-hero-tag">NEW ゲーム</div><div class="sim-hero-title">☕ BAシミュレーション</div><div class="sim-hero-sub">お客様の好みと飲み方を聞いて、<br>ぴったりの豆と挽き具合で提供しよう</div><div class="sim-hero-cta">🔔 開店する</div></div></div>';
+  }
+  function simLinkHtml(){ return '<button class="sim-link-btn" id="btnSimEntry" type="button"><b>☕ BAシミュレーション <span class="new-pill big">NEW</span></b><span>お客様の好みと飲み方を聞いて、豆と挽き具合を選ぶゲーム</span></button>'; }
+  function bindSimLink(){
+    var b = document.getElementById('btnSimEntry'); if(!b) return;
+    var open = function(){ sim = null; screen = 'sim'; render(); window.scrollTo(0, 0); };
+    b.onclick = open; b.onkeydown = function(e){ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); open(); } };
   }
 
   /* ---------------- コーヒー豆図鑑（勉強用・問題には出さない） ---------------- */
