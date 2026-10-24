@@ -614,6 +614,9 @@
   .sim-hero-cta{margin-top:6px;background:#D4AA5C;color:#1C3B32;font-weight:800;font-size:15px;border-radius:999px;padding:9px 26px;}
   .sim-link-btn{display:flex;flex-direction:column;align-items:center;gap:3px;width:100%;max-width:340px;border-radius:14px;padding:13px 16px;margin-top:10px;cursor:pointer;font-family:var(--font-body);background:#FFF4E2;border:1.5px solid #D4A04C;color:#6B4510;}
   .sim-link-btn b{font-size:14.5px;} .sim-link-btn span{font-size:11.5px;opacity:.85;}
+  .sim-count{width:100%;max-width:320px;margin:0 0 6px;} .sim-count-row{display:flex;gap:8px;justify-content:center;}
+  .sim-count-row button{flex:1;padding:10px 0;border-radius:999px;border:1.5px solid var(--line);background:var(--paper);font-weight:800;font-size:15px;color:var(--ink);cursor:pointer;font-family:var(--font-body);}
+  .sim-count-row button.on{background:var(--forest);border-color:var(--forest);color:#F6EFDD;}
   .sim-rules{text-align:left;background:var(--paper);border-radius:14px;padding:12px 14px;font-size:13px;line-height:1.75;margin:6px 0 14px;width:100%;max-width:380px;box-sizing:border-box;}
   .sim-hud{display:flex;justify-content:space-between;font-weight:800;font-size:14px;color:var(--forest-deep);margin:0 2px 8px;}
   .sim-scene{position:relative;height:400px;border-radius:16px;overflow:hidden;background:#EADBC0;user-select:none;}
@@ -3985,23 +3988,38 @@
 
   /* ---------------- BAシミュレーション（お客様の要望に合わせて豆と挽き具合を選ぶ） ---------------- */
   // 抽出器具とマルコニックの挽き具合（FY27電車版の推奨。範囲があるものは範囲内なら正解）
+  // w：出てくる割合の重み（家でよく使う器具ほど多め）。1回の営業では同じ器具は出さない
   var SIM_BREWS = [
-    { d:'デロンギ デディカ アルテ（エスプレッソマシン）', ok:[3,4], best:'3〜4番（推奨4番）', say:['家のデロンギ デディカ アルテでエスプレッソをいれます','エスプレッソマシン（デディカ アルテ）で使います'] },
-    { d:'ソロフィルター', ok:[5], best:'5番', say:['ソロフィルターで1杯ずついれます','家ではソロフィルターを使っています'] },
-    { d:'ペーパー用（ペーパーフィルターのドリッパー）', ok:[7], best:'7番', say:['ペーパー用でお願いします','ペーパーフィルターのドリッパーでいれます'] },
-    { d:'kMix ドリップコーヒーメーカー', ok:[7], best:'7番', say:['デロンギのkMixドリップコーヒーメーカーでいれます'] },
-    { d:'オリジナル セラミック ドリッパー', ok:[7,8,9,10], best:'7〜10番', say:['オリジナルのセラミックドリッパーでいれます'] },
-    { d:'サイフォン', ok:[8], best:'8番', say:['サイフォンでいれるのが好きなんです','家ではサイフォンを使っています'] },
-    { d:'直火式エスプレッソメーカー（モカポット）', ok:[8], best:'8番', say:['モカポットでいれます','直火式のエスプレッソメーカーで使います'] },
-    { d:'グラスドリップコーヒーメーカー', ok:[8,9,10], best:'8〜10番', say:['グラスドリップコーヒーメーカーでいれます'] },
-    { d:'オリジナル ステンレス コーンフィルター', ok:[8,9,10], best:'8〜10番（推奨10番）', say:['ステンレスのコーンフィルターでいれます'] },
-    { d:'コールドブリューストレーナー', ok:[10], best:'10番', say:['コールドブリューストレーナーで水出しにします','家で水出しコーヒーを作ります（コールドブリューストレーナー）'] },
-    { d:'BALMUDA The Brew', ok:[10], best:'10番', say:['BALMUDA The Brewでいれます'] },
-    { d:'コーヒープレス', ok:[13], best:'13番', say:['コーヒープレスでいれます','家ではコーヒープレスを使っています'] },
-    { d:'パーコレーター', ok:[13], best:'13番', say:['キャンプでパーコレーターを使います'] },
-    { d:'豆のまま', ok:['WB'], best:'挽かずに豆のまま', say:['家にミルがあるので、豆のままでお願いします','自分で挽くので、挽かなくて大丈夫です'] }
+    { d:'ペーパー用（ペーパーフィルターのドリッパー）', ok:[7], best:'7番', w:1.6, say:['ペーパー用でお願いします','ペーパーフィルターのドリッパーでいれます','ハンドドリップ（ペーパー）用に挽いてください'], g:'ペーパー用で頼むわ〜' },
+    { d:'コーヒープレス', ok:[13], best:'13番', w:1.4, say:['コーヒープレスでいれます','家ではコーヒープレスを使っています','フレンチプレス用でお願いします'], g:'うちはコーヒープレスだからさ' },
+    { d:'ソロフィルター', ok:[5], best:'5番', w:1.3, say:['ソロフィルターで1杯ずついれます','家ではソロフィルターを使っています','ソロフィルター用に挽いてもらえますか'], g:'ソロフィルターで飲むからね' },
+    { d:'豆のまま', ok:['WB'], best:'挽かずに豆のまま', w:1.3, say:['家にミルがあるので、豆のままでお願いします','自分で挽くので、挽かなくて大丈夫です','挽かずにそのままください'], g:'豆のままでいいよ、自分で挽くからさ' },
+    { d:'グラスドリップコーヒーメーカー', ok:[8,9,10], best:'8〜10番', w:1.1, say:['グラスドリップコーヒーメーカーでいれます','ガラスのドリップコーヒーメーカーを使っています'], g:'グラスドリップのやつで淹れるよ' },
+    { d:'kMix ドリップコーヒーメーカー', ok:[7], best:'7番', w:1, say:['デロンギのkMixドリップコーヒーメーカーでいれます','kMixのコーヒーメーカー用でお願いします'], g:'kMixのコーヒーメーカーで淹れるよ' },
+    { d:'オリジナル セラミック ドリッパー', ok:[7,8,9,10], best:'7〜10番', w:1, say:['オリジナルのセラミックドリッパーでいれます','陶器のドリッパー（オリジナル セラミック）を使います'], g:'セラミックのドリッパーで淹れるよ' },
+    { d:'デロンギ デディカ アルテ（エスプレッソマシン）', ok:[3,4], best:'3〜4番（推奨4番）', w:1, say:['家のデロンギ デディカ アルテでエスプレッソをいれます','エスプレッソマシン（デディカ アルテ）で使います'], g:'デディカでエスプレッソにするからさ' },
+    { d:'サイフォン', ok:[8], best:'8番', w:0.9, say:['サイフォンでいれるのが好きなんです','家ではサイフォンを使っています'], g:'サイフォンで淹れるのが好きなのよ' },
+    { d:'直火式エスプレッソメーカー（モカポット）', ok:[8], best:'8番', w:0.9, say:['モカポットでいれます','直火式のエスプレッソメーカー（マキネッタ）で使います'], g:'モカポットで淹れるよ' },
+    { d:'オリジナル ステンレス コーンフィルター', ok:[8,9,10], best:'8〜10番（推奨10番）', w:0.9, say:['ステンレスのコーンフィルターでいれます'], g:'ステンレスのコーンフィルターで淹れるよ' },
+    { d:'ネルドリップ', ok:[8,9,10], best:'8〜10番', w:0.8, say:['ネルドリップでいれます','布のフィルター（ネルドリップ）を使っています'], g:'ネルドリップで淹れるのが好きなのよ' },
+    { d:'パーコレーター', ok:[13], best:'13番', w:0.7, say:['キャンプでパーコレーターを使います','パーコレーター用に挽いてください'], g:'キャンプでパーコレーター使うからさ' },
+    { d:'BALMUDA The Brew', ok:[10], best:'10番', w:0.6, say:['BALMUDA The Brewでいれます'], g:'バルミューダのやつで淹れるよ' },
+    { d:'コールドブリューストレーナー', ok:[10], best:'10番', w:0.5, say:['コールドブリューストレーナーで水出しにします','家で水出しコーヒーを作ります（コールドブリューストレーナー）'], g:'水出しにするのよ、コールドブリューストレーナーで' }
   ];
-  var SIM_N = 5, SIM_PATIENCE = 30;  // 1回の営業のお客様の数・待ってくれる秒数
+  function simPickBrews(n){
+    var left = SIM_BREWS.slice(), out = [];
+    while(out.length < n){
+      if(!left.length) left = SIM_BREWS.slice();
+      var tot = left.reduce(function(t, b){ return t + b.w; }, 0), r = Math.random() * tot, i = 0;
+      while(i < left.length - 1 && (r -= left[i].w) > 0) i++;
+      out.push(left.splice(i, 1)[0]);
+    }
+    return out;
+  }
+  var SIM_N = 5, SIM_PATIENCE = 30;  // 来客人数（初期値）・待ってくれる秒数
+  var SIM_COUNTS = [3, 5, 10];
+  try { SIM_N = parseInt(localStorage.getItem('bac-sim-n'), 10) || 5; } catch(e) {}
+  if(SIM_COUNTS.indexOf(SIM_N) === -1) SIM_N = 5;
   var SIM_LOOKS = [
     { skin:'#F2C9A5', hair:'#3B2418', shirt:'#C0392B', style:'bob' }, { skin:'#E8B892', hair:'#1E1A18', shirt:'#2E6F9E', style:'short' },
     { skin:'#F5D3B5', hair:'#8A5A2B', shirt:'#3E8E5E', style:'long' }, { skin:'#D9A47E', hair:'#2A1B12', shirt:'#7A4BA0', style:'bun' },
@@ -4020,37 +4038,60 @@
   var SIM_ACID = { LOW:'酸味は控えめ', MEDIUM:'酸味はほどよく', HIGH:'酸味はしっかり' };
   var SIM_BODY = { LIGHT:'コクが軽い', MEDIUM:'コクがほどよい', FULL:'コクがしっかりした' };
   // お客様のリクエストを作る。ヒントに合う豆は全部正解にする
-  function simMakeOrder(bean, pool){
+  // パッケージの絵（FY27電車版より）
+  var SIM_PKG = { KEN:'アフリカゾウ', GUA:'ケツァールっていう鳥', LNB:'ハチドリ', CLG:'アンデスコンドル', SUM:'スマトラトラ', KDR:'コモドドラゴン', VER:'赤いバラ', ITA:'ヴェスパ（スクーター）', FRE:'フルール・ド・リス', EDB:'ブタのマスコット', TYO:'灰色グマ' };
+  var SIM_SO = { KEN:'アフリカ', GUA:'ラテンアメリカ', CLG:'ラテンアメリカ', SUM:'アジア／太平洋' };
+  var SIM_PRE = ['', '', '', '朝に飲む用で、', '友達へのプレゼントなんですけど、', '職場で飲むので、', '久しぶりに豆を買いに来ました。', '週末にゆっくり飲みたくて、', 'おすすめを聞きたいんですけど、'];
+  var SIM_PRE_G = ['', '', 'また来たよ〜！', 'ちょっと聞いてよ、', 'あ、いたいた！', '今日はね、'];
+  function simMakeOrder(bean, pool, brew){
     var decaf = bean.c === 'DHO';
-    var kinds = []; if(bean.k) kinds.push('k'); if(bean.f) kinds.push('f');
+    var granny = Math.random() < 0.2;  // 5回に1回、常連のおばあちゃん（タメ口）が来る
+    var kinds = [];
+    if(bean.k) kinds.push('k', 'k');
+    if(bean.f) kinds.push('f', 'f');
+    if(SIM_PKG[bean.c]) kinds.push('pkg');
+    if(SIM_SO[bean.c]) kinds.push('so');
+    if(bean.s) kinds.push('found');
     // ロースト・酸味・コクのヒントは、当てはまる豆が2つまでのときだけ使う（多すぎると簡単になるため）
     if(bean.r && bean.a && bean.b && pool.filter(function(b){ return b.r === bean.r && b.a === bean.a && b.b === bean.b; }).length <= 2) kinds.push('rab');
     var kind = simPick(kinds), line, match;
-    var granny = Math.random() < 0.2;  // 5回に1回、常連のおばあちゃん（タメ口）が来る
     if(kind === 'k'){
       var k = bean.k.replace('を思わせる', 'みたいな').replace('のような', 'みたいな');
-      line = granny ? simPick(['ねぇ、「' + k + '」のやつちょうだい！', '「' + k + '」のコーヒー、あるでしょ？あれ出してよ〜。'])
-                    : simPick(['「' + k + '」のコーヒーが飲みたいです。', '「' + k + '」のコーヒーってありますか？']);
+      line = granny ? simPick(['ねぇ、「' + k + '」のやつちょうだい！', '「' + k + '」のコーヒー、あるでしょ？あれ出してよ〜。', '「' + k + '」って書いてあったやつ、あれがいいの！'])
+                    : simPick(['「' + k + '」のコーヒーが飲みたいです。', '「' + k + '」のコーヒーってありますか？', '前に飲んだ「' + k + '」のコーヒーが忘れられなくて…。', '「' + k + '」と紹介されているコーヒーはどれですか？']);
       match = function(b){ return b.k === bean.k; };
     } else if(kind === 'f'){
       line = granny ? simPick(['「' + bean.f + '」に合うやつ、選んでよ〜。', 'ねぇねぇ、「' + bean.f + '」と一緒に飲むやつ、何がいい？'])
-                    : simPick(['「' + bean.f + '」と相性のいいコーヒーを探しています。', '「' + bean.f + '」と一緒に楽しめるコーヒーをください。']);
+                    : simPick(['「' + bean.f + '」と相性のいいコーヒーを探しています。', '「' + bean.f + '」と一緒に楽しめるコーヒーをください。', '「' + bean.f + '」に合わせるなら、どのコーヒーがいいですか？', 'おやつに「' + bean.f + '」を用意したので、合うコーヒーをください。']);
       match = function(b){ return b.f === bean.f; };
+    } else if(kind === 'pkg'){
+      line = granny ? simPick(['ほら、パッケージに' + SIM_PKG[bean.c] + 'が描いてあるやつ！あれちょうだい。', SIM_PKG[bean.c] + 'の絵のやつ、まだある？'])
+                    : simPick(['パッケージに' + SIM_PKG[bean.c] + 'が描かれているコーヒーをください。', '名前を忘れちゃったんですけど、袋に' + SIM_PKG[bean.c] + 'の絵があるコーヒーです。']);
+      match = function(b){ return b.c === bean.c; };
+    } else if(kind === 'so'){
+      line = granny ? SIM_SO[bean.c] + 'のシングルオリジンがいいな〜。ブレンドじゃないやつね！'
+                    : simPick([SIM_SO[bean.c] + '産のシングルオリジンのコーヒーを探しています。', 'ブレンドではなく、' + SIM_SO[bean.c] + 'のシングルオリジンが飲みたいです。']);
+      match = function(b){ return SIM_SO[b.c] === SIM_SO[bean.c]; };
+    } else if(kind === 'found'){
+      line = granny ? 'スタバが創業したときからある' + SIM_ROAST[bean.r] + 'のやつ、ちょうだい！'
+                    : simPick(['スターバックスの創業当初からある、' + SIM_ROAST[bean.r] + 'のコーヒーをください。', '1971年の創業のころから売っている' + SIM_ROAST[bean.r] + 'のコーヒーはどれですか？']);
+      match = function(b){ return b.s && b.r === bean.r; };
     } else {
       line = granny ? SIM_ROAST[bean.r] + 'でさ、' + SIM_ACID[bean.a] + '、' + SIM_BODY[bean.b] + 'のがいいな〜。'
-                    : SIM_ROAST[bean.r] + 'で、' + SIM_ACID[bean.a] + '、' + SIM_BODY[bean.b] + 'コーヒーがいいです。';
+                    : simPick([SIM_ROAST[bean.r] + 'で、' + SIM_ACID[bean.a] + '、' + SIM_BODY[bean.b] + 'コーヒーがいいです。', SIM_ACID[bean.a] + '、' + SIM_BODY[bean.b] + '、' + SIM_ROAST[bean.r] + 'のコーヒーを探しています。']);
       match = function(b){ return b.r === bean.r && b.a === bean.a && b.b === bean.b; };
     }
-    if(decaf) line += granny ? 'カフェインは控えめで頼むよ！' : 'カフェインは控えたいです。';
+    // 前置きのひと言（すでに場面のある言い方には付けない）
+    if(!/^(おやつに|前に飲んだ|名前を忘れ)/.test(line)) line = (granny ? simPick(SIM_PRE_G) : simPick(SIM_PRE)) + line;
+    if(decaf) line += granny ? 'カフェインは控えめで頼むよ！' : simPick(['カフェインは控えたいです。', '夜に飲むので、カフェインは控えめがいいです。']);
     var ok = decaf ? ['DHO'] : pool.filter(match).map(function(b){ return b.c; });
-    var brew = simPick(SIM_BREWS);
-    var brewLine = granny ? (brew.ok[0] === 'WB' ? '豆のままでいいよ、自分で挽くからさ！' : 'うちは' + brew.d + 'で淹れるから、よろしくね〜。') : simPick(brew.say) + '。';
+    var brewLine = granny ? brew.g + '、よろしくね〜。' : simPick(brew.say) + '。';
     return { bean:bean.c, ok:ok, line:line, brew:brew, brewLine:brewLine, look:granny ? SIM_GRANNY : simPick(SIM_LOOKS), granny:granny };
   }
   function simStart(){
     var pool = simPool();
-    var beans = simShuffle(pool).slice(0, SIM_N);
-    sim = { i:0, score:0, results:[], orders:beans.map(function(b){ return simMakeOrder(b, pool); }), selBean:'', selGrind:'', phase:'walk', left:SIM_PATIENCE };
+    var beans = simShuffle(pool).slice(0, SIM_N), brews = simPickBrews(SIM_N);
+    sim = { i:0, score:0, results:[], orders:beans.map(function(b, i){ return simMakeOrder(b, pool, brews[i]); }), selBean:'', selGrind:'', phase:'walk', left:SIM_PATIENCE };
     screen = 'sim'; render(); window.scrollTo(0, 0);
   }
   function simGrannySvg(lk){
@@ -4097,9 +4138,10 @@
     var html = '<div class="center-col"><button class="text-link-btn" id="btnSimHome" type="button">ホームに戻る</button>';
     html += '<div class="big-title">☕ BAシミュレーション</div>';
     html += '<p class="desc">お店にやってくるお客様の要望を聞いて、<b>ぴったりのコーヒー豆</b>を選び、<b>飲み方に合った挽き具合</b>で提供しよう！</p>';
-    html += '<div class="sim-rules"><div>👂 お客様は<b>風味のキーワード・相性のよい風味・ロースト／酸味／コク</b>で好みを伝えてきます</div><div>⚙️ いれ方（器具）に合わせて、<b>マルコニックの番号</b>か「豆のまま」を選びます</div><div>⏳ 待たせすぎるとお客様は帰ってしまいます（' + SIM_PATIENCE + '秒）</div><div>🏆 1回の営業は' + SIM_N + '人。豆60点＋挽き具合40点＋スピードボーナス</div></div>';
-    var best = loadJSON('bac-sim-best', 0);
-    if(best) html += '<p class="desc" style="font-weight:700;">自己ベスト：' + best + '点</p>';
+    html += '<div class="sim-rules"><div>👂 お客様は<b>風味のキーワード・相性のよい風味・ロースト／酸味／コク・パッケージの絵</b>などで好みを伝えてきます</div><div>⚙️ いれ方（器具）に合わせて、<b>マルコニックの番号</b>か「豆のまま」を選びます</div><div>⏳ 待たせすぎるとお客様は帰ってしまいます（' + SIM_PATIENCE + '秒）</div><div>🏆 豆60点＋挽き具合40点＋スピードボーナス</div></div>';
+    html += '<div class="sim-count"><div class="sim-lbl" style="text-align:center;">👥 来客人数を選ぶ</div><div class="sim-count-row">' + SIM_COUNTS.map(function(n){ return '<button type="button" data-simn="' + n + '" class="' + (n === SIM_N ? 'on' : '') + '">' + n + '人</button>'; }).join('') + '</div></div>';
+    var best = loadJSON('bac-sim-best-' + SIM_N, 0);
+    html += '<p class="desc" style="font-weight:700;" id="simBest">' + (best ? SIM_N + '人の自己ベスト：' + best + '点' : '') + '</p>';
     html += '<button class="btn" id="btnSimOpen" type="button" style="width:100%;max-width:320px;font-size:17px;">🔔 開店する</button></div>';
     return html;
   }
@@ -4126,7 +4168,7 @@
   function renderSimDone(){
     var max = SIM_N * 120, pct = sim.score / max;
     var stars = pct >= 0.85 ? '⭐⭐⭐' : pct >= 0.6 ? '⭐⭐' : pct >= 0.3 ? '⭐' : '—';
-    var best = loadJSON('bac-sim-best', 0); if(sim.score > best) saveJSON('bac-sim-best', sim.score);
+    var best = loadJSON('bac-sim-best-' + SIM_N, 0); if(sim.score > best) saveJSON('bac-sim-best-' + SIM_N, sim.score);
     var html = '<div class="center-col"><button class="text-link-btn" id="btnSimHome" type="button">ホームに戻る</button><div class="big-title">🌙 閉店！今日の営業結果</div>';
     html += '<div class="score-big">' + sim.score + '<small style="font-size:18px;"> 点</small></div><div class="score-sub">' + stars + (sim.score > best ? '　🎉 自己ベスト更新！' : '') + '</div>';
     html += '<div class="sim-log">';
@@ -4140,6 +4182,11 @@
   function bindSim(){
     var hb = document.getElementById('btnSimHome'); if(hb) hb.onclick = function(){ simStop(); sim = null; goHome(); };
     var ob = document.getElementById('btnSimOpen'); if(ob) ob.onclick = function(){ initAudio(); simStart(); };
+    document.querySelectorAll('[data-simn]').forEach(function(b){ b.onclick = function(){
+      SIM_N = parseInt(b.getAttribute('data-simn'), 10); try { localStorage.setItem('bac-sim-n', String(SIM_N)); } catch(e) {}
+      document.querySelectorAll('[data-simn]').forEach(function(x){ x.classList.toggle('on', x === b); });
+      var best = loadJSON('bac-sim-best-' + SIM_N, 0), el = document.getElementById('simBest'); if(el) el.textContent = best ? SIM_N + '人の自己ベスト：' + best + '点' : '';
+    }; });
     var ab = document.getElementById('btnSimAgain'); if(ab) ab.onclick = function(){ simStart(); };
     if(!sim || sim.phase === 'done') return;
     document.querySelectorAll('[data-simbean]').forEach(function(b){ b.onclick = function(){ if(sim.phase !== 'order') return; sim.selBean = b.getAttribute('data-simbean'); document.querySelectorAll('[data-simbean]').forEach(function(x){ x.classList.toggle('on', x === b); }); simServeState(); }; });
