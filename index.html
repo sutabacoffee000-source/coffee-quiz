@@ -578,13 +578,29 @@
   @keyframes shrinkBar { from { width: 100%; } to { width: 0%; } }
   .answer-bar { height: 100%; background: var(--clay); animation: shrinkBar 5s linear forwards; }
   @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+  /* 起動アニメーション：「BA」が画面に近づいてきてアプリが開く */
+  #splashScreen{position:fixed;inset:0;z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0F2A22;overflow:hidden;animation:spBg .55s ease 1.75s forwards;cursor:pointer;}
+  #splashScreen .sp-ba{font-family:var(--font-display);font-weight:900;font-size:min(36vw,170px);line-height:1;letter-spacing:-0.02em;color:#F6EFDD;text-shadow:0 0 28px rgba(212,170,92,0.45);will-change:transform,opacity;animation:baIn .7s cubic-bezier(.2,.8,.2,1) both, baZoom 1.05s cubic-bezier(.7,0,.95,.35) 1.15s forwards;}
+  #splashScreen .sp-sub{text-align:center;margin-top:14px;animation:subIn .6s ease .25s both, subOut .35s ease 1s forwards;}
+  #splashScreen .sp-drill{font-family:var(--font-display);font-weight:800;font-size:22px;letter-spacing:0.3em;color:#D4AA5C;}
+  #splashScreen .sp-eye{font-size:11px;font-weight:700;letter-spacing:0.18em;color:rgba(246,239,221,0.6);margin-top:6px;}
+  #splashScreen.done{opacity:0;transition:opacity .25s ease;pointer-events:none;}
+  @keyframes baIn{from{opacity:0;transform:scale(.82);}to{opacity:1;transform:scale(1);}}
+  @keyframes baZoom{0%{transform:scale(1);opacity:1;}65%{opacity:1;}100%{transform:scale(26);opacity:0;}}
+  @keyframes subIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  @keyframes subOut{to{opacity:0;transform:translateY(6px);}}
+  @keyframes spBg{to{background-color:rgba(15,42,34,0);}}
+  @media (prefers-reduced-motion: reduce){
+    #splashScreen .sp-ba,#splashScreen .sp-sub{animation:subIn .4s ease both;}
+    #splashScreen{animation:spBg .4s ease 1.2s forwards;}
+  }
 </style>
 </head>
 <body>
 
-<div id="splashScreen" style="position:fixed; inset:0; background:var(--paper); z-index:10000; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:opacity 0.5s ease;">
-  <div style="font-family:var(--font-display); font-size:42px; font-weight:800; color:var(--forest-deep); margin-bottom:12px;">BAドリル</div>
-  <div style="font-size:13px; color:var(--ink-soft); font-weight:600; letter-spacing:0.1em;">STARBUCKS COFFEE MASTER</div>
+<div id="splashScreen" aria-hidden="true">
+  <div class="sp-ba">BA</div>
+  <div class="sp-sub"><div class="sp-drill">ドリル</div><div class="sp-eye">STARBUCKS COFFEE MASTER</div></div>
 </div>
 
 <div class="wrap" id="mainWrap">
@@ -1252,6 +1268,33 @@
 
   /* --- BAバトル用（はっきりした音） --- */
   // 第◯問：テレッテッテーン
+  // 起動アニメーションの音：低い「ドゥン、ドゥーン」と、近づいてくる風切り音
+  function playSplashSound() {
+    try { if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) { return; }
+    if(audioCtx.state !== 'running'){
+      // 端末が自動再生を許可していないときは鳴らさない（許可されて間に合えば鳴らす）
+      var asked = Date.now();
+      audioCtx.resume().then(function(){ if(audioCtx.state === 'running' && Date.now() - asked < 300) playSplashSound(); }).catch(function(){});
+      return;
+    }
+    var t0 = audioCtx.currentTime + 0.02;
+    var master = audioCtx.createGain(); master.gain.value = 0.55; master.connect(audioCtx.destination);
+    // 低音のヒット2回
+    [[0, 0.55, 0.9], [0.32, 0.9, 1.3]].forEach(function(h){
+      var o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = 'sine'; o.frequency.setValueAtTime(95, t0 + h[0]); o.frequency.exponentialRampToValueAtTime(42, t0 + h[0] + 0.5);
+      g.gain.setValueAtTime(0.0001, t0 + h[0]); g.gain.exponentialRampToValueAtTime(h[1], t0 + h[0] + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, t0 + h[0] + h[2]);
+      o.connect(g); g.connect(master); o.start(t0 + h[0]); o.stop(t0 + h[0] + h[2] + 0.05);
+    });
+    // 近づいてくる風切り音（ノイズの高さを上げながら大きく）
+    var len = Math.floor(audioCtx.sampleRate * 1.1), buf = audioCtx.createBuffer(1, len, audioCtx.sampleRate), d = buf.getChannelData(0);
+    for(var i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    var n = audioCtx.createBufferSource(), f = audioCtx.createBiquadFilter(), ng = audioCtx.createGain();
+    n.buffer = buf; f.type = 'bandpass'; f.Q.value = 1.2;
+    f.frequency.setValueAtTime(250, t0); f.frequency.exponentialRampToValueAtTime(3200, t0 + 1.0);
+    ng.gain.setValueAtTime(0.0001, t0); ng.gain.exponentialRampToValueAtTime(0.35, t0 + 0.95); ng.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.08);
+    n.connect(f); f.connect(ng); ng.connect(master); n.start(t0); n.stop(t0 + 1.1);
+  }
   function playIntroTone() {
     playTone(523.25, 'triangle', 0.12, 0.12, 0);
     playTone(659.25, 'triangle', 0.12, 0.12, 0.09);
@@ -1491,10 +1534,18 @@
     if(guideBtn) guideBtn.onclick = showOnboarding;
     if(!onboarded){ showOnboarding(); }
 
-    setTimeout(function(){
-      var sp = document.getElementById('splashScreen');
-      if(sp) { sp.style.opacity = '0'; setTimeout(function(){ sp.style.display = 'none'; }, 500); }
-    }, 2500); 
+    // 起動アニメーションが終わったら消す（タップでスキップ）
+    (function(){
+      var sp = document.getElementById('splashScreen'); if(!sp) return;
+      var gone = false;
+      function hide(){ if(gone) return; gone = true; sp.classList.add('done'); setTimeout(function(){ sp.style.display = 'none'; }, 260); }
+      sp.addEventListener('click', hide);
+      setTimeout(hide, 2250);
+      // 「BA」が近づいてくるタイミングで音を鳴らす（ズーム開始は表示から約1.15秒後）
+      if(soundOn && !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)){
+        setTimeout(playSplashSound, Math.max(0, 1150 - performance.now()));
+      }
+    })();
     setTimeout(maybeShowNews, 2800);
 
     setTimeout(function(){
