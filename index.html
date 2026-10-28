@@ -399,6 +399,22 @@
   .exam-card-title { font-size:17px; font-weight:800; color:var(--ink); }
   .exam-card-sub { font-size:12px; color:var(--ink-soft); margin-top:2px; }
   .void-note { background:#FFF0F0; border:1.5px solid #E03B3B; color:#B42318; font-size:13px; font-weight:bold; border-radius:12px; padding:10px 12px; margin-bottom:12px; line-height:1.6; }
+  .entry-final-ov { background:rgba(60,10,10,0.72); }
+  .entry-final { width:100%; max-width:380px; border-radius:22px; overflow:hidden; background:var(--paper); box-shadow:0 24px 60px rgba(0,0,0,.45); text-align:center; animation:popIn .4s cubic-bezier(.2,1.4,.4,1); }
+  .ef-top { background:linear-gradient(135deg,#C62828,#E53935 60%,#FF7043); color:#FFF; padding:18px 16px 16px; position:relative; }
+  .ef-siren { font-size:40px; line-height:1; animation:efShake 1.2s ease-in-out infinite; }
+  .ef-label { display:inline-block; margin:8px 0 6px; background:#FFF; color:#C62828; font-weight:900; font-size:15px; letter-spacing:.12em; border-radius:999px; padding:4px 16px; animation:efPulse 1.1s ease-in-out infinite; }
+  .ef-title { font-family:var(--font-display); font-weight:800; font-size:19px; line-height:1.4; }
+  .ef-body { padding:16px 18px 16px; }
+  .ef-date { display:flex; flex-direction:column; align-items:center; border:2.5px solid #C62828; border-radius:16px; padding:8px 10px 10px; margin-bottom:12px; background:#FFF5F5; }
+  .ef-date small { font-size:12px; font-weight:800; color:#C62828; letter-spacing:.1em; }
+  .ef-date b { font-family:var(--font-display); font-size:44px; line-height:1.1; color:#B71C1C; } .ef-date b span { font-size:20px; }
+  .ef-date em { font-style:normal; font-weight:900; color:#FFF; background:#C62828; border-radius:999px; padding:2px 12px; margin-top:4px; font-size:14px; }
+  .ef-done { font-weight:800; color:#1E7A46; background:#E7F5EC; border-radius:12px; padding:8px; margin-bottom:10px; }
+  .ef-text { font-size:14px; line-height:1.7; color:var(--ink); margin:0 0 12px; } .ef-text b { color:#B71C1C; }
+  .ef-btn { width:100%; background:#C62828; font-size:17px; padding:14px; }
+  @keyframes efPulse { 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.08); } }
+  @keyframes efShake { 0%,100%{ transform:rotate(0); } 20%{ transform:rotate(-12deg); } 40%{ transform:rotate(10deg); } 60%{ transform:rotate(-6deg); } }
   .news-overlay { position:fixed; inset:0; background:rgba(20,30,25,0.55); z-index:10001; display:flex; align-items:center; justify-content:center; padding:20px; box-sizing:border-box; }
   .entry-period { background:#FFF4E5; border:1.5px solid #E8A33D; border-radius:12px; padding:10px 12px; margin:6px 0 10px; font-size:13.5px; line-height:1.7; color:var(--ink); }
   .entry-period b { color:#C0392B; }
@@ -602,7 +618,7 @@
   .sh-door{position:absolute;left:50%;top:22px;width:40px;height:56px;margin-left:-20px;background:linear-gradient(#6A4429,#3E2716);border:3px solid #E9DCC2;border-bottom:none;border-radius:5px 5px 0 0;}
   .sh-floor{position:absolute;left:-30%;right:-30%;top:78px;bottom:0;background:repeating-conic-gradient(#F1E6D0 0 25%,#C7B08A 0 50%) 0 0/34px 34px;transform:perspective(160px) rotateX(50deg);transform-origin:top;}
   .sh-cust{position:absolute;left:38%;bottom:22px;width:58px;margin-left:-29px;animation:shWalk 2.6s ease-in-out infinite;transform-origin:50% 100%;}
-  .sh-cust .sim-person{width:100%;display:block;}
+  .sh-cust .sim-person{display:block;width:100%;}
   @keyframes shWalk{0%{transform:translateY(-34px) scale(.45);opacity:0;}15%{opacity:1;}60%,100%{transform:none;opacity:1;}}
   .sh-counter{position:absolute;left:0;right:0;bottom:0;height:30px;background:linear-gradient(#8A5532,#5A341C);border-top:6px solid #1C3B32;}
   .sh-bubble{position:absolute;right:12px;top:44px;background:#FFF;color:var(--ink);border-radius:12px;padding:6px 9px;font-size:11px;font-weight:800;line-height:1.4;text-align:left;box-shadow:0 4px 10px rgba(0,0,0,.2);animation:shBub 2.6s ease infinite;}
@@ -633,7 +649,8 @@
   .sim-table::after{content:"";position:absolute;left:32px;top:12px;width:6px;height:34px;background:#8D8D8D;}
   .sim-table.l{left:5%;} .sim-table.r{right:5%;}
   .sim-cust{position:absolute;left:50%;bottom:56px;width:112px;transform:translate(-50%,0);transform-origin:50% 100%;z-index:3;}
-  .sim-person{width:100%;display:block;}
+  .sim-person{width:100%;display:block;filter:drop-shadow(0 6px 6px rgba(0,0,0,.28)) drop-shadow(0 1px 0 rgba(255,255,255,.25));}
+  .sim-cust-shadow{position:absolute;left:10%;right:10%;bottom:-6px;height:16px;border-radius:50%;background:radial-gradient(rgba(0,0,0,.35),rgba(0,0,0,0) 70%);}
   .sim-cust.walking .sim-person{animation:simBob .38s ease-in-out infinite alternate;transform-origin:50% 100%;}
   @keyframes simBob{from{transform:translateY(0) rotate(-2deg);}to{transform:translateY(-7px) rotate(2deg);}}
   .sim-counter{position:absolute;left:0;right:0;bottom:0;height:72px;background:linear-gradient(#8A5532,#5A341C);border-top:9px solid #2E5A4C;z-index:4;box-shadow:0 -4px 10px rgba(0,0,0,.18);}
@@ -650,9 +667,10 @@
   .sim-bag-top{position:absolute;top:0;left:0;right:0;height:10px;background:rgba(0,0,0,.2);border-radius:5px 5px 0 0;}
   .sim-bag.blonde{background:#F3D98B;color:#5A4210;} .sim-bag.medium{background:#B7804F;color:#FFF;} .sim-bag.dark{background:#5B3A7E;color:#FFF;}
   .sim-bag.on{border-color:#1E7A46;box-shadow:0 0 0 3px rgba(30,122,70,.4);transform:translateY(-3px);}
-  .sim-grind{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 6px;-webkit-overflow-scrolling:touch;}
-  .sim-grind button{flex:0 0 auto;min-width:40px;height:40px;border-radius:50%;border:1.5px solid var(--line);background:var(--paper);font-weight:800;font-size:15px;color:var(--ink);cursor:pointer;font-family:var(--font-body);}
-  .sim-grind button.wb{border-radius:999px;padding:0 12px;font-size:12.5px;}
+  .sim-grind{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:2px 0;}
+  .sim-grind button{width:100%;height:46px;border-radius:12px;padding:0;border:1.5px solid var(--line);background:var(--paper);font-weight:800;font-size:15px;color:var(--ink);cursor:pointer;font-family:var(--font-body);}
+  .sim-grind button.wb{font-size:11px;line-height:1.2;}
+  .sim-grind-scale{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-soft);margin:5px 2px 0;}
   .sim-grind button.on{background:var(--forest);border-color:var(--forest);color:#F6EFDD;}
   .sim-serve{width:100%;margin-top:14px;font-size:17px;} .sim-serve:disabled{opacity:.45;}
   .sim-result{margin-top:12px;background:var(--paper);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;}
@@ -1213,7 +1231,17 @@
     {id:799,c:'equip',q:'レギュラー店舗のClover Vertica™について正しいのはどれでしょう？',o:['コーヒー豆を選べるのはHOTのみで、ICEDはバッチブリューのため原則1種類','HOTもICEDも、6種類の中から自由にコーヒー豆を選べる','ICEDのみコーヒー豆を選べて、HOTは原則1種類','HOTもICEDも、コーヒー豆は1種類に固定されている'],a:0,n:'レギュラー店舗でコーヒー豆を選べるのはHOTのみです。ICEDはバッチブリューのため原則1種類（DHOを含めると2種類）になります。'},
     {id:800,c:'ops',q:'お客様が持ち込んだコーヒー豆のグラインドについて、正しいのはどれでしょう？',o:['有料（50円）でグラインドできる','スターバックスの海外製品で開封済みでも、無料でグラインドできる','国内で販売された未開封の商品に限り、グラインドできる','フレーバーコーヒーでも、スターバックスの商品ならグラインドできる'],a:1,n:'スターバックスの商品で、フレーバーコーヒーではなく、異臭・異物の混入などの異常がなければ、無料でグラインドできます。海外製品でも、店舗販売品以外のスターバックスブランドの商品でも、開封済みでも対応できます。'},
     {id:801,c:'ops',q:'プロモーションのコーヒー豆を配布できるのは、いつからでしょう？',o:['プロモーション開始の1週間前の、プレスリリース開示日から','プロモーション開始の当日から','プロモーション開始の前日から','プロモーション開始の1か月前から'],a:0,n:'プロモーション豆は、プロモーションスタートの1週間前のプレスリリース開示日から配布できます。'},
-    {id:802,c:'core',q:'LNBのパッケージで、ハチドリの羽に使われている、スターバックス特有の緑色を何と呼ぶでしょう？',o:['エプロングリーン','ロゴグリーン','サイレングリーン','ハウスグリーン'],a:3,n:'LNB は「スターバックス ライトノート ブレンド」です。葉っぱの鮮やかなアクセントカラーと、ラテンアメリカの農園でよく見られるハチドリの羽に使われている「ハウスグリーン」が、いきいきとした味わいを表現しています。'}
+    {id:802,c:'core',q:'LNBのパッケージで、ハチドリの羽に使われている、スターバックス特有の緑色を何と呼ぶでしょう？',o:['エプロングリーン','ロゴグリーン','サイレングリーン','ハウスグリーン'],a:3,n:'LNB は「スターバックス ライトノート ブレンド」です。葉っぱの鮮やかなアクセントカラーと、ラテンアメリカの農園でよく見られるハチドリの羽に使われている「ハウスグリーン」が、いきいきとした味わいを表現しています。'},
+    {id:803,c:'core',q:'XMBの酸味とコクの組み合わせとして正しいのはどれでしょう？',o:['酸味：HIGH ／ コク：LIGHT','酸味：LOW ／ コク：FULL','酸味：MEDIUM ／ コク：MEDIUM','酸味：HIGH ／ コク：FULL'],a:0,n:'XMB は「スターバックス クリスマス ブロンド ロースト」です。ブロンドローストで、酸味HIGH・コクLIGHTです。'},
+    {id:804,c:'core',q:'XMBの風味のキーワードとして正しいのはどれでしょう？',o:['キャンディードピーカンやセージを思わせる風味','シュガープラムやスモークしたバニラを思わせる風味','オレンジやスパイス、イチジクを思わせる風味','スパイスの効いたチョコレートやスプルースの新芽を思わせるハーブの風味'],a:2,n:'XMB は「スターバックス クリスマス ブロンド ロースト」です。Notes of Spiced Orange & Fig Compote（オレンジやスパイス、イチジクを思わせる風味）です。'},
+    {id:805,c:'core',q:'XMEの風味のキーワードとして正しいのはどれでしょう？',o:['シュガープラムやスモークしたバニラを思わせる風味','オレンジやスパイス、イチジクを思わせる風味','豊かな風味とキャラメルのような甘み','スパイスの効いたチョコレートやスプルースの新芽を思わせるハーブの風味'],a:0,n:'XME は「スターバックス クリスマス ブレンド エスプレッソ ロースト」です。Notes of Sugar Plum & Smoked Vanilla（シュガープラムやスモークしたバニラを思わせる風味）です。'},
+    {id:806,c:'core',q:'XMAと相性のよい風味の組み合わせとして正しいのはどれでしょう？',o:['ハーブ、チーズ','シトラス、ベリークランブル','ジンジャー、ドライフルーツ、カスタード','ダークチョコレート、ベーキングスパイス'],a:2,n:'XMA は「スターバックス クリスマス ブレンド」です。相性のよい風味はジンジャー、ドライフルーツ、カスタードです。ダークチョコレート、ベーキングスパイスはXME、シトラス、ベリークランブルはXMBです。'},
+    {id:807,c:'core',q:'XMEは、どのコア豆のホリデー版として発売されたでしょう？',o:['ITA','FRE','VER','ESP'],a:3,n:'XME は「スターバックス クリスマス ブレンド エスプレッソ ロースト」です。ESP（エスプレッソ ロースト）のホリデー版として2010年に発売されました。'},
+    {id:808,c:'core',q:'XMBが開発された年として正しいのはどれでしょう？（2020年から今のレシピになっています）',o:['2020年','2012年','1984年','2010年'],a:1,n:'XMB は「スターバックス クリスマス ブロンド ロースト」です。クリスマス ブレンドをより軽やかに楽しめるように2012年に開発され、2020年から今のレシピになりました。'},
+    {id:809,c:'misc',q:'DXMのカフェインの除去方法として正しいのはどれでしょう？',o:['二酸化炭素抽出法','酵素分解法','ダイレクトコンタクト法','ウォータープロセス'],a:3,n:'DXM は「スターバックス ディカフェ クリスマス ブレンド」です。クリスマス ブレンドの風味や味わいはそのままに、ウォータープロセスでカフェインを除去しています（一部店舗）。'},
+    {id:810,c:'core',q:'クリスマスシリーズのうち、店舗でのドリップ提供がHOTもICEDも可能なのはどれでしょう？',o:['XMA','DXM','XMB','XME'],a:2,n:'XMB（スターバックス クリスマス ブロンド ロースト）はHOT・ICEDとも可能です。XMA・XME・DXMはHOTのみです。'},
+    {id:811,c:'core',q:'XMAに使われている「スプルースの新芽」の風味の特徴として正しいのはどれでしょう？',o:['明るい柑橘系の風味と、やや苦味のある味わい','バニラのような甘い香り','ベリーのような甘酸っぱさ','ナッツのような香ばしさ'],a:0,n:'XMA は「スターバックス クリスマス ブレンド」です。スプルースの新芽は明るい柑橘系の風味とやや苦味のある味わいが特徴で、北米ではスプルースの木がクリスマスツリーに使われることもあります。'},
+    {id:812,c:'core',q:'XMBのリージョンとして正しいのはどれでしょう？',o:['ラテンアメリカ','マルチリージョン（アフリカ、アジア／太平洋）','マルチリージョン（ラテンアメリカ、アフリカ）','マルチリージョン（ラテンアメリカ、アジア／太平洋）'],a:1,n:'XMB は「スターバックス クリスマス ブロンド ロースト」です。アフリカとアジア／太平洋のマルチリージョンです。XMA・XME・DXMはラテンアメリカとアジア／太平洋です。'}
   ];
 
   // 抽出器具のイメージ図（SVG）。答えが分かってしまう問題には付けない
@@ -3478,7 +3506,11 @@
     {"id": "t197", "c": "equip", "s": "Clover Vertica™は、それぞれのコーヒー豆に最適なレシピで、1杯ごとに豆を挽いて抽出する。", "a": true, "n": "豆ごとに最適なレシピで1杯ずつ挽き、約30秒で抽出します。"},
     {"id": "t198", "c": "ops", "s": "お客様が持ち込んだスターバックスのコーヒー豆は、開封済みのものでもグラインドできる。", "a": true, "n": "スターバックスの商品で、フレーバーコーヒーではなく、異臭・異物の混入などがなければ、開封済みでも無料でグラインドできます。"},
     {"id": "t199", "c": "ops", "s": "お客様が持ち込んだスターバックスのフレーバーコーヒーは、無料でグラインドできる。", "a": false, "n": "フレーバーコーヒーはグラインドできません。"},
-    {"id": "t200", "c": "ops", "s": "プロモーションのコーヒー豆は、プロモーション開始の当日から配布できる。", "a": false, "n": "プロモーション開始の1週間前の、プレスリリース開示日から配布できます。"}
+    {"id": "t200", "c": "ops", "s": "プロモーションのコーヒー豆は、プロモーション開始の当日から配布できる。", "a": false, "n": "プロモーション開始の1週間前の、プレスリリース開示日から配布できます。"},
+    {"id": "t201", "c": "core", "s": "XMBは、クリスマス ブレンドをより軽やかに楽しめるように開発されたブロンドローストである。", "a": true, "n": "XMB（スターバックス クリスマス ブロンド ロースト）は2012年に開発され、2020年から今のレシピです。"},
+    {"id": "t202", "c": "core", "s": "XMEと相性のよい風味は、ジンジャー、ドライフルーツ、カスタードである。", "a": false, "n": "それはXMA（クリスマス ブレンド）とDXMです。XMEはダークチョコレート、ベーキングスパイスです。"},
+    {"id": "t203", "c": "core", "s": "DXMは、クリスマス ブレンドの風味や味わいはそのままに、カフェインを除去したコーヒーである。", "a": true, "n": "DXM（ディカフェ クリスマス ブレンド）はウォータープロセスでカフェインを除去しています。"},
+    {"id": "t204", "c": "core", "s": "XMAは、酸味がHIGH、コクがLIGHTのコーヒーである。", "a": false, "n": "XMA（クリスマス ブレンド）はダークローストで、酸味LOW・コクFULLです。HIGH・LIGHTはXMBです。"}
   ];
   var TF_COUNT = 15, TF_MULTI_SETS = 5;
   // BAバトルでは出さない、やさしめの文（ひとり練習では出題する）
@@ -3572,7 +3604,11 @@
     {"id": "h87", "c": "core", "s": "ICBは、2006年に「テラッツァ ブレンド」として登場した。", "a": true, "n": "ICB（アイスコーヒー ブレンド）は今年で20年を迎えます。"},
     {"id": "h88", "c": "equip", "s": "Clover Vertica™には、コーヒー豆を入れるホッパーが8つある。", "a": false, "n": "ホッパーは6つです。"},
     {"id": "h89", "c": "equip", "s": "Clover Vertica™は、1杯を約60秒で抽出する。", "a": false, "n": "約30秒で抽出します。"},
-    {"id": "h90", "c": "equip", "s": "Clover Vertica™は、抽出時間と温度をデジタル制御している。", "a": true, "n": "抽出時間や温度をデジタル制御し、バキュームプレス方式で抽出します。"}
+    {"id": "h90", "c": "equip", "s": "Clover Vertica™は、抽出時間と温度をデジタル制御している。", "a": true, "n": "抽出時間や温度をデジタル制御し、バキュームプレス方式で抽出します。"},
+    {"id": "h91", "c": "core", "s": "XMEは、2012年にエスプレッソ ローストのホリデー版として発売された。", "a": false, "n": "XMEの発売は2010年です。2012年はXMBが開発された年です。"},
+    {"id": "h92", "c": "core", "s": "XMBのリージョンは、アフリカとアジア／太平洋のマルチリージョンである。", "a": true, "n": "XMB（クリスマス ブロンド ロースト）はアフリカ、アジア／太平洋です。"},
+    {"id": "h93", "c": "core", "s": "XMEの加工法は、水洗式と半水洗式の2種類である。", "a": false, "n": "XMEは水洗式・半水洗式・乾燥式の3種類です。水洗式・半水洗式の2種類なのはXMAとDXMです。"},
+    {"id": "h94", "c": "core", "s": "DXMは、店舗でICEDのドリップ提供もできる。", "a": false, "n": "DXM（ディカフェ クリスマス ブレンド）のドリップ提供はHOTのみです。"}
   ];
   var TF_BATTLE_EASY = ['t2','t21','t22','t40','t42','t43','t44','t63','t71','t72','t73','t81','t82','t92','t93','t102','t113','t125','t126','t132','t134','t136','t141','t143','t150','t152','t155','t157','t159','t165'];
   var tfStats = {};          // {id:{seen, correct, streak}}
@@ -4098,10 +4134,14 @@
     var id = 'gs' + Math.random().toString(36).slice(2, 7);
     return '<svg viewBox="0 0 120 200" class="sim-person" aria-hidden="true"><defs><pattern id="' + id + '" width="12" height="11" patternUnits="userSpaceOnUse"><rect width="12" height="11" fill="#FFF"/><rect y="0" width="12" height="3.2" fill="#1B1B1B"/></pattern></defs>' +
       '<path d="M34 200 Q33 128 60 122 Q87 128 86 200 Z" fill="url(#' + id + ')" stroke="#1B1B1B" stroke-width="1.2"/>' +
+      '<path d="M34 200 Q33 150 40 134 L44 200 Z" fill="#000" opacity=".18"/><path d="M86 200 Q87 150 80 134 L76 200 Z" fill="#000" opacity=".18"/>' +
       '<path d="M50 122 Q60 132 70 122" fill="none" stroke="#1B1B1B" stroke-width="2"/>' +
       '<rect x="55" y="96" width="10" height="28" rx="4" fill="' + lk.skin + '"/>' +
       '<path d="M26 64 Q20 44 32 40 L88 40 Q100 44 94 64 Q96 80 88 84 L32 84 Q24 80 26 64 Z" fill="#E6E6E6" stroke="#BDBDBD" stroke-width="1"/>' +
-      '<ellipse cx="60" cy="62" rx="29" ry="36" fill="' + lk.skin + '"/>' +
+      '<radialGradient id="' + id + 'f" cx="40%" cy="35%" r="70%"><stop offset="0%" stop-color="' + simShade(lk.skin, 16) + '"/><stop offset="70%" stop-color="' + lk.skin + '"/><stop offset="100%" stop-color="' + simShade(lk.skin, -36) + '"/></radialGradient>' +
+      '<ellipse cx="31" cy="66" rx="5" ry="8" fill="' + simShade(lk.skin, -15) + '"/><ellipse cx="89" cy="66" rx="5" ry="8" fill="' + simShade(lk.skin, -15) + '"/>' +
+      '<ellipse cx="60" cy="62" rx="29" ry="36" fill="url(#' + id + 'f)"/>' +
+      '<path d="M58 70 Q56 77 60 78 Q63 78 62 75" stroke="' + simShade(lk.skin, -50) + '" stroke-width="1.5" fill="none" stroke-linecap="round"/>' +
       '<path d="M30 52 Q31 20 60 20 Q89 20 90 52 Q77 40 60 40 Q43 40 30 52 Z" fill="#D7263D"/>' +
       '<circle cx="44" cy="31" r="1.8" fill="#FFF"/><circle cx="58" cy="26" r="1.8" fill="#FFF"/><circle cx="72" cy="29" r="1.8" fill="#FFF"/><circle cx="82" cy="38" r="1.6" fill="#FFF"/><circle cx="36" cy="42" r="1.6" fill="#FFF"/>' +
       '<path d="M88 44 L104 36 L100 50 Z" fill="#D7263D"/><path d="M88 46 L102 56 L92 60 Z" fill="#B81E33"/><circle cx="89" cy="46" r="3.5" fill="#B81E33"/>' +
@@ -4113,20 +4153,39 @@
       '<path class="sim-mouth" d="M50 82 Q60 91 70 82" stroke="#8A3B2E" stroke-width="3" fill="none" stroke-linecap="round"/>' +
       '</svg>';
   }
+  // 陰影（グラデーション）と影をつけて、少し立体的に見せる
+  function simShade(hex, amt){
+    var n = parseInt(hex.slice(1), 16), r = (n >> 16) + amt, g = ((n >> 8) & 255) + amt, bl = (n & 255) + amt;
+    var c = function(v){ return Math.max(0, Math.min(255, v)); };
+    return '#' + ((1 << 24) + (c(r) << 16) + (c(g) << 8) + c(bl)).toString(16).slice(1);
+  }
   function simPersonSvg(lk){
     if(lk.style === 'granny') return simGrannySvg(lk);
-    var hairBack = lk.style === 'long' ? '<path d="M18 40 Q16 86 30 96 L90 96 Q104 86 102 40 Z" fill="' + lk.hair + '"/>' : '';
-    var hairTop = lk.style === 'bun' ? '<circle cx="60" cy="14" r="12" fill="' + lk.hair + '"/><path d="M26 44 Q28 16 60 16 Q92 16 94 44 Q84 30 60 30 Q36 30 26 44 Z" fill="' + lk.hair + '"/>'
-      : lk.style === 'short' ? '<path d="M25 46 Q24 14 60 14 Q96 14 95 46 Q88 28 60 28 Q34 28 25 46 Z" fill="' + lk.hair + '"/>'
-      : '<path d="M22 56 Q18 14 60 14 Q102 14 98 56 Q94 34 80 30 Q60 40 34 32 Q24 40 22 56 Z" fill="' + lk.hair + '"/>';
-    return '<svg viewBox="0 0 120 200" class="sim-person" aria-hidden="true">' + hairBack +
-      '<path d="M20 200 Q20 120 60 116 Q100 120 100 200 Z" fill="' + lk.shirt + '"/>' +
-      '<path d="M48 118 L60 134 L72 118 Z" fill="#FFF" opacity=".85"/>' +
-      '<rect x="52" y="96" width="16" height="22" rx="6" fill="' + lk.skin + '"/>' +
-      '<ellipse cx="60" cy="58" rx="36" ry="40" fill="' + lk.skin + '"/>' + hairTop +
-      '<ellipse cx="46" cy="62" rx="4" ry="5.5" fill="#2A1B12"/><ellipse cx="74" cy="62" rx="4" ry="5.5" fill="#2A1B12"/>' +
-      '<circle cx="47.5" cy="60" r="1.4" fill="#FFF"/><circle cx="75.5" cy="60" r="1.4" fill="#FFF"/>' +
-      '<ellipse cx="38" cy="76" rx="6" ry="3.5" fill="#F19C9C" opacity=".55"/><ellipse cx="82" cy="76" rx="6" ry="3.5" fill="#F19C9C" opacity=".55"/>' +
+    var id = 'p' + Math.random().toString(36).slice(2, 7);
+    var defs = '<defs>' +
+      '<radialGradient id="' + id + 'f" cx="40%" cy="35%" r="70%"><stop offset="0%" stop-color="' + simShade(lk.skin, 18) + '"/><stop offset="70%" stop-color="' + lk.skin + '"/><stop offset="100%" stop-color="' + simShade(lk.skin, -38) + '"/></radialGradient>' +
+      '<linearGradient id="' + id + 's" x1="0" x2="1"><stop offset="0%" stop-color="' + simShade(lk.shirt, -45) + '"/><stop offset="35%" stop-color="' + simShade(lk.shirt, 18) + '"/><stop offset="70%" stop-color="' + lk.shirt + '"/><stop offset="100%" stop-color="' + simShade(lk.shirt, -55) + '"/></linearGradient>' +
+      '<linearGradient id="' + id + 'h" x1="0" y1="0" x2="0.4" y2="1"><stop offset="0%" stop-color="' + simShade(lk.hair, 45) + '"/><stop offset="45%" stop-color="' + lk.hair + '"/><stop offset="100%" stop-color="' + simShade(lk.hair, -25) + '"/></linearGradient>' +
+      '<radialGradient id="' + id + 'e" cx="35%" cy="30%" r="70%"><stop offset="0%" stop-color="#5A4030"/><stop offset="100%" stop-color="#140C08"/></radialGradient>' +
+      '</defs>';
+    var H = 'url(#' + id + 'h)';
+    var hairBack = lk.style === 'long' ? '<path d="M18 40 Q16 86 30 96 L90 96 Q104 86 102 40 Z" fill="' + simShade(lk.hair, -20) + '"/>' : '';
+    var hairTop = lk.style === 'bun' ? '<circle cx="60" cy="14" r="12" fill="' + H + '"/><path d="M26 44 Q28 16 60 16 Q92 16 94 44 Q84 30 60 30 Q36 30 26 44 Z" fill="' + H + '"/>'
+      : lk.style === 'short' ? '<path d="M25 46 Q24 14 60 14 Q96 14 95 46 Q88 28 60 28 Q34 28 25 46 Z" fill="' + H + '"/>'
+      : '<path d="M22 56 Q18 14 60 14 Q102 14 98 56 Q94 34 80 30 Q60 40 34 32 Q24 40 22 56 Z" fill="' + H + '"/>';
+    return '<svg viewBox="0 0 120 200" class="sim-person" aria-hidden="true">' + defs + hairBack +
+      '<path d="M14 200 Q14 128 34 122 L86 122 Q106 128 106 200 Z" fill="url(#' + id + 's)"/>' +
+      '<path d="M14 200 Q14 150 22 136 L26 200 Z" fill="' + simShade(lk.shirt, -60) + '" opacity=".5"/><path d="M106 200 Q106 150 98 136 L94 200 Z" fill="' + simShade(lk.shirt, -60) + '" opacity=".5"/>' +
+      '<path d="M46 120 L60 138 L74 120 Z" fill="#FFF" opacity=".9"/>' +
+      '<rect x="51" y="94" width="18" height="30" rx="7" fill="' + simShade(lk.skin, -22) + '"/>' +
+      '<ellipse cx="60" cy="100" rx="13" ry="5" fill="' + simShade(lk.skin, -50) + '" opacity=".45"/>' +
+      '<ellipse cx="24" cy="62" rx="6" ry="9" fill="' + simShade(lk.skin, -15) + '"/><ellipse cx="96" cy="62" rx="6" ry="9" fill="' + simShade(lk.skin, -15) + '"/>' +
+      '<ellipse cx="60" cy="58" rx="36" ry="40" fill="url(#' + id + 'f)"/>' + hairTop +
+      '<path d="M58 66 Q56 74 60 75 Q63 75 62 72" stroke="' + simShade(lk.skin, -50) + '" stroke-width="1.6" fill="none" stroke-linecap="round"/>' +
+      '<ellipse cx="46" cy="62" rx="4.2" ry="5.8" fill="url(#' + id + 'e)"/><ellipse cx="74" cy="62" rx="4.2" ry="5.8" fill="url(#' + id + 'e)"/>' +
+      '<circle cx="47.6" cy="59.6" r="1.6" fill="#FFF"/><circle cx="75.6" cy="59.6" r="1.6" fill="#FFF"/>' +
+      '<ellipse cx="38" cy="76" rx="6" ry="3.5" fill="#F19C9C" opacity=".5"/><ellipse cx="82" cy="76" rx="6" ry="3.5" fill="#F19C9C" opacity=".5"/>' +
+      '<ellipse cx="48" cy="40" rx="10" ry="5" fill="#FFF" opacity=".18"/>' +
       '<path class="sim-mouth" d="M50 80 Q60 90 70 80" stroke="#8A3B2E" stroke-width="3" fill="none" stroke-linecap="round"/>' +
       '</svg>';
   }
@@ -4153,15 +4212,15 @@
     html += '<div class="sim-hud"><span>👤 ' + (sim.i + 1) + ' / ' + SIM_N + '人目</span><span>⭐ ' + sim.score + '点</span></div>';
     html += '<div class="sim-scene" id="simScene"><div class="sim-wall"><div class="sim-win"></div><div class="sim-gap"></div><div class="sim-win"></div><div class="sim-lamp a"></div><div class="sim-lamp b"></div></div>';
     html += '<div class="sim-floor"></div><div class="sim-door"></div><div class="sim-table l"></div><div class="sim-table r"></div>';
-    html += '<div class="sim-cust" id="simCust">' + simPersonSvg(o.look) + '</div>';
+    html += '<div class="sim-cust" id="simCust"><div class="sim-cust-shadow"></div>' + simPersonSvg(o.look) + '</div>';
     html += '<div class="sim-bubble" id="simBubble"><p>' + esc(o.line) + '</p><p class="brew">🫖 ' + esc(o.brewLine) + '</p></div>';
     html += '<div class="sim-counter"></div><div class="sim-patience"><i id="simPat"></i></div></div>';
     html += '<div class="sim-panel" id="simPanel">';
     html += '<div class="sim-lbl">① コーヒー豆を選ぶ</div><div class="sim-shelf">' + simPool().map(simBagHtml).join('') + '</div>';
     html += '<div class="sim-lbl">② 挽き具合を選ぶ（マルコニック）</div><div class="sim-grind">';
-    html += '<button type="button" data-simg="WB" class="wb' + (sim.selGrind === 'WB' ? ' on' : '') + '">豆のまま</button>';
+    html += '<button type="button" data-simg="WB" class="wb' + (sim.selGrind === 'WB' ? ' on' : '') + '">豆の<br>まま</button>';
     for(var g = 1; g <= 13; g++) html += '<button type="button" data-simg="' + g + '" class="' + (String(sim.selGrind) === String(g) ? 'on' : '') + '">' + g + '</button>';
-    html += '</div><button class="btn sim-serve" id="btnSimServe" type="button"' + (sim.selBean && sim.selGrind !== '' ? '' : ' disabled') + '>☕ 提供する</button></div>';
+    html += '</div><div class="sim-grind-scale"><span>← 細かい（1番）</span><span>粗い（13番）→</span></div><button class="btn sim-serve" id="btnSimServe" type="button"' + (sim.selBean && sim.selGrind !== '' ? '' : ' disabled') + '>☕ 提供する</button></div>';
     html += '<div class="sim-result" id="simResult" style="display:none;"></div></div>';
     return html;
   }
@@ -4901,11 +4960,43 @@
     document.getElementById('btnEntryLater').onclick = close;
     box.onclick = function(e){ if(e.target === box) close(); };
   }
+  // 締め切り間近（10/28〜11/3）は、エントリー済みの人も含めて、アプリを開くたびに大きく表示する
+  var ENTRY_FINAL_START = '2026-10-28', entryFinalShown = false;
+  function entryFinalDue(){ var t = todayStr(); return !entryFinalShown && t >= ENTRY_FINAL_START && t <= ENTRY_END; }
+  function showEntryFinalPopup(){
+    entryFinalShown = true;
+    var done = loadJSON(ENTRY_DONE_KEY, false), last = todayStr() === ENTRY_END;
+    var box = document.createElement('div');
+    box.className = 'news-overlay entry-final-ov'; box.id = 'entryOverlay';
+    var h = '<div class="entry-final"><div class="ef-top"><div class="ef-siren">🚨</div><div class="ef-label">' + (last ? '本日締め切り' : '締め切り間近') + '</div><div class="ef-title">FY27 ブラックエプロンチャレンジ<br>エントリー</div></div>';
+    h += '<div class="ef-body"><div class="ef-date"><small>エントリー締め切り</small><b>11/3<span>（火）</span></b>' + (last ? '<em>今日までです！</em>' : '') + '</div>';
+    if(done){
+      h += '<div class="ef-done">✅ あなたはエントリー済みです</div><p class="ef-text">まだエントリーしていない仲間がいたら、<b>今日のうちに声をかけてあげましょう！</b><br>GROWにログインできない人が多いので、早めの確認がおすすめです。</p>';
+      h += '<button class="btn ef-btn" id="btnEntryShare" type="button">📣 仲間に知らせる</button><button class="entry-later" id="btnEntryLater" type="button">閉じる</button>';
+    } else {
+      h += '<p class="ef-text"><b>' + (last ? '今日中にエントリーしないと、受験できません。' : '締め切りを過ぎると、今年は受験できません。') + '</b><br>' + (last ? '今すぐGROWからエントリーしましょう！' : '👉 <b>次の出勤で、必ずエントリーを済ませましょう！</b>') + '</p>';
+      h += '<div class="entry-warn">⚠️ <b>GROWにログインできず、エントリーに時間がかかる人が多いです。</b>ログインできるか、今のうちに確認しておきましょう。</div>';
+      h += '<button class="btn ef-btn" id="btnEntryDone" type="button">✅ エントリーした！</button><button class="entry-later" id="btnEntryLater" type="button">あとで</button>';
+    }
+    box.innerHTML = h + '</div></div>';
+    document.body.appendChild(box);
+    function close(){ if(box.parentNode) box.parentNode.removeChild(box); setTimeout(maybeShowNews, 400); }
+    var d = document.getElementById('btnEntryDone');
+    if(d) d.onclick = function(){ saveJSON(ENTRY_DONE_KEY, true); close(); showBattleNotice('🎉 エントリーおつかれさまでした！受験期間は11/17（火）〜12/9（水）です'); };
+    var sh = document.getElementById('btnEntryShare');
+    if(sh) sh.onclick = function(){
+      var t = '【BAチャレンジ エントリー締め切り】11/3（火）まで！\nまだの人は次の出勤で必ずエントリーしよう。GROWにログインできるかの確認も忘れずに！';
+      if(navigator.share){ navigator.share({ text: t }).catch(function(){}); }
+      else window.open('https://line.me/R/share?text=' + encodeURIComponent(t), '_blank');
+    };
+    document.getElementById('btnEntryLater').onclick = close;
+  }
   function maybeShowNews(){
     if(screen !== 'home' || document.getElementById('entryOverlay') || document.getElementById('newsOverlay')) return;
     var ov0 = document.getElementById('onboardOverlay');
     if(ov0 && ov0.style.display === 'flex') return;
-    if(entryPopupDue()){ showEntryPopup(); return; }
+    if(entryFinalDue()){ showEntryFinalPopup(); return; }
+    if(entryPopupDue() && todayStr() < ENTRY_FINAL_START){ showEntryPopup(); return; }
     if(newsShownThisOpen) return;
     if(!loadJSON(ZUKAN_NEWS_KEY, false)){ showZukanNews(); return; }
     if(loadJSON(NEWS_KEY, false)) return;
